@@ -5,6 +5,28 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.6 — Gửi vào nhóm Zalo, hộp gửi nói rõ ai nhận được
+
+**Nhóm Zalo**
+
+- Màn **Kết nối Zalo** thêm **Chọn nhóm nhận thời khoá biểu**: đọc danh sách nhóm của tài khoản
+  đang đăng nhập, gõ tên để lọc, tích nhóm nào thì nhóm đó thành người nhận.
+- **Gửi vào nhóm không cần số điện thoại, không cần kết bạn** — dùng thẳng mã nhóm.
+  Hợp với nhóm tổ chuyên môn hay nhóm toàn trường.
+- Nhóm hiện ở mục *Người nhận ngoài danh sách*, ghi rõ tên nhóm và số thành viên.
+
+**Hộp tuỳ chọn gửi làm lại**
+
+- Mở ra thấy ngay bốn con số: **gửi được ngay · chưa kết bạn · chưa dò Zalo · không gửi được**.
+- Chia ba tab: *Gửi cho ai* · *Gửi cái gì* · *Lời nhắn*, thay cho một màn dồn hết mọi thứ.
+- Danh sách người nhận nay ghi rõ từng người: **có số điện thoại chưa, đã dò Zalo chưa,
+  đã kết bạn chưa**. Người không gửi được thì làm mờ và không tích vào được.
+- Có **ô tìm** và **bộ lọc theo trạng thái** (chỉ người đã kết bạn, chỉ nhóm, chỉ người chưa kết bạn…),
+  nút chọn hết và bỏ hết.
+- Còn người chưa dò Zalo thì có nút **Dò Zalo ngay** ngay trong hộp, dò xong tự quay lại.
+
+---
+
 ## 0.1.5 — Ảnh thời khoá biểu vẽ lại cho điện thoại, chỉ cần một tệp là chạy
 
 **Ảnh thời khoá biểu**

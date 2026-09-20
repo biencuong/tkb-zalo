@@ -230,6 +230,35 @@ app.whenReady().then(async () => {
     kiem(denNoi.lop === "noi" && denNoi.dap && denNoi.chuky === "1s",
       `nối rồi thì đèn xanh đập mỗi giây (lớp ${denNoi.lop}, chu kỳ ${denNoi.chuky}, chữ "${denNoi.chu}")`);
 
+    // Hộp tuỳ chọn gửi: phải thấy rõ ai gửi được, ai chưa, và chọn tay được.
+    zalo.trangThai.status = "da_ket_noi";
+    zalo.trangThai.ten = "Tai khoan thu";
+    zalo.trangThai.uid = "1";
+    const hopGui = await cua.webContents.executeJavaScript(`(async () => {
+      const m = await import("./js/gui-modal.js");
+      const r = await window.api.tkb.ds();
+      m.moGui(r.ds[0].id);
+      await new Promise((x) => setTimeout(x, 1500));
+      const hop = document.getElementById("hop");
+      const o = hop.querySelectorAll(".ng-o").length;
+      const nhan = [...hop.querySelectorAll(".ng-o .nhan")].map((x) => x.textContent.trim());
+      const co = {
+        so_nguoi: o,
+        co_tab: hop.querySelectorAll("#tab-gui button").length,
+        co_loc: Boolean(hop.querySelector("#loc-hang")),
+        co_o_so: hop.querySelectorAll(".o-so").length,
+        nhan_khac_nhau: [...new Set(nhan)].join(" | "),
+      };
+      document.querySelector("#hop .x")?.click();
+      await new Promise((x) => setTimeout(x, 300));
+      return co;
+    })()`, true);
+    kiem(hopGui.so_nguoi > 0, `hộp gửi liệt kê từng người nhận (${hopGui.so_nguoi} dòng)`);
+    kiem(hopGui.co_tab === 3 && hopGui.co_loc, "hộp gửi chia 3 tab và có bộ lọc theo trạng thái");
+    kiem(hopGui.co_o_so === 4 && hopGui.nhan_khac_nhau.length > 0,
+      `hộp gửi nói rõ ai gửi được ai không (${hopGui.nhan_khac_nhau})`);
+    zalo.trangThai.status = "chua_dang_nhap";
+
     const chipBan = await cua.webContents.executeJavaScript(`document.getElementById("ban-app")?.textContent.trim() || ""`, true);
     kiem(/^v\d+\.\d+\.\d+/.test(chipBan), `chân thanh bên hiện số hiệu chuẩn (${chipBan})`);
 

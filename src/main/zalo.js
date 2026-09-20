@@ -174,6 +174,9 @@ export function dangXuat({ xoaPhien = true } = {}) {
   return { ...trangThai };
 }
 
+/** Trả về đối tượng API của thư viện — dùng cho các việc chưa bọc hàm riêng. */
+export const layApi = () => api;
+
 export const daKetNoi = () => trangThai.status === "da_ket_noi" && Boolean(api);
 
 const nghi = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -261,7 +264,36 @@ export async function moiKetBan(uid, loiNhan = "") {
 }
 
 /** Gửi ẢNH kèm lời nhắn — một tin duy nhất. Dùng Buffer + metadata (tránh lỗi đường dẫn Windows). */
-export async function guiAnh(uid, duongDanAnh, loiNhan, { width, height } = {}) {
+/**
+ * Danh sách nhóm Zalo của tài khoản đang đăng nhập.
+ * Gửi vào nhóm KHÔNG cần số điện thoại — dùng thẳng mã nhóm.
+ */
+export async function dsNhom() {
+  if (!daKetNoi()) throw new Error("Chưa kết nối Zalo.");
+  const g = await api.getAllGroups();
+  const ids = Object.keys(g?.gridVerMap || {});
+  const ra = [];
+  // Hỏi thông tin theo lô cho nhẹ máy chủ
+  for (let i = 0; i < ids.length; i += 50) {
+    const lo = ids.slice(i, i + 50);
+    const info = await api.getGroupInfo(lo);
+    const m = info?.gridInfoMap || {};
+    for (const id of Object.keys(m)) {
+      const x = m[id];
+      ra.push({
+        id: String(x.groupId || id),
+        ten: String(x.name || "(nhóm không tên)"),
+        so_thanh_vien: Number(x.totalMember || 0),
+        la_cong_dong: Number(x.type) === 2,
+      });
+    }
+    if (i + 50 < ids.length) await new Promise((r) => setTimeout(r, ngau(400, 900)));
+  }
+  ra.sort((a, b) => b.so_thanh_vien - a.so_thanh_vien || a.ten.localeCompare(b.ten, "vi"));
+  return ra;
+}
+
+export async function guiAnh(uid, duongDanAnh, loiNhan, { width, height, laNhom = false } = {}) {
   if (!daKetNoi()) throw new Error("Chưa kết nối Zalo.");
   const data = fs.readFileSync(duongDanAnh);
   const r = await api.sendMessage(
@@ -273,7 +305,7 @@ export async function guiAnh(uid, duongDanAnh, loiNhan, { width, height } = {}) 
         metadata: { totalSize: data.length, width: width || 1080, height: height || 1080 },
       }],
     },
-    String(uid), ThreadType.User
+    String(uid), laNhom ? ThreadType.Group : ThreadType.User
   );
   return { ok: true, msg_id: r?.attachment?.[0]?.msgId ? String(r.attachment[0].msgId) : (r?.message?.msgId ? String(r.message.msgId) : "") };
 }
@@ -287,14 +319,14 @@ function coHanCho(viec, giay, loiNeuQua) {
   ]);
 }
 
-export async function guiTep(uid, duongDanTep) {
+export async function guiTep(uid, duongDanTep, { laNhom = false } = {}) {
   if (!daKetNoi()) throw new Error("Chưa kết nối Zalo.");
   // Gửi tệp phải đợi sự kiện "file_done" qua WebSocket. Thiếu trình nghe là treo.
   batTrinhNghe();
   if (!dangNghe) throw new Error("Chưa bật được kênh nhận sự kiện của Zalo nên không gửi tệp được. Thử quét lại mã QR.");
 
   const r = await coHanCho(
-    api.sendMessage({ msg: "", attachments: [duongDanTep] }, String(uid), ThreadType.User),
+    api.sendMessage({ msg: "", attachments: [duongDanTep] }, String(uid), laNhom ? ThreadType.Group : ThreadType.User),
     120,
     "Gửi tệp quá 2 phút chưa xong. Có thể mạng chậm hoặc Zalo chưa xác nhận tải lên."
   );

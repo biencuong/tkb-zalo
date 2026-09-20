@@ -85,94 +85,203 @@ export async function moHopLoi(dotId) {
   }
 }
 
+/** Xếp hạng người nhận: gửi được ngay / gửi được nhưng rủi ro / chưa gửi được. */
+function xepHang(g) {
+  if (g.la_nhom) return { ma: "nhom", nhan: '<span class="nhan n-ok">Nhóm Zalo</span>', thu: 0 };
+  if (!g.dien_thoai) return { ma: "thieu_sdt", nhan: '<span class="nhan n-xau">Chưa có số</span>', thu: 3 };
+  if (!g.zalo_uid) {
+    return g.zalo_trang_thai === "khong_thay"
+      ? { ma: "khong_zalo", nhan: '<span class="nhan n-xau">Số không có Zalo</span>', thu: 3 }
+      : { ma: "chua_do", nhan: '<span class="nhan n-canh">Chưa dò Zalo</span>', thu: 2 };
+  }
+  if (g.la_ban === 0) return { ma: "chua_ban", nhan: '<span class="nhan n-canh">Chưa kết bạn</span>', thu: 1 };
+  return { ma: "san_sang", nhan: '<span class="nhan n-ok">Sẵn sàng</span>', thu: 0 };
+}
+
+/** Một dòng người nhận trong bảng chọn tay. */
+function veDongNguoi(g) {
+  const h = xepHang(g);
+  const chonDuoc = h.ma !== "thieu_sdt" && h.ma !== "khong_zalo";
+  return `<label class="ng-o ${chonDuoc ? "" : "tat"} h-${h.ma}"
+      data-tim="${esc((g.ho_ten + " " + (g.ma_gv || "") + " " + (g.dien_thoai || "") + " " + (g.to_chuyen_mon || "")).toLowerCase())}"
+      data-hang="${h.ma}">
+    <input type="checkbox" name="ng" value="${g.la_nhom ? "ngoai" : "gv"}:${g.id}"
+      ${chonDuoc ? "checked" : "disabled"}>
+    <span class="ng-chu">
+      <b>${esc(g.ho_ten)}</b>
+      <span class="ng-phu">${g.la_nhom
+        ? esc(g.ghi_chu || "Nhóm Zalo")
+        : `${esc(g.ma_gv || "")}${g.to_chuyen_mon ? " · " + esc(g.to_chuyen_mon) : ""}${g.dien_thoai ? " · " + esc(g.dien_thoai) : " · chưa có số"}`}</span>
+    </span>
+    ${h.nhan}
+  </label>`;
+}
+
 /** Bước 1: hộp tuỳ chọn. */
-async function hopTuyChon(tuyChonCu, dsGv) {
+async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
   const cd = (await window.api.app.caiDat()).cai_dat;
   const tc = { ...tuyChonCu };
+  const nguoi = [...dsNhom.map((n) => ({ ...n, la_nhom: 1 })), ...dsGv]
+    .sort((a, b) => xepHang(a).thu - xepHang(b).thu || String(a.ho_ten).localeCompare(String(b.ho_ten), "vi"));
+
+  const dem = { san_sang: 0, nhom: 0, chua_ban: 0, chua_do: 0, thieu_sdt: 0, khong_zalo: 0 };
+  for (const g of nguoi) dem[xepHang(g).ma] += 1;
+  const guiDuoc = dem.san_sang + dem.nhom + dem.chua_ban;
+
   const noiDung = `
+    <div class="luoi c4" style="margin-bottom:.7rem">
+      <div class="o-so vach-ok"><b>Gửi được ngay</b><span class="v">${so(dem.san_sang + dem.nhom)}</span>
+        <span class="g">${so(dem.nhom)} nhóm · ${so(dem.san_sang)} người đã kết bạn</span></div>
+      <div class="o-so ${dem.chua_ban ? "vach-xau" : "vach"}"><b>Chưa kết bạn</b><span class="v">${so(dem.chua_ban)}</span>
+        <span class="g">có thể không nhận được tin</span></div>
+      <div class="o-so ${dem.chua_do ? "vach-xau" : "vach"}"><b>Chưa dò Zalo</b><span class="v">${so(dem.chua_do)}</span>
+        <span class="g">có số nhưng chưa tra Zalo</span></div>
+      <div class="o-so ${dem.thieu_sdt + dem.khong_zalo ? "vach-xau" : "vach"}"><b>Không gửi được</b>
+        <span class="v">${so(dem.thieu_sdt + dem.khong_zalo)}</span>
+        <span class="g">${so(dem.thieu_sdt)} chưa có số · ${so(dem.khong_zalo)} số không có Zalo</span></div>
+    </div>
+
+    ${dem.chua_do ? `<div class="bao canh" style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap">
+      <span><b>${so(dem.chua_do)} người có số điện thoại nhưng chưa tra Zalo.</b>
+        <span class="sua">Tra xong mới gửi được cho họ.</span></span>
+      <button type="button" class="nut nho chinh" id="do-ngay">Dò Zalo ngay</button>
+    </div>` : ""}
+    ${dem.chua_ban ? `<div class="bao canh"><b>${so(dem.chua_ban)} người chưa kết bạn Zalo.</b>
+      <span class="sua">Tin rơi vào mục “Tin nhắn từ người lạ”, nhiều người không mở. Nên kết bạn trước.</span></div>` : ""}
     ${NHAC_NGAN}
-    <div class="luoi c2">
-      <div>
-        <h3>Gửi những gì</h3>
-        <label class="tich"><input type="checkbox" id="t-gv" ${tc.gui_tkb_gv !== false ? "checked" : ""}>
-          <span>Thời khoá biểu <b>cá nhân</b> cho giáo viên</span></label>
-        <label class="tich"><input type="checkbox" id="t-lop" ${tc.gui_tkb_lop_gvcn !== false ? "checked" : ""}>
-          <span>Thời khoá biểu <b>lớp</b> cho chủ nhiệm<span class="g">Lớp chưa có chủ nhiệm sẽ bị bỏ qua.</span></span></label>
-        <label class="tich"><input type="checkbox" id="t-ngoai" ${tc.gui_nguoi_ngoai ? "checked" : ""}>
-          <span>Người <b>ngoài danh sách</b> đã đăng ký</span></label>
 
-        <h3>Dạng tệp</h3>
-        <label class="tich"><input type="checkbox" id="t-anh" ${tc.gui_anh !== false ? "checked" : ""}>
-          <span><b>Ảnh</b> — xem ngay trên điện thoại</span></label>
-        <label class="tich"><input type="checkbox" id="t-docx" ${tc.gui_docx !== false ? "checked" : ""}>
-          <span><b>Tệp Word</b> — tải về in</span></label>
-        <div class="o-nhap" style="max-width:240px"><label>Ảnh gồm buổi nào</label>
-          <select id="t-gom">
-            <option value="ca_ngay" ${tc.anh_gom !== "sang" && tc.anh_gom !== "chieu" ? "selected" : ""}>Cả ngày</option>
-            <option value="sang" ${tc.anh_gom === "sang" ? "selected" : ""}>Chỉ sáng</option>
-            <option value="chieu" ${tc.anh_gom === "chieu" ? "selected" : ""}>Chỉ chiều</option>
-          </select></div>
+    <div class="tab" id="tab-gui">
+      <button class="chon" data-tg="ai">Gửi cho ai (${so(guiDuoc)})</button>
+      <button data-tg="gi">Gửi cái gì</button>
+      <button data-tg="loi">Lời nhắn</button>
+    </div>
+
+    <div data-khu-tg="ai">
+      <div class="hang-nut" style="margin:.2rem 0 .5rem">
+        <input type="search" id="loc-ng" placeholder="Tìm tên, mã, số điện thoại, tổ…" style="flex:1;min-width:200px">
+        <select id="loc-hang" style="width:auto">
+          <option value="">Tất cả</option>
+          <option value="san_sang">Chỉ người đã kết bạn</option>
+          <option value="nhom">Chỉ nhóm Zalo</option>
+          <option value="chua_ban">Chỉ người chưa kết bạn</option>
+          <option value="chua_do">Chỉ người chưa dò Zalo</option>
+        </select>
+        <button type="button" class="nut nho" id="chon-het">Chọn hết</button>
+        <button type="button" class="nut nho" id="bo-het">Bỏ hết</button>
       </div>
-      <div>
-        <h3>Tránh gửi trùng</h3>
-        <label class="tich"><input type="checkbox" id="t-botrung" ${tc.bo_qua_trung !== false ? "checked" : ""}>
-          <span>Bỏ qua người <b>đã nhận y nguyên</b></span></label>
-        <label class="tich"><input type="checkbox" id="t-thaydoi" ${tc.chi_thay_doi ? "checked" : ""}>
-          <span>Chỉ gửi người <b>có thay đổi</b></span></label>
+      <p class="nho mo" id="dem-ng" style="margin:0 0 .4rem"></p>
+      <div class="ds-nguoi" id="ds-ng">${nguoi.map(veDongNguoi).join("")}</div>
+      <p class="nho mo" style="margin:.5rem 0 0">Dòng mờ là không gửi được: chưa có số điện thoại,
+        hoặc số đó không dùng Zalo.</p>
+    </div>
 
-        <h3>Người nhận</h3>
-        <label class="tich"><input type="radio" name="ai" value="tat_ca" checked><span>Tất cả</span></label>
-        <label class="tich"><input type="radio" name="ai" value="gvcn"><span>Chỉ giáo viên chủ nhiệm</span></label>
-        <label class="tich"><input type="radio" name="ai" value="chon"><span>Chọn tay</span></label>
-        <div id="khung-chon" hidden>
-          <div class="hang-nut" style="margin:.3rem 0">
-            <button type="button" class="nut nho" id="chon-het">Chọn hết</button>
-            <button type="button" class="nut nho" id="bo-het">Bỏ hết</button>
-            <input type="search" id="loc-gv" placeholder="Lọc tên…" style="max-width:150px">
-          </div>
-          <div class="ds-tich" id="ds-chon" style="max-height:170px">${dsGv.map((g) =>
-            `<label class="tich" data-ten="${esc(g.ho_ten.toLowerCase())}"><input type="checkbox" name="ng" value="gv:${g.id}" checked>
-              <span>${esc(g.ho_ten)} <span class="g">${esc(g.ma_gv)}</span></span></label>`).join("")}</div>
+    <div data-khu-tg="gi" hidden>
+      <div class="luoi c2">
+        <div>
+          <h3>Gửi những gì</h3>
+          <label class="tich"><input type="checkbox" id="t-gv" ${tc.gui_tkb_gv !== false ? "checked" : ""}>
+            <span>Thời khoá biểu <b>cá nhân</b> cho giáo viên</span></label>
+          <label class="tich"><input type="checkbox" id="t-lop" ${tc.gui_tkb_lop_gvcn !== false ? "checked" : ""}>
+            <span>Thời khoá biểu <b>lớp</b> cho chủ nhiệm<span class="g">Lớp chưa có chủ nhiệm sẽ bị bỏ qua.</span></span></label>
+          <label class="tich"><input type="checkbox" id="t-ngoai" ${tc.gui_nguoi_ngoai ? "checked" : ""}>
+            <span>Người <b>ngoài danh sách</b> và <b>nhóm Zalo</b> đã đăng ký</span></label>
+        </div>
+        <div>
+          <h3>Dạng tệp</h3>
+          <label class="tich"><input type="checkbox" id="t-anh" ${tc.gui_anh !== false ? "checked" : ""}>
+            <span><b>Ảnh</b> — xem ngay trên điện thoại</span></label>
+          <label class="tich"><input type="checkbox" id="t-docx" ${tc.gui_docx !== false ? "checked" : ""}>
+            <span><b>Tệp Word</b> — tải về in<span class="g">Không có tệp Word thì mục này tự bỏ qua.</span></span></label>
+          <div class="o-nhap" style="max-width:240px"><label>Ảnh gồm buổi nào</label>
+            <select id="t-gom">
+              <option value="ca_ngay" ${tc.anh_gom !== "sang" && tc.anh_gom !== "chieu" ? "selected" : ""}>Cả ngày</option>
+              <option value="sang" ${tc.anh_gom === "sang" ? "selected" : ""}>Chỉ sáng</option>
+              <option value="chieu" ${tc.anh_gom === "chieu" ? "selected" : ""}>Chỉ chiều</option>
+            </select></div>
+
+          <h3>Tránh gửi trùng</h3>
+          <label class="tich"><input type="checkbox" id="t-botrung" ${tc.bo_qua_trung !== false ? "checked" : ""}>
+            <span>Bỏ qua người <b>đã nhận y nguyên</b></span></label>
+          <label class="tich"><input type="checkbox" id="t-thaydoi" ${tc.chi_thay_doi ? "checked" : ""}>
+            <span>Chỉ gửi người <b>có thay đổi</b></span></label>
         </div>
       </div>
     </div>
-    <hr class="tach">
-    <div class="o-nhap"><label>Lời nhắn kèm thời khoá biểu cá nhân</label>
-      <textarea id="t-mau-gv" rows="2">${esc(tc.mau_tin_gv || cd.mau_tin_gv)}</textarea>
-      <div class="goi-y">{truong} {ten} {so_tkb} {ngay} {nam_hoc} {hoc_ky} {lop} {so_tiet}</div></div>
-    <div class="o-nhap"><label>Lời nhắn kèm thời khoá biểu lớp</label>
-      <textarea id="t-mau-lop" rows="2">${esc(tc.mau_tin_lop || cd.mau_tin_lop)}</textarea></div>`;
 
+    <div data-khu-tg="loi" hidden>
+      <div class="o-nhap"><label>Lời nhắn kèm thời khoá biểu cá nhân</label>
+        <textarea id="t-mau-gv" rows="3">${esc(tc.mau_tin_gv || cd.mau_tin_gv)}</textarea>
+        <div class="goi-y">{truong} {ten} {so_tkb} {ngay} {nam_hoc} {hoc_ky} {lop} {so_tiet}</div></div>
+      <div class="o-nhap"><label>Lời nhắn kèm thời khoá biểu lớp</label>
+        <textarea id="t-mau-lop" rows="3">${esc(tc.mau_tin_lop || cd.mau_tin_lop)}</textarea></div>
+    </div>`;
+
+  let doLai = false;
   const chon = await moHop({
-    tieuDe: "Gửi thời khoá biểu — tuỳ chọn", rong: "rong", noiDung,
+    tieuDe: "Gửi thời khoá biểu — tuỳ chọn", rong: "rat-rong", noiDung,
     nut: [{ ten: "Huỷ", giaTri: null }, { ten: "Xem trước", kieu: "chinh", giaTri: "xem" }],
-    khiMo: (hop) => {
-      const kc = hop.querySelector("#khung-chon");
-      $$('input[name="ai"]', hop).forEach((r) => r.addEventListener("change", () => {
-        kc.hidden = hop.querySelector('input[name="ai"]:checked').value !== "chon";
-      }));
-      hop.querySelector("#chon-het").onclick = () => $$('input[name="ng"]', hop).forEach((x) => { x.checked = true; });
-      hop.querySelector("#bo-het").onclick = () => $$('input[name="ng"]', hop).forEach((x) => { x.checked = false; });
-      hop.querySelector("#loc-gv").oninput = (e) => {
-        const v = e.target.value.toLowerCase();
-        $$("#ds-chon .tich", hop).forEach((l) => { l.style.display = l.dataset.ten.includes(v) ? "" : "none"; });
+    khiMo: (hop, xong) => {
+      const dsO = hop.querySelector("#ds-ng");
+      const demLai = () => {
+        const n = $$('input[name="ng"]:checked', hop).length;
+        hop.querySelector("#dem-ng").textContent = n
+          ? `Đang chọn ${n} người nhận.` : "Chưa chọn ai — sẽ không gửi cho người nào.";
       };
+      demLai();
+
+      const locLai = () => {
+        const v = hop.querySelector("#loc-ng").value.trim().toLowerCase();
+        const h = hop.querySelector("#loc-hang").value;
+        $$(".ng-o", dsO).forEach((l) => {
+          const hop1 = !v || l.dataset.tim.includes(v);
+          const hop2 = !h || l.dataset.hang === h;
+          l.style.display = hop1 && hop2 ? "" : "none";
+        });
+      };
+      hop.querySelector("#loc-ng").oninput = locLai;
+      hop.querySelector("#loc-hang").onchange = locLai;
+      hop.querySelector("#chon-het").onclick = () => {
+        $$(".ng-o", dsO).forEach((l) => {
+          if (l.style.display === "none") return;
+          const x = l.querySelector("input");
+          if (!x.disabled) x.checked = true;
+        });
+        demLai();
+      };
+      hop.querySelector("#bo-het").onclick = () => {
+        $$('input[name="ng"]', dsO).forEach((x) => { x.checked = false; });
+        demLai();
+      };
+      dsO.addEventListener("change", demLai);
+
+      hop.querySelector("#do-ngay")?.addEventListener("click", () => { doLai = true; xong("do"); });
+
+      hop.querySelector("#tab-gui").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-tg]");
+        if (!b) return;
+        $$("#tab-gui button", hop).forEach((x) => x.classList.toggle("chon", x === b));
+        $$("[data-khu-tg]", hop).forEach((k) => { k.hidden = k.dataset.khuTg !== b.dataset.tg; });
+      });
+
       hop.querySelector(".hop-chan .nut.chinh").addEventListener("click", () => {
         const g = (id) => hop.querySelector(id);
-        const ai = hop.querySelector('input[name="ai"]:checked').value;
+        const daChon = $$('input[name="ng"]:checked', hop)
+          .map((x) => { const [l, i] = x.value.split(":"); return { nguoi_loai: l, nguoi_id: Number(i) }; });
+        const tongChonDuoc = $$('input[name="ng"]:not(:disabled)', hop).length;
         Object.assign(tc, {
           gui_tkb_gv: g("#t-gv").checked, gui_tkb_lop_gvcn: g("#t-lop").checked, gui_nguoi_ngoai: g("#t-ngoai").checked,
           gui_anh: g("#t-anh").checked, gui_docx: g("#t-docx").checked, anh_gom: g("#t-gom").value,
           bo_qua_trung: g("#t-botrung").checked, chi_thay_doi: g("#t-thaydoi").checked,
-          chi_gvcn: ai === "gvcn",
-          chi_chon: ai === "chon"
-            ? $$('input[name="ng"]:checked', hop).map((x) => { const [l, i] = x.value.split(":"); return { nguoi_loai: l, nguoi_id: Number(i) }; })
-            : null,
+          chi_gvcn: false,
+          // Chọn hết thì để trống cho nhẹ, chọn một phần mới lọc theo danh sách
+          chi_chon: daChon.length && daChon.length < tongChonDuoc ? daChon : null,
           mau_tin_gv: g("#t-mau-gv").value, mau_tin_lop: g("#t-mau-lop").value,
         });
       }, true);
     },
   });
+
+  if (chon === "do") return { doLai: true };
   return chon === "xem" ? tc : null;
 }
 
@@ -251,9 +360,24 @@ export async function moGui(tkbId) {
   let tcCu = {};
   try { tcCu = JSON.parse(cd.tuy_chon_gui_json || "{}"); } catch { /* */ }
   const dsGv = (await window.api.gv.ds({})).ds.filter((g) => g.hoat_dong);
+  const dsNhom = ((await window.api.gv.nguoiNhan()).ds || []).filter((x) => x.la_nhom && x.hoat_dong !== 0);
 
-  const tc = await hopTuyChon(tcCu, dsGv);
+  const tc = await hopTuyChon(tcCu, dsGv, dsNhom);
   if (!tc) return;
+
+  // Người dùng bấm "Dò Zalo ngay" ngay trong hộp: dò xong quay lại hộp với số liệu mới.
+  if (tc.doLai) {
+    const cho0 = hopCho("Đang dò Zalo theo số điện thoại", "Dò chậm cho an toàn…");
+    const boNghe = window.api.zalo.onDoTienDo((t) => cho0.capNhat(`Đã dò ${t.da}/${t.tong} số — ${esc(t.sdt)}`));
+    let kq;
+    try { kq = await window.api.zalo.doUid({ chiThieu: true }); }
+    finally { boNghe(); cho0.dong(); await cho0.doi; }
+    if (kq?.ok) {
+      await window.api.zalo.doiChieuBanBe().catch(() => {});
+      baoOk(`Dò xong ${kq.n} số: tìm thấy ${kq.tim_thay}, không có Zalo ${kq.khong_thay}.`);
+    } else baoKetQua(kq);
+    return moGui(tkbId);
+  }
 
   const cho = hopCho("Đang dựng danh sách gửi");
   let r;

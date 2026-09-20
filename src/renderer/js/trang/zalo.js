@@ -67,6 +67,13 @@ export async function ve(khung) {
           <li>Phiên lưu trên máy, lần sau tự vào.</li>
         </ul>
         ${daNoi ? `<hr class="tach">
+          <hr class="tach">
+          <h3>Nhóm Zalo</h3>
+          <p class="nho mo">Gửi vào nhóm không cần số điện thoại, không cần kết bạn.
+            Hợp với nhóm tổ chuyên môn hay nhóm toàn trường.</p>
+          <button class="nut" id="chon-nhom">Chọn nhóm nhận thời khoá biểu</button>
+
+          <hr class="tach">
           <h3>Đối chiếu bạn bè</h3>
           <p class="nho mo">Người chưa kết bạn có thể không nhận được tin.</p>
           <button class="nut" id="doi-chieu">Đối chiếu bạn bè</button>` : ""}
@@ -87,6 +94,11 @@ export async function ve(khung) {
     if (!b) return;
     if (b.id === "xem-rui-ro") return moHopRuiRo({});
     if (b.id === "di-do-zalo") return di("du-lieu", { tab: "gv" });
+    if (b.id === "chon-nhom") {
+      const { moChonNhom } = await import("../chon-nhom.js");
+      if (await moChonNhom()) { dem = await window.api.app.tienDo().catch(() => dem); veNoiDung(); }
+      return;
+    }
     if (b.id === "dang-nhap") { await window.api.zalo.dangNhap(false); return; }
     if (b.id === "quet-lai") {
       if (t.status === "da_ket_noi" && !(await hoi("Đổi tài khoản Zalo?",

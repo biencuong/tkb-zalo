@@ -258,6 +258,15 @@ Quét một lần, lần sau tự vào.</p>
 </tbody></table>
 <p class="nho mo">Phiên Zalo đứt giữa chừng thì đèn tắt trong vòng 30 giây, không để bạn gửi nhầm khi đã mất kết nối.</p>
 
+<h3>Gửi vào nhóm Zalo</h3>
+<p>Ở màn <b>Kết nối Zalo</b> bấm <b>Chọn nhóm nhận thời khoá biểu</b>. Phần mềm đọc danh sách nhóm
+của tài khoản đang đăng nhập, gõ tên để lọc, tích nhóm nào thì nhóm đó thành người nhận.</p>
+<div class="bao tin"><b>Gửi vào nhóm không cần số điện thoại và không cần kết bạn.</b>
+  <span class="sua">Mình đã ở trong nhóm rồi nên tin chắc chắn tới. Hợp với nhóm tổ chuyên môn
+  hoặc nhóm toàn trường: một lần gửi là cả nhóm thấy.</span></div>
+<p>Nhóm đã chọn hiện ở <b>Dữ liệu → Giáo viên → Người nhận ngoài danh sách</b>, ghi rõ tên nhóm và
+số thành viên. Muốn nhóm nhận thời khoá biểu nào thì đặt đăng ký cho nhóm đó như với người ngoài.</p>
+
 <h3>Nút nối nhanh</h3>
 <p>Không cần vào tận màn đó: nút tròn <b>Nối Zalo</b> có mặt ở cuối thanh bên, trang Tổng quan,
 trang Dữ liệu và trang Gửi. Màu nút cho biết trạng thái:</p>
@@ -309,6 +318,19 @@ Số không có Zalo bị đánh dấu và bỏ qua khi gửi.</p>
 <p>Chưa kết nối Zalo thì app mở hộp quét mã QR trước, xong là đi tiếp.</p>
 
 <h3>Hộp tuỳ chọn</h3>
+<p>Mở ra là thấy ngay <b>bốn con số</b>: gửi được ngay · chưa kết bạn · chưa dò Zalo · không gửi được.
+Bên dưới chia ba tab:</p>
+<table class="b"><tbody>
+  <tr><td style="width:22%"><b>Gửi cho ai</b></td>
+      <td>Danh sách từng người, mỗi dòng ghi rõ <b>có số điện thoại chưa</b>, <b>đã dò Zalo chưa</b>,
+          <b>đã kết bạn chưa</b>. Dòng mờ là không gửi được, không tích vào được.
+          Có ô tìm và bộ lọc theo trạng thái, nút chọn hết / bỏ hết.</td></tr>
+  <tr><td><b>Gửi cái gì</b></td><td>Thời khoá biểu cá nhân · lớp cho chủ nhiệm · người ngoài và nhóm Zalo;
+          ảnh hay tệp Word; tránh gửi trùng.</td></tr>
+  <tr><td><b>Lời nhắn</b></td><td>Sửa riêng cho đợt này, không ảnh hưởng mẫu trong Cài đặt.</td></tr>
+</tbody></table>
+<p>Còn người <b>chưa dò Zalo</b> thì hộp hiện nút <b>Dò Zalo ngay</b> — dò xong tự quay lại hộp
+với số liệu mới, khỏi phải thoát ra làm rồi vào lại.</p>
 <table class="b"><tbody>
   <tr><td style="width:26%"><b>Gửi gì</b></td><td>TKB cá nhân · TKB lớp cho chủ nhiệm · người ngoài danh sách. Tích bao nhiêu cũng được.</td></tr>
   <tr><td><b>Dạng tệp</b></td><td>Ảnh · Word · cả hai. Ảnh chọn được cả ngày, chỉ sáng, hoặc chỉ chiều.</td></tr>

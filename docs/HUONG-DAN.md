@@ -248,6 +248,15 @@ Lúc nào cũng thấy, ở mọi trang:
 
 Phiên Zalo đứt giữa chừng thì đèn tắt trong vòng 30 giây, không để bạn gửi nhầm khi đã mất kết nối.
 
+### Gửi vào nhóm Zalo
+
+Ở màn **Kết nối Zalo** bấm **Chọn nhóm nhận thời khoá biểu**. Phần mềm đọc danh sách nhóm của tài khoản đang đăng nhập, gõ tên để lọc, tích nhóm nào thì nhóm đó thành người nhận.
+
+> **Gửi vào nhóm không cần số điện thoại và không cần kết bạn.** Mình đã ở trong nhóm rồi nên tin chắc chắn tới.
+> Hợp với nhóm tổ chuyên môn hoặc nhóm toàn trường: một lần gửi là cả nhóm thấy.
+
+Nhóm đã chọn hiện ở **Dữ liệu → Giáo viên → Người nhận ngoài danh sách**, ghi rõ tên nhóm và số thành viên. Muốn nhóm nhận thời khoá biểu nào thì đặt đăng ký cho nhóm đó như với người ngoài.
+
 ### Nút nối nhanh
 
 Không cần vào tận màn đó: nút tròn **Nối Zalo** có mặt ở cuối thanh bên, trang Tổng quan, trang Dữ liệu và trang Gửi. Màu nút cho biết trạng thái:
@@ -304,6 +313,17 @@ Có hai lối vào, đều mở cùng một hộp thoại:
 Chưa kết nối Zalo thì app mở hộp quét mã QR trước, xong là đi tiếp.
 
 ### Hộp tuỳ chọn
+
+Mở ra là thấy ngay **bốn con số**: gửi được ngay · chưa kết bạn · chưa dò Zalo · không gửi được. Bên dưới chia ba tab:
+
+|   |   |
+|---|---|
+| **Gửi cho ai** | Danh sách từng người, mỗi dòng ghi rõ **có số điện thoại chưa**, **đã dò Zalo chưa**, **đã kết bạn chưa**. Dòng mờ là không gửi được, không tích vào được. Có ô tìm và bộ lọc theo trạng thái, nút chọn hết / bỏ hết. |
+| **Gửi cái gì** | Thời khoá biểu cá nhân · lớp cho chủ nhiệm · người ngoài và nhóm Zalo; ảnh hay tệp Word; tránh gửi trùng. |
+| **Lời nhắn** | Sửa riêng cho đợt này, không ảnh hưởng mẫu trong Cài đặt. |
+
+
+Còn người **chưa dò Zalo** thì hộp hiện nút **Dò Zalo ngay** — dò xong tự quay lại hộp với số liệu mới, khỏi phải thoát ra làm rồi vào lại.
 
 |   |   |
 |---|---|

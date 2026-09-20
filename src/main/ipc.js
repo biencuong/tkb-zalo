@@ -308,6 +308,36 @@ export function dangKyTatCa() {
     gv.capNhatLaBan(tap);
     return { ok: true, so_ban: tap.size };
   });
+  dangKy("zalo:ds-nhom", async () => ({ ok: true, ds: await zalo.dsNhom() }));
+
+  /**
+   * Thêm nhóm Zalo vào danh sách người nhận. Nhóm không cần số điện thoại — dùng thẳng mã nhóm,
+   * và coi như đã kết bạn vì mình vốn ở trong nhóm.
+   */
+  dangKy("gv:them-nhom", (ds) => {
+    let them = 0, capNhat = 0;
+    for (const n of ds || []) {
+      const cu2 = db.mot("SELECT id FROM nguoi_nhan WHERE zalo_uid=?", String(n.id));
+      if (cu2) {
+        db.chay(
+          "UPDATE nguoi_nhan SET ho_ten=?, ghi_chu=?, la_nhom=1, la_ban=1, zalo_trang_thai='da_co', hoat_dong=1 WHERE id=?",
+          n.ten, `Nhóm Zalo · ${n.so_thanh_vien || 0} thành viên`, cu2.id
+        );
+        capNhat += 1;
+      } else {
+        db.chay(
+          `INSERT INTO nguoi_nhan(ho_ten,chuc_danh,dien_thoai,zalo_uid,zalo_ten,zalo_trang_thai,la_ban,la_nhom,ghi_chu,hoat_dong)
+           VALUES(?,?,?,?,?,?,?,?,?,1)`,
+          n.ten, "Nhóm Zalo", "", String(n.id), n.ten, "da_co", 1, 1,
+          `Nhóm Zalo · ${n.so_thanh_vien || 0} thành viên`
+        );
+        them += 1;
+      }
+    }
+    db.ghiNhatKy("them_nhom_zalo", { mo_ta: `${them} thêm mới, ${capNhat} cập nhật` });
+    return { ok: true, them, capNhat };
+  });
+
   dangKy("zalo:moi-ket-ban", async (uid, loiNhan) => zalo.moiKetBan(uid, loiNhan));
 
   // ------------------------------------------------ GỬI

@@ -188,7 +188,7 @@ export async function chay_(dotId) {
         let msgAnh = v.msg_id_anh, msgFile = v.msg_id_file;
 
         if (v.buoc === "gui_anh" && v.anh_path) {
-          const r = await zalo.guiAnh(v.uid, v.anh_path, v.caption, { width: v.anh_w, height: v.anh_h });
+          const r = await zalo.guiAnh(v.uid, v.anh_path, v.caption, { width: v.anh_w, height: v.anh_h, laNhom: v.la_nhom === 1 });
           msgAnh = r.msg_id || "";
           capNhatViec(v.id, { buoc: v.docx_path ? "gui_file" : "xong", msg_id_anh: msgAnh });
           v.buoc = v.docx_path ? "gui_file" : "xong";
@@ -204,7 +204,7 @@ export async function chay_(dotId) {
         }
 
         if (v.buoc === "gui_file" && v.docx_path) {
-          const r = await zalo.guiTep(v.uid, v.docx_path);
+          const r = await zalo.guiTep(v.uid, v.docx_path, { laNhom: v.la_nhom === 1 });
           msgFile = r.msg_id || "";
           capNhatViec(v.id, { buoc: "xong", msg_id_file: msgFile });
         }

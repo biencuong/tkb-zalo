@@ -248,6 +248,8 @@ const COT_THEM = [
   ["giao_vien", "to_chuyen_mon", "TEXT NOT NULL DEFAULT ''"],
   ["giao_vien", "la_ban", "INTEGER NOT NULL DEFAULT -1"],
   ["nguoi_nhan", "la_ban", "INTEGER NOT NULL DEFAULT -1"],
+  ["nguoi_nhan", "la_nhom", "INTEGER NOT NULL DEFAULT 0"],
+  ["viec_gui", "la_nhom", "INTEGER NOT NULL DEFAULT 0"],
   ["viec_gui", "la_ban", "INTEGER NOT NULL DEFAULT -1"],
   ["viec_gui", "ly_do_bo_qua", "TEXT NOT NULL DEFAULT ''"],
   ["tkb", "so_tuan", "REAL"],

@@ -138,7 +138,8 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
         if (!l) continue;
         themMuc({
           loai: "lop", ma: l.lop, nguoi_loai: "ngoai", nguoi_id: n.id, nguoi_ten: n.ho_ten,
-          sdt: n.dien_thoai, uid: n.zalo_uid, la_ban: n.la_ban, van_tay: l.van_tay,
+          sdt: n.dien_thoai, uid: n.zalo_uid, la_ban: n.la_nhom ? 1 : n.la_ban, la_nhom: n.la_nhom,
+          van_tay: l.van_tay,
           co_anh: tc.gui_anh && Boolean(l.anh_path), co_docx: tc.gui_docx && Boolean(l.docx_path),
           anh_path: tc.gui_anh ? l.anh_path : "", docx_path: tc.gui_docx ? l.docx_path : "",
           so_tiet: l.so_tiet, lop_cn: l.lop,
@@ -153,7 +154,8 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
         if (!g) continue;
         themMuc({
           loai: "gv", ma: g.ma_trong_tkb, nguoi_loai: "ngoai", nguoi_id: n.id, nguoi_ten: n.ho_ten,
-          sdt: n.dien_thoai, uid: n.zalo_uid, la_ban: n.la_ban, van_tay: g.van_tay,
+          sdt: n.dien_thoai, uid: n.zalo_uid, la_ban: n.la_nhom ? 1 : n.la_ban, la_nhom: n.la_nhom,
+          van_tay: g.van_tay,
           co_anh: tc.gui_anh && Boolean(g.anh_path), co_docx: tc.gui_docx && Boolean(g.docx_path),
           anh_path: tc.gui_anh ? g.anh_path : "", docx_path: tc.gui_docx ? g.docx_path : "",
           so_tiet: g.so_tiet_dem, lop_cn: g.lop_cn,
@@ -210,11 +212,11 @@ export function taoDotGui(tkbId, tuyChon, muc, { ten = "", zaloUid = "", zaloTen
       const trangThai = m.bo_qua ? "bo_qua" : "cho";
       if (m.bo_qua) boQua++; else n++;
       chay(
-        `INSERT INTO viec_gui(dot_id,tkb_id,loai,ma,nguoi_loai,nguoi_id,nguoi_ten,sdt,uid,la_ban,caption,
+        `INSERT INTO viec_gui(dot_id,tkb_id,loai,ma,nguoi_loai,nguoi_id,nguoi_ten,sdt,uid,la_ban,la_nhom,caption,
          anh_path,anh_w,anh_h,docx_path,van_tay,trung,buoc,trang_thai,ly_do_bo_qua)
-         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
         dotId, tkbId, m.loai, m.ma, m.nguoi_loai, m.nguoi_id, m.nguoi_ten, m.sdt || "", m.uid || "",
-        m.la_ban == null ? -1 : m.la_ban, m.caption || "",
+        m.la_ban == null ? -1 : m.la_ban, m.la_nhom ? 1 : 0, m.caption || "",
         m.co_anh ? m.anh_path : "", m.anh_w || null, m.anh_h || null,
         m.co_docx ? m.docx_path : "", m.van_tay || "", m.trung ? 1 : 0,
         m.co_anh ? "gui_anh" : "gui_file", trangThai, m.ly_do || ""

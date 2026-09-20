@@ -1,0 +1,15 @@
+node_modules/
+dist/
+_dist/
+out/
+*.log
+.DS_Store
+Thumbs.db
+
+# Dữ liệu chạy thử cục bộ
+_du-lieu-thu/
+
+# DỮ LIỆU THẬT CỦA NHÀ TRƯỜNG — KHÔNG ĐƯA LÊN KHO CÔNG KHAI
+# Chứa họ tên 40 giáo viên và số điện thoại. Muốn chạy `npm test` thì tự chép
+# tệp Excel/Word xuất từ phần mềm xếp thời khoá biểu vào thư mục này.
+test/mau/

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Vẽ ảnh thời khoá biểu</title>
+<link rel="stylesheet" href="./fonts/fonts.css">
+<style>
+  :root{
+    --bg:#F0EEE6; --card:#FFFFFF; --ink:#1F1E1D; --muted:#655F59; --line:#E4E0D6;
+    --accent:#D97757; --accent-ink:#9C4420; --accent-soft:#F7E9E1; --chim:#FBFAF6;
+  }
+  *{box-sizing:border-box}
+  html{overflow:hidden}
+  body{margin:0;width:1080px;background:var(--bg);color:var(--ink);
+       font-family:"Inter","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  #khung{padding:28px}
+  .the{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;
+       box-shadow:0 2px 10px rgba(31,30,29,.05)}
+  .dau{padding:26px 30px 22px;border-bottom:1px solid var(--line);border-top:6px solid var(--accent)}
+  .truong{font-family:"Barlow Semi Condensed","Segoe UI",sans-serif;font-size:26px;font-weight:600;
+          color:var(--muted);letter-spacing:.02em;margin:0 0 10px}
+  h1{font-family:"Barlow Semi Condensed","Segoe UI",sans-serif;font-size:44px;font-weight:600;margin:0 0 6px;line-height:1.15}
+  .phu{font-size:25px;color:var(--muted);margin:0}
+  .phu b{color:var(--accent-ink);font-weight:600}
+  .chu-the{display:inline-block;margin-top:14px;background:var(--accent-soft);color:var(--accent-ink);
+           border-radius:999px;padding:7px 20px;font-size:24px;font-weight:600;
+           font-family:"Barlow Semi Condensed","Segoe UI",sans-serif}
+  .than{padding:24px 30px 10px}
+  .buoi{margin-bottom:22px}
+  .buoi-ten{font-family:"Barlow Semi Condensed","Segoe UI",sans-serif;font-size:25px;font-weight:600;
+            color:var(--accent-ink);margin:0 0 10px;display:flex;align-items:center;gap:12px}
+  .buoi-ten::after{content:"";flex:1;height:2px;background:var(--line);border-radius:2px}
+  table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
+  th,td{border:1px solid var(--line);padding:0;text-align:center;vertical-align:middle}
+  thead th{background:var(--chim);font-family:"Barlow Semi Condensed","Segoe UI",sans-serif;
+           font-size:24px;font-weight:600;color:var(--muted);height:52px}
+  thead th:first-child{width:96px}
+  tbody th{background:var(--chim);font-family:"JetBrains Mono",monospace;font-size:24px;font-weight:600;
+           color:var(--muted);width:96px}
+  tbody td{height:74px;padding:6px 8px}
+  .mon{font-size:25px;font-weight:600;line-height:1.2;display:block;
+       overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .phu-o{font-size:21px;color:var(--muted);line-height:1.25;display:block;margin-top:3px;
+         overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  td.co{background:var(--accent-soft)}
+  td.trong{background:repeating-linear-gradient(135deg,#fff,#fff 8px,#FBFAF6 8px,#FBFAF6 16px)}
+  .chan{padding:18px 30px 24px;border-top:1px solid var(--line);display:flex;
+        justify-content:space-between;align-items:center;gap:20px;background:var(--chim)}
+  .tong{font-family:"Barlow Semi Condensed","Segoe UI",sans-serif;font-size:25px;font-weight:600}
+  .tong b{color:var(--accent-ink);font-size:30px}
+  .ghi{font-size:21px;color:var(--muted);text-align:right;line-height:1.35}
+  .rong{padding:40px;text-align:center;color:var(--muted);font-size:26px}
+</style>
+</head>
+<body>
+<div id="khung"></div>
+<script>
+const THU = [2,3,4,5,6,7];
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+function luoi(tiet, buoi, soTiet, hienGi) {
+  const co = tiet.filter((t) => t.buoi === buoi);
+  if (!co.length) return "";
+  const maxTiet = Math.max(soTiet, ...co.map((t) => t.tiet));
+  const bang = new Map(co.map((t) => [t.thu + "-" + t.tiet, t]));
+  let h = '<div class="buoi"><p class="buoi-ten">' + (buoi === "S" ? "Buổi sáng" : "Buổi chiều") + "</p><table><thead><tr><th>Tiết</th>";
+  for (const t of THU) h += "<th>Thứ " + t + "</th>";
+  h += "</tr></thead><tbody>";
+  for (let i = 1; i <= maxTiet; i++) {
+    h += "<tr><th>" + i + "</th>";
+    for (const t of THU) {
+      const o = bang.get(t + "-" + i);
+      if (!o) { h += '<td class="trong"></td>'; continue; }
+      const chinh = hienGi === "lop" ? o.mon : o.mon;
+      const phu = hienGi === "lop" ? (o.ma_gv || "") : (o.lop || "");
+      h += '<td class="co"><span class="mon">' + esc(chinh) + "</span>"
+         + (phu ? '<span class="phu-o">' + esc(phu) + "</span>" : "") + "</td>";
+    }
+    h += "</tr>";
+  }
+  return h + "</tbody></table></div>";
+}
+
+/**
+ * Vẽ một thời khoá biểu rồi trả về chiều cao thật của trang (px CSS).
+ * d = { loai:'gv'|'lop', ten, phu, truong, so_tkb, ngay, nam_hoc, hoc_ky, lop_cn,
+ *       tiet:[{thu,buoi,tiet,mon,lop,ma_gv}], so_tiet_moi_buoi, gom:'ca_ngay'|'sang'|'chieu' }
+ */
+window.veTKB = async function (d) {
+  const tiet = (d.tiet || []).filter((t) => d.gom === "sang" ? t.buoi === "S" : d.gom === "chieu" ? t.buoi === "C" : true);
+  const soTiet = d.so_tiet_moi_buoi || 5;
+  const than = luoi(tiet, "S", soTiet, d.loai) + luoi(tiet, "C", soTiet, d.loai)
+    || '<div class="rong">Không có tiết nào trong thời khoá biểu này.</div>';
+
+  const dong2 = [];
+  if (d.hoc_ky) dong2.push("Học kỳ " + esc(d.hoc_ky));
+  if (d.nam_hoc) dong2.push("Năm học " + esc(d.nam_hoc));
+
+  document.getElementById("khung").innerHTML =
+    '<div class="the"><div class="dau">'
+    + (d.truong ? '<p class="truong">' + esc(d.truong) + "</p>" : "")
+    + "<h1>" + esc(d.ten) + "</h1>"
+    + '<p class="phu">THỜI KHOÁ BIỂU <b>số ' + esc(d.so_tkb) + "</b>"
+    + (d.ngay ? " · thực hiện từ <b>" + esc(d.ngay) + "</b>" : "")
+    + (dong2.length ? " · " + dong2.join(" · ") : "") + "</p>"
+    + (d.phu ? '<span class="chu-the">' + esc(d.phu) + "</span>" : "")
+    + '</div><div class="than">' + than + "</div>"
+    + '<div class="chan"><span class="tong">Tổng <b>' + tiet.length + "</b> tiết/tuần</span>"
+    + '<span class="ghi">' + esc(d.ghi_chan || "Ảnh do phần mềm TKB Zalo tạo tự động") + "</span></div></div>";
+
+  // Chờ phông nạp xong rồi mới báo chiều cao — nếu không, chữ sẽ nhảy sau khi chụp
+  const phong = [
+    '600 44px "Barlow Semi Condensed"', '600 26px "Barlow Semi Condensed"',
+    '400 25px "Inter"', '600 25px "Inter"', '600 24px "JetBrains Mono"',
+  ];
+  try { await Promise.all(phong.map((f) => document.fonts.load(f, "ÀĂÂĐÊÔƠƯàăâđêôơư"))); } catch (e) { /* */ }
+  try { await document.fonts.ready; } catch (e) { /* */ }
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  return Math.ceil(document.documentElement.scrollHeight);
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+/**
+ * Kết nối Zalo cá nhân bằng zca-js: quét QR → lưu phiên → dò UID theo số điện thoại → gửi tin.
+ *
+ * CẢNH BÁO: zca-js là thư viện KHÔNG CHÍNH THỨC, mô phỏng Zalo Web. Gửi nhiều tin cho người lạ
+ * có thể khiến tài khoản bị hạn chế hoặc khoá. Mọi nhịp gửi đều cố ý chậm.
+ *
+ * Bài học đã đúc kết (OSZalo-247 + cầu nối SmartScheduler):
+ *  - KHÔNG xoá file phiên khi login lỗi tạm thời (mạng chập) — cookie vẫn còn giá trị.
+ *  - Ghi lại phiên định kỳ vì zca-js xoay cookie trong RAM.
+ *  - Gửi ảnh bằng Buffer + metadata để tránh lỗi tách tên file theo "/" trên Windows.
+ *  - sendMessage với attachments bắt buộc có msg (dù là chuỗi rỗng), nếu không sẽ ném TypeError.
+ */
+import fs from "node:fs";
+import path from "node:path";
+import { chuanSdt } from "./khop.js";
+
+let Zalo = null, ThreadType = null;
+let api = null;
+let duongDanPhien = "";
+let hetHanGhiPhien = null;
+
+export const trangThai = {
+  status: "chua_dang_nhap",   // chua_dang_nhap | cho_quet_qr | dang_dang_nhap | da_ket_noi | loi
+  qr: null, uid: null, ten: null, sdt: null, loi: null,
+  ket_noi_luc: null,
+};
+
+async function napThuVien() {
+  if (Zalo) return;
+  const mod = await import("zca-js");
+  Zalo = mod.Zalo;
+  ThreadType = mod.ThreadType;
+}
+
+export function datDuongDanPhien(p) { duongDanPhien = p; }
+
+function luuPhien() {
+  try {
+    if (!api || !duongDanPhien) return;
+    const ctx = api.getContext?.();
+    if (!ctx) return;
+    // Lưu GỌN: chỉ thứ cần để đăng nhập lại (getContext trả cả đống cấu hình không cần thiết)
+    const goi = {
+      imei: ctx.imei,
+      userAgent: ctx.userAgent,
+      language: ctx.language || "vi",
+      cookie: ctx.cookie?.toJSON ? ctx.cookie.toJSON().cookies : ctx.cookie,
+    };
+    if (!goi.imei || !goi.cookie) return;
+    const tmp = duongDanPhien + ".tmp";
+    fs.mkdirSync(path.dirname(duongDanPhien), { recursive: true });
+    fs.writeFileSync(tmp, JSON.stringify(goi), { mode: 0o600 });
+    fs.renameSync(tmp, duongDanPhien);
+  } catch (e) { console.error("[zalo] lưu phiên lỗi:", e?.message || e); }
+}
+
+function batGhiPhienDinhKy() {
+  if (hetHanGhiPhien) return;
+  hetHanGhiPhien = setInterval(() => { if (trangThai.status === "da_ket_noi") luuPhien(); }, 30 * 60 * 1000);
+  hetHanGhiPhien.unref?.();
+}
+
+export const coPhienCu = () => Boolean(duongDanPhien && fs.existsSync(duongDanPhien));
+
+/**
+ * Đăng nhập. quetMoi=true → bỏ phiên cũ, hiện QR mới.
+ * Chạy nền; giao diện hỏi trangThai để lấy ảnh QR và kết quả.
+ */
+export async function dangNhap({ quetMoi = false, onDoi } = {}) {
+  if (trangThai.status === "dang_dang_nhap" || trangThai.status === "cho_quet_qr") return trangThai;
+  await napThuVien();
+  const bao = () => { try { onDoi?.({ ...trangThai }); } catch { /* */ } };
+  trangThai.loi = null;
+  trangThai.status = "dang_dang_nhap";
+  bao();
+
+  try {
+    const zalo = new Zalo({ selfListen: false, checkUpdate: false, logging: false });
+    let phienCu = null;
+    if (!quetMoi && coPhienCu()) {
+      try { phienCu = JSON.parse(fs.readFileSync(duongDanPhien, "utf8")); } catch { /* hỏng thì quét lại */ }
+    }
+
+    if (phienCu?.cookie && phienCu?.imei) {
+      api = await zalo.login(phienCu);
+    } else {
+      trangThai.status = "cho_quet_qr";
+      trangThai.qr = null;
+      bao();
+      api = await zalo.loginQR(undefined, (ev) => {
+        const img = ev?.data?.image || ev?.data?.qrCode || ev?.image;
+        if (!img) return;
+        trangThai.qr = String(img).startsWith("data:") ? img : `data:image/png;base64,${img}`;
+        trangThai.status = "cho_quet_qr";
+        bao();
+      });
+    }
+
+    trangThai.status = "da_ket_noi";
+    trangThai.qr = null;
+    trangThai.ket_noi_luc = new Date().toISOString();
+    try { trangThai.uid = String(api.getOwnId?.() ?? ""); } catch { /* */ }
+    try {
+      const info = await api.fetchAccountInfo?.();
+      const p = info?.profile || {};
+      trangThai.ten = p.displayName || p.zaloName || null;
+      trangThai.sdt = p.phoneNumber || null;
+      if (!trangThai.uid && p.userId) trangThai.uid = String(p.userId);
+    } catch { /* không lấy được tên cũng không sao */ }
+    luuPhien();
+    batGhiPhienDinhKy();
+    bao();
+    return { ...trangThai };
+  } catch (e) {
+    api = null;
+    // KHÔNG xoá file phiên: lỗi thường chỉ là tạm thời, xoá đi là buộc quét QR oan.
+    trangThai.status = "chua_dang_nhap";
+    trangThai.qr = null;
+    trangThai.loi = String(e?.message || e);
+    bao();
+    return { ...trangThai };
+  }
+}
+
+export function dangXuat({ xoaPhien = true } = {}) {
+  try { api?.listener?.stop?.(); } catch { /* */ }
+  api = null;
+  Object.assign(trangThai, { status: "chua_dang_nhap", qr: null, uid: null, ten: null, sdt: null, loi: null, ket_noi_luc: null });
+  if (xoaPhien && duongDanPhien) { try { fs.unlinkSync(duongDanPhien); } catch { /* */ } }
+  return { ...trangThai };
+}
+
+export const daKetNoi = () => trangThai.status === "da_ket_noi" && Boolean(api);
+
+const nghi = (ms) => new Promise((r) => setTimeout(r, ms));
+export const ngau = (a, b) => Math.round(a + Math.random() * (b - a));
+
+/** Giới hạn chia sẻ tệp mà Zalo cho phép (đọc lúc đăng nhập) — chặn sớm tệp quá lớn/đuôi cấm. */
+export function gioiHanTep() {
+  try {
+    const f = api?.getContext?.()?.settings?.features?.sharefile;
+    if (!f) return null;
+    return {
+      max_size_mb: Math.round((f.max_size_share_file_v3 || f.max_size_share_file || 0) / 1048576),
+      duoi_cam: String(f.restricted_ext_file || "").split(/[,\s]+/).filter(Boolean),
+      max_file: f.max_file || null,
+    };
+  } catch { return null; }
+}
+
+/**
+ * Dò UID theo số điện thoại: dùng API hàng loạt trước, thiếu đâu mới dò từng số.
+ * @param {string[]} dsSdt
+ * @param {(tien:{da:number,tong:number,sdt:string})=>void} onTienDo
+ */
+export async function doUid(dsSdt, onTienDo) {
+  if (!daKetNoi()) throw new Error("Chưa kết nối Zalo. Hãy quét QR ở màn Kết nối Zalo trước.");
+  const ds = [...new Set(dsSdt.map(chuanSdt).filter((s) => /^0\d{9}$/.test(s)))];
+  const kq = new Map();
+  let da = 0;
+  for (let i = 0; i < ds.length; i += 20) {
+    const lo = ds.slice(i, i + 20);
+    try {
+      const r = await api.getMultiUsersByPhones(lo);
+      for (const [k, u] of Object.entries(r || {})) {
+        const uid = String(u?.uid ?? u?.userId ?? "");
+        if (uid) kq.set(chuanSdt(k), { uid, ten: u.display_name || u.zalo_name || u.displayName || "" });
+      }
+    } catch { /* rơi xuống dò từng số */ }
+    for (const s of lo) {
+      if (!kq.has(s)) {
+        try {
+          const u = await api.findUser(s);
+          const uid = String(u?.uid ?? u?.userId ?? "");
+          if (uid) kq.set(s, { uid, ten: u.display_name || u.zalo_name || u.displayName || "" });
+        } catch { /* 216 = không có tài khoản Zalo */ }
+        await nghi(ngau(1500, 3000));
+      }
+      da++;
+      onTienDo?.({ da, tong: ds.length, sdt: s });
+    }
+    await nghi(ngau(2000, 4000));
+  }
+  return kq;
+}
+
+/** Lấy toàn bộ UID bạn bè để gắn nhãn "chưa là bạn". */
+export async function dsBanBe() {
+  if (!daKetNoi()) throw new Error("Chưa kết nối Zalo.");
+  const tap = new Set();
+  for (let trang = 0; trang < 40; trang++) {
+    let lo;
+    try { lo = await api.getAllFriends(100, trang); } catch { break; }
+    const arr = Array.isArray(lo) ? lo : lo?.friends || [];
+    if (!arr.length) break;
+    for (const b of arr) {
+      const uid = String(b?.userId ?? b?.uid ?? "");
+      if (uid) tap.add(uid);
+    }
+    if (arr.length < 100) break;
+    await nghi(ngau(800, 1500));
+  }
+  return tap;
+}
+
+/** Gửi lời mời kết bạn. Các mã 225/215/222 coi như đã xử lý xong, không phải lỗi. */
+export async function moiKetBan(uid, loiNhan = "") {
+  if (!daKetNoi()) throw new Error("Chưa kết nối Zalo.");
+  try {
+    await api.sendFriendRequest(loiNhan || "Xin chào, tôi gửi thời khoá biểu của nhà trường qua Zalo.", String(uid));
+    return { ok: true };
+  } catch (e) {
+    const ma = e?.code ?? null;
+    if ([225, 215, 222].includes(ma)) return { ok: true, ghi_chu: "Đã là bạn hoặc lời mời đã tồn tại." };
+    return { ok: false, ma_loi: ma, loi: String(e?.message || e) };
+  }
+}
+
+/** Gửi ẢNH kèm lời nhắn — một tin duy nhất. Dùng Buffer + metadata (tránh lỗi đường dẫn Windows). */
+export async function guiAnh(uid, duongDanAnh, loiNhan, { width, height } = {}) {
+  if (!daKetNoi()) throw new Error("Chưa kết nối Zalo.");
+  const data = fs.readFileSync(duongDanAnh);
+  const r = await api.sendMessage(
+    {
+      msg: String(loiNhan ?? ""),
+      attachments: [{
+        data,
+        filename: path.basename(duongDanAnh),
+        metadata: { totalSize: data.length, width: width || 1080, height: height || 1080 },
+      }],
+    },
+    String(uid), ThreadType.User
+  );
+  return { ok: true, msg_id: r?.attachment?.[0]?.msgId ? String(r.attachment[0].msgId) : (r?.message?.msgId ? String(r.message.msgId) : "") };
+}
+
+/** Gửi TỆP (docx). msg phải là chuỗi rỗng — có chữ sẽ thành 2 tin. */
+export async function guiTep(uid, duongDanTep) {
+  if (!daKetNoi()) throw new Error("Chưa kết nối Zalo.");
+  const r = await api.sendMessage({ msg: "", attachments: [duongDanTep] }, String(uid), ThreadType.User);
+  return { ok: true, msg_id: r?.attachment?.[0]?.msgId ? String(r.attachment[0].msgId) : "" };
+}
+
+/** Gửi tin văn bản thuần (Zalo không hiểu Markdown). */
+export async function guiChu(uid, noiDung) {
+  if (!daKetNoi()) throw new Error("Chưa kết nối Zalo.");
+  const r = await api.sendMessage({ msg: String(noiDung ?? "") }, String(uid), ThreadType.User);
+  return { ok: true, msg_id: r?.message?.msgId ? String(r.message.msgId) : "" };
+}
+
+/** Lỗi mạng/HTTP (không có mã Zalo) coi là tạm thời → đáng thử lại. */
+export function loiTamThoi(e) {
+  const ma = e?.code;
+  if (ma != null && Number.isFinite(Number(ma))) return false;
+  const s = String(e?.message || e).toLowerCase();
+  return s.includes("fetch") || s.includes("network") || s.includes("timeout") || s.includes("econn") || s.includes("socket");
+}
+
+/** Dấu hiệu phiên Zalo đã hỏng → phải quét QR lại. */
+export function loiMatPhien(e) {
+  const s = String(e?.message || e).toLowerCase();
+  return s.includes("401") || s.includes("403") || s.includes("login") || s.includes("đăng nhập") || s.includes("session");
+}

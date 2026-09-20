@@ -1,0 +1,94 @@
+{
+  "name": "tkb-zalo",
+  "productName": "TKB Zalo",
+  "version": "0.1.0",
+  "description": "Gửi thời khoá biểu cho giáo viên qua Zalo cá nhân — ảnh xem ngay + file Word tải về in",
+  "author": "TKB Zalo",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "fonts": "node scripts/copy-fonts.mjs",
+    "kiem-sqlite": "node scripts/kiem-sqlite.mjs",
+    "huong-dan": "node scripts/xuat-huong-dan.mjs",
+    "thu-chay": "electron scripts/thu-chay.mjs",
+    "dist": "electron-builder --win nsis && node scripts/kiem-goi.mjs",
+    "kiem-goi": "node scripts/kiem-goi.mjs",
+    "dist:dir": "electron-builder --win dir"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "jszip": "^3.10.2",
+    "zca-js": "^2.2.0"
+  },
+  "devDependencies": {
+    "@fontsource/barlow-semi-condensed": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/bricolage-grotesque": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/lora": "^5.3.0",
+    "@fontsource/source-sans-3": "^5.3.0",
+    "electron": "^44.4.3",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "vn.tkbzalo.app",
+    "productName": "TKB Zalo",
+    "executableName": "TKBZalo",
+    "copyright": "TKB Zalo",
+    "npmRebuild": false,
+    "nodeGypRebuild": false,
+    "asar": true,
+    "compression": "maximum",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "docs/HUONG-DAN.md",
+      "docs/KINH-NGHIEM.md",
+      "package.json",
+      "!**/*.{map,md,markdown,flow,coffee}",
+      "!**/*.d.ts",
+      "!**/{__tests__,.github,.vscode,.idea,.nyc_output,coverage}/**",
+      "!**/{.eslintrc,.eslintrc.js,.eslintrc.json,.babelrc,.editorconfig,.npmignore,.prettierrc,tsconfig.json,jest.config.js,karma.conf.js,gulpfile.js,Gruntfile.js,.travis.yml,appveyor.yml}",
+      "!node_modules/exceljs/dist/**",
+      "!node_modules/@types/**",
+      "!src/**/*.test.js"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "TKBZalo-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "license": "build/DIEU-KHOAN-RUI-RO.txt",
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "allowElevation": false,
+      "runAfterFinish": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "TKB Zalo",
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "artifactName": "TKBZalo-Setup-${version}.${ext}"
+    },
+    "electronLanguages": [
+      "vi",
+      "en-US"
+    ],
+    "asarUnpack": [],
+    "removePackageScripts": true,
+    "removePackageKeywords": true
+  }
+}

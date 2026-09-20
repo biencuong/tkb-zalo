@@ -206,12 +206,10 @@ app.whenReady().then(async () => {
     const den = await cua.webContents.executeJavaScript(`(async () => {
       const e = document.getElementById("nhip-zalo");
       if (!e) return { co: false };
-      // Bài kiểm mã QR ở trên để lại một phiên đang chờ quét — huỷ hẳn rồi mới đo,
-      // nếu không sự kiện trạng thái bay về sẽ ghi đè lên.
       const m = await import("./js/zalo-nhanh.js");
-      await window.api.zalo.dangXuat(true).catch(() => {});
+      // Đo NGAY trong cùng một lượt, không await ở giữa — phiên QR của bài kiểm trước
+      // vẫn đang chạy và sẽ đẩy trạng thái mới vào bất cứ lúc nào.
       m.veChipZalo({ status: "chua_dang_nhap" });
-      await new Promise((r) => setTimeout(r, 600));
       const g = getComputedStyle(e.querySelector(".nz-tim"));
       return { co: true, lop: e.className, dap: g.animationName !== "none",
                chu: e.querySelector(".nz-chu")?.textContent || "" };

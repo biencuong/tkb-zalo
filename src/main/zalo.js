@@ -60,6 +60,37 @@ function batGhiPhienDinhKy() {
   hetHanGhiPhien.unref?.();
 }
 
+let dangNghe = false;
+
+/**
+ * BẮT BUỘC bật trình nghe WebSocket sau khi đăng nhập.
+ *
+ * Thư viện tải tệp đính kèm (không phải ảnh) theo kiểu: gửi từng phần lên máy chủ, rồi
+ * ĐỢI SỰ KIỆN "file_done" bay về qua WebSocket mới coi là xong. Không bật trình nghe thì
+ * sự kiện đó không bao giờ tới, lời gọi gửi tệp treo vĩnh viễn — ảnh vẫn gửi được vì ảnh
+ * không phải đợi sự kiện nào. Đây đúng là lỗi "nhận được ảnh mà không thấy tệp Word".
+ */
+function batTrinhNghe() {
+  if (!api?.listener || dangNghe) return;
+  try {
+    api.listener.on("error", (e) => { console.error("[zalo] trình nghe lỗi:", e?.message || e); });
+    api.listener.on("closed", () => { dangNghe = false; });
+    api.listener.start({ retryOnClose: true });
+    dangNghe = true;
+  } catch (e) {
+    dangNghe = false;
+    console.error("[zalo] không bật được trình nghe:", e?.message || e);
+  }
+}
+
+function tatTrinhNghe() {
+  if (!api?.listener || !dangNghe) return;
+  try { api.listener.stop(); } catch { /* */ }
+  dangNghe = false;
+}
+
+export const dangNgheSuKien = () => dangNghe;
+
 export const coPhienCu = () => Boolean(duongDanPhien && fs.existsSync(duongDanPhien));
 
 /**
@@ -99,6 +130,7 @@ export async function dangNhap({ quetMoi = false, onDoi } = {}) {
     trangThai.status = "da_ket_noi";
     trangThai.qr = null;
     trangThai.ket_noi_luc = new Date().toISOString();
+    batTrinhNghe();
     try { trangThai.uid = String(api.getOwnId?.() ?? ""); } catch { /* */ }
     try {
       const info = await api.fetchAccountInfo?.();
@@ -123,6 +155,7 @@ export async function dangNhap({ quetMoi = false, onDoi } = {}) {
 }
 
 export function dangXuat({ xoaPhien = true } = {}) {
+  tatTrinhNghe();
   try { api?.listener?.stop?.(); } catch { /* */ }
   api = null;
   Object.assign(trangThai, { status: "chua_dang_nhap", qr: null, uid: null, ten: null, sdt: null, loi: null, ket_noi_luc: null });
@@ -235,9 +268,25 @@ export async function guiAnh(uid, duongDanAnh, loiNhan, { width, height } = {}) 
 }
 
 /** Gửi TỆP (docx). msg phải là chuỗi rỗng — có chữ sẽ thành 2 tin. */
+/** Chạy một việc có hạn chờ; quá hạn thì ném lỗi thay vì treo mãi. */
+function coHanCho(viec, giay, loiNeuQua) {
+  return Promise.race([
+    viec,
+    new Promise((_, hong) => setTimeout(() => hong(new Error(loiNeuQua)), giay * 1000)),
+  ]);
+}
+
 export async function guiTep(uid, duongDanTep) {
   if (!daKetNoi()) throw new Error("Chưa kết nối Zalo.");
-  const r = await api.sendMessage({ msg: "", attachments: [duongDanTep] }, String(uid), ThreadType.User);
+  // Gửi tệp phải đợi sự kiện "file_done" qua WebSocket. Thiếu trình nghe là treo.
+  batTrinhNghe();
+  if (!dangNghe) throw new Error("Chưa bật được kênh nhận sự kiện của Zalo nên không gửi tệp được. Thử quét lại mã QR.");
+
+  const r = await coHanCho(
+    api.sendMessage({ msg: "", attachments: [duongDanTep] }, String(uid), ThreadType.User),
+    120,
+    "Gửi tệp quá 2 phút chưa xong. Có thể mạng chậm hoặc Zalo chưa xác nhận tải lên."
+  );
   return { ok: true, msg_id: r?.attachment?.[0]?.msgId ? String(r.attachment[0].msgId) : "" };
 }
 

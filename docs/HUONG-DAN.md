@@ -92,10 +92,24 @@ Mỗi lần phát hành cần **ba tệp**:
 > **Chưa nhập thì cột chủ nhiệm trống, app không biết gửi TKB lớp cho ai.** Nhập “Danh sách giáo viên chủ nhiệm” trong phần mềm xếp TKB rồi xuất Excel lại.
 > Hoặc chọn tay trong màn Thời khoá biểu.
 
-### Xuất tệp
+### Lấy tệp ra khỏi phần mềm xếp thời khoá biểu
 
-- Excel: **Hệ thống → Chuyển đổi dữ liệu sang Excel**.
-- Word: **In thời khoá biểu** — theo giáo viên, và theo lớp.
+Làm đúng ba bước này, mỗi bước ra một loại tệp:
+
+| Bước | Vào đâu | Ra tệp gì |
+|---|---|---|
+| **1** | **Dữ liệu → Dữ liệu giáo viên → Danh sách giáo viên**, bấm **biểu tượng Excel**, chọn **Copy file dữ liệu mẫu**. | Tệp Excel **danh sách giáo viên** đúng mẫu. Mở ra điền thêm **số điện thoại** từng người rồi lưu lại. |
+| **2** | **Hệ thống → Chuyển đổi dữ liệu sang Excel**. | Tệp Excel tổng (`SS….xlsx`) — bảng phân công và toàn bộ tiết học. |
+| **3** | **Hệ thống → In ấn → Thời khoá biểu theo lớp**, rồi **Thời khoá biểu theo giáo viên**, xuất ra tệp Word. | Hai tệp Word để giáo viên tải về in. |
+
+
+> **Đủ ba loại tệp trên rồi thì kéo thả tất cả vào phần mềm này một lượt.** Thả cùng lượt thì tệp Word mới biết nó thuộc thời khoá biểu số mấy.
+> Phần mềm tự phân loại, đặt tên chuẩn và cất đúng chỗ, sau đó bạn bấm nhập vào hệ thống.
+
+### Thứ tự nạp
+
+1. **Danh sách giáo viên trước.** Chưa có ai trong danh sách thì thời khoá biểu không khớp vào người được, nút nhập sẽ bị khoá.
+2. **Thời khoá biểu sau** — phần mềm tự tạo ảnh luôn sau khi nhập.
 
 Đóng Word và Excel trước khi nhập, nếu không app báo lỗi đọc tệp.
 

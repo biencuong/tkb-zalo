@@ -6,7 +6,7 @@ import { moHopCapNhat } from "../cap-nhat.js";
 import { di } from "../app.js";
 
 
-export async function ve(khung) {
+export async function ve(khung, thamSo = {}) {
   khung.innerHTML = `
   <div class="dau-trang">
     <div><h1>Hướng dẫn sử dụng</h1>
@@ -32,6 +32,11 @@ export async function ve(khung) {
       </div>
     </div>
   </div>`;
+
+  // Vào từ chỗ khác kèm tên mục thì nhảy thẳng tới mục đó, khỏi bắt tự tìm.
+  if (thamSo?.muc) {
+    setTimeout(() => khung.querySelector("#hd-" + thamSo.muc)?.scrollIntoView({ block: "start" }), 60);
+  }
 
   khung.querySelector("nav").addEventListener("click", (e) => {
     const b = e.target.closest("[data-muc]");

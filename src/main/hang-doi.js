@@ -128,12 +128,15 @@ export async function chay_(dotId) {
   if (!zalo.daKetNoi()) return { ok: false, loi: ["Chưa kết nối Zalo. Vào màn Kết nối Zalo quét QR trước."] };
   const dot = mot("SELECT * FROM dot_gui WHERE id=?", dotId);
   if (!dot) return { ok: false, loi: ["Không tìm thấy đợt gửi."] };
+  // Hồi phục TRƯỚC khi đếm: tắt app giữa chừng thì việc còn dở đang ở trạng thái 'dang'.
+  // Đếm giới hạn chỉ nhìn việc ở trạng thái 'cho', nên đếm trước khi hồi phục sẽ ra 0 việc
+  // và báo nhầm "chạm giới hạn" — đợt dở không bao giờ chạy tiếp được.
+  chay("UPDATE viec_gui SET trang_thai='cho' WHERE dot_id=? AND trang_thai IN ('dang','cho_nhom_khac')", dotId);
+
   const gh0 = kiemGioiHan(dotId);
   const guiDuocAi = gh0.con_tin > 0 && ((gh0.dot_ban > 0 && gh0.con_ban > 0) || (gh0.dot_la > 0 && gh0.con_la > 0));
   if (!guiDuocAi) return { ok: false, cham_gioi_han: true, gioi_han: gh0, loi: gh0.canh_bao.length ? gh0.canh_bao : ["Chạm giới hạn an toàn trong 24 giờ."] };
 
-  // Hồi phục sau khi tắt app giữa chừng: việc đang dở trả về hàng chờ (bước đã ghi nên không gửi lại ảnh)
-  chay("UPDATE viec_gui SET trang_thai='cho' WHERE dot_id=? AND trang_thai='dang'", dotId);
   chay("UPDATE dot_gui SET trang_thai='dang' WHERE id=?", dotId);
 
   Object.assign(tinhTrang, {

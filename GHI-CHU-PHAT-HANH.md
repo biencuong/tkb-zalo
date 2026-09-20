@@ -5,6 +5,29 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.4 — SỬA LỖI KHÔNG GỬI ĐƯỢC TỆP WORD
+
+- **Người nhận chỉ thấy ảnh, không thấy tệp Word.** Nguyên nhân: thư viện Zalo tải tệp đính kèm
+  lên theo từng phần rồi **đợi một sự kiện báo "tải xong" qua WebSocket** mới coi là hoàn tất,
+  mà phần mềm chưa bật kênh nhận sự kiện đó. Ảnh không phải đợi nên vẫn gửi được, còn tệp Word
+  thì treo vĩnh viễn, không báo lỗi. Nay phần mềm **bật kênh nhận sự kiện ngay sau khi đăng nhập**.
+- Thêm **hạn chờ 2 phút** khi gửi tệp: quá hạn thì báo lỗi rõ ràng thay vì treo im lặng.
+- **Sửa lỗi đợt gửi dở không chạy tiếp được**, báo nhầm *"Chạm giới hạn an toàn trong 24 giờ"*
+  trong khi chưa gửi cho ai. Nguyên nhân: việc còn dở nằm ở trạng thái *đang gửi*, mà phép đếm
+  giới hạn chỉ nhìn việc *đang chờ*, và bước khôi phục lại chạy sau phép đếm.
+- Đợt gửi đang dở nay **tự chạy tiếp đúng chỗ**: người đã nhận ảnh rồi thì chỉ gửi nốt tệp Word,
+  không gửi lại ảnh.
+- Đã kiểm chứng bằng tài khoản Zalo thật: ảnh và tệp Word đều đến nơi.
+
+**Hướng dẫn lấy tệp từ phần mềm xếp thời khoá biểu**
+
+- Mục *Chuẩn bị tệp* nay ghi đủ ba bước: (1) Dữ liệu → Dữ liệu giáo viên → Danh sách giáo viên →
+  biểu tượng Excel → **Copy file dữ liệu mẫu**; (2) Hệ thống → **Chuyển đổi dữ liệu sang Excel**;
+  (3) Hệ thống → In ấn → Thời khoá biểu **theo lớp** và **theo giáo viên**, xuất ra tệp Word.
+- Ba bước này cũng hiện ngay ở trang Dữ liệu khi máy còn trắng, kèm nút mở hướng dẫn đầy đủ.
+
+---
+
 ## 0.1.3 — Nói đúng thứ còn thiếu ở bước Gửi
 
 - **Sửa lỗi gây hiểu nhầm:** đã quét mã QR xong mà bước Gửi vẫn báo *"Còn thiếu: chưa kết nối Zalo"*.

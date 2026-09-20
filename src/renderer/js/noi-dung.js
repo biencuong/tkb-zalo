@@ -102,11 +102,35 @@ Tự kiểm tra bất cứ lúc nào: bấm số hiệu ở cuối thanh bên, h
 <div class="bao canh"><b>Chưa nhập thì cột chủ nhiệm trống, app không biết gửi TKB lớp cho ai.</b>
 <span class="sua">Nhập “Danh sách giáo viên chủ nhiệm” trong phần mềm xếp TKB rồi xuất Excel lại. Hoặc chọn tay trong màn Thời khoá biểu.</span></div>
 
-<h3>Xuất tệp</h3>
-<ul>
-  <li>Excel: <b>Hệ thống → Chuyển đổi dữ liệu sang Excel</b>.</li>
-  <li>Word: <b>In thời khoá biểu</b> — theo giáo viên, và theo lớp.</li>
-</ul>
+<h3>Lấy tệp ra khỏi phần mềm xếp thời khoá biểu</h3>
+<p>Làm đúng ba bước này, mỗi bước ra một loại tệp:</p>
+
+<table class="b"><thead><tr><th style="width:8%">Bước</th><th>Vào đâu</th><th>Ra tệp gì</th></tr></thead><tbody>
+  <tr><td><b>1</b></td>
+      <td><b>Dữ liệu → Dữ liệu giáo viên → Danh sách giáo viên</b>, bấm <b>biểu tượng Excel</b>,
+          chọn <b>Copy file dữ liệu mẫu</b>.</td>
+      <td>Tệp Excel <b>danh sách giáo viên</b> đúng mẫu. Mở ra điền thêm
+          <b>số điện thoại</b> từng người rồi lưu lại.</td></tr>
+  <tr><td><b>2</b></td>
+      <td><b>Hệ thống → Chuyển đổi dữ liệu sang Excel</b>.</td>
+      <td>Tệp Excel tổng (<span class="mono">SS….xlsx</span>) — bảng phân công và toàn bộ tiết học.</td></tr>
+  <tr><td><b>3</b></td>
+      <td><b>Hệ thống → In ấn → Thời khoá biểu theo lớp</b>, rồi
+          <b>Thời khoá biểu theo giáo viên</b>, xuất ra tệp Word.</td>
+      <td>Hai tệp Word để giáo viên tải về in.</td></tr>
+</tbody></table>
+
+<div class="bao tin"><b>Đủ ba loại tệp trên rồi thì kéo thả tất cả vào phần mềm này một lượt.</b>
+  <span class="sua">Thả cùng lượt thì tệp Word mới biết nó thuộc thời khoá biểu số mấy.
+  Phần mềm tự phân loại, đặt tên chuẩn và cất đúng chỗ, sau đó bạn bấm nhập vào hệ thống.</span></div>
+
+<h3>Thứ tự nạp</h3>
+<ol>
+  <li><b>Danh sách giáo viên trước.</b> Chưa có ai trong danh sách thì thời khoá biểu không khớp
+      vào người được, nút nhập sẽ bị khoá.</li>
+  <li><b>Thời khoá biểu sau</b> — phần mềm tự tạo ảnh luôn sau khi nhập.</li>
+</ol>
+
 <p class="nho mo">Đóng Word và Excel trước khi nhập, nếu không app báo lỗi đọc tệp.</p>`,
   },
   {

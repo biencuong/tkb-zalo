@@ -596,3 +596,14 @@ button.lien:hover{color:var(--accent-nut)}
 @media (prefers-reduced-motion: reduce){
   #nhip-zalo .nz-tim,#nhip-zalo .nz-tim::after{animation:none !important}
 }
+
+/* ---------- Ba bước lấy tệp từ phần mềm xếp thời khoá biểu ---------- */
+.ba-buoc{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:.8rem;margin-top:.5rem}
+.ba-buoc > div{display:flex;flex-direction:column;gap:.2rem;padding-left:1.9rem;position:relative}
+.bb-so{
+  position:absolute;left:0;top:1px;display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;
+  font-size:.78rem;font-weight:700;
+}
+.ba-buoc b{font-family:"Barlow Semi Condensed","Segoe UI",sans-serif;font-size:.95rem}
+.ba-buoc span:not(.bb-so){font-size:.8rem;color:var(--muted);line-height:1.45}

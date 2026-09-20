@@ -229,6 +229,32 @@ async function veKho(khung, ti) {
 }
 
 /**
+ * Ba bước lấy tệp ra khỏi phần mềm xếp thời khoá biểu. Chỉ hiện khi máy còn trắng —
+ * có dữ liệu rồi thì người dùng đã biết đường, bày ra nữa là thừa.
+ */
+const veBaBuoc = () => `
+  <div class="the" style="border-left:3px solid var(--accent)">
+    <div class="the-dau"><h3 style="margin:0">Lấy tệp ra khỏi phần mềm xếp thời khoá biểu</h3>
+      <button class="nut nho" id="mo-huong-dan-tep">Xem hướng dẫn đầy đủ</button></div>
+    <div class="ba-buoc">
+      <div><span class="bb-so">1</span>
+        <b>Danh sách giáo viên</b>
+        <span>Dữ liệu → Dữ liệu giáo viên → Danh sách giáo viên → bấm biểu tượng Excel →
+          <b>Copy file dữ liệu mẫu</b>. Mở ra điền số điện thoại rồi lưu.</span></div>
+      <div><span class="bb-so">2</span>
+        <b>Excel tổng</b>
+        <span>Hệ thống → <b>Chuyển đổi dữ liệu sang Excel</b>. Ra tệp <span class="mono">SS….xlsx</span>
+          chứa phân công và toàn bộ tiết học.</span></div>
+      <div><span class="bb-so">3</span>
+        <b>Hai tệp Word</b>
+        <span>Hệ thống → In ấn → Thời khoá biểu <b>theo lớp</b>, rồi <b>theo giáo viên</b>,
+          xuất ra tệp Word để in.</span></div>
+    </div>
+    <p class="nho mo" style="margin:.6rem 0 0">Đủ ba loại rồi thì kéo thả tất cả vào vùng bên dưới
+      <b>một lượt</b> — thả cùng lượt thì tệp Word mới biết nó thuộc thời khoá biểu số mấy.</p>
+  </div>`;
+
+/**
  * Thẻ tệp đang chờ. DANH SÁCH GIÁO VIÊN LUÔN ĐỨNG TRƯỚC: thời khoá biểu phải khớp được
  * với giáo viên mới nhập được, chưa có ai trong danh sách thì nhập thời khoá biểu là vô nghĩa.
  */
@@ -281,7 +307,11 @@ async function veKhuNhap(khung, ti) {
   // Đã có dữ liệu rồi thì vùng kéo thả chiếm chỗ vô ích — thu lại sau một nút nhỏ có nhãn rõ.
   const daCoDuLieu = soGv > 0 && soTkb > 0;
 
+  // Máy còn trắng: chỉ đường lấy tệp trước, rồi mới tới vùng kéo thả.
+  const conTrang = soGv === 0 && soTkb === 0;
+
   khung.innerHTML = `
+  ${conTrang ? veBaBuoc() : ""}
   ${daCoDuLieu ? `<div class="thanh-them">
       <button class="nut nho chinh" id="mo-tha" aria-expanded="false">＋ Thêm tệp dữ liệu</button>
       <span class="nho mo">Có thời khoá biểu mới thì thả tệp vào đây.</span>
@@ -344,6 +374,10 @@ async function veKhuNhap(khung, ti) {
     const b = e.target.closest("button");
     if (!b || b.closest("#tm-khung")) return;
 
+    if (b.id === "mo-huong-dan-tep") {
+      const { di: diTrang } = await import("../app.js");
+      return diTrang("cai-dat", { tab: "tro-giup", muc: "chuan-bi" });
+    }
     if (b.id === "mo-tha") {
       const boc = khung.querySelector("#boc-tha");
       const mo = boc.hidden;

@@ -270,9 +270,34 @@ function vaCotThieu() {
   }
 }
 
+/**
+ * Gỡ khoá gửi trùng MỘT LẦN cho máy đã dùng bản cũ.
+ * Bản cũ mặc định bỏ qua người đã nhận y nguyên, nên bấm gửi lại là không gửi được gì.
+ * Nay gửi trùng chỉ cảnh báo, không chặn. Chỉ sửa đúng một lần, sau đó người dùng tự chọn.
+ */
+function goKhoaGuiTrung() {
+  try {
+    const daGo = db.prepare("SELECT gia_tri FROM cai_dat WHERE khoa='da_go_khoa_trung'").get();
+    if (daGo) return;
+    const r = db.prepare("SELECT gia_tri FROM cai_dat WHERE khoa='tuy_chon_gui_json'").get();
+    if (r?.gia_tri) {
+      const tc = JSON.parse(r.gia_tri);
+      if (tc.bo_qua_trung === true) {
+        tc.bo_qua_trung = false;
+        db.prepare("UPDATE cai_dat SET gia_tri=? WHERE khoa='tuy_chon_gui_json'").run(JSON.stringify(tc));
+        console.log("[db] đã gỡ khoá gửi trùng trong tuỳ chọn gửi đã lưu");
+      }
+    }
+    db.prepare("INSERT OR REPLACE INTO cai_dat(khoa,gia_tri) VALUES('da_go_khoa_trung','1')").run();
+  } catch (e) {
+    console.error("[db] không gỡ được khoá gửi trùng:", e?.message || e);
+  }
+}
+
 function taoLuocDo() {
   db.exec(LUOC_DO);
   vaCotThieu();
+  goKhoaGuiTrung();
   const v = db.prepare("SELECT phien_ban FROM luoc_do LIMIT 1").get();
   if (!v) db.prepare("INSERT INTO luoc_do(phien_ban) VALUES (?)").run(PHIEN_BAN_LUOC_DO);
 }

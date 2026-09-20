@@ -5,6 +5,18 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.7 — Gửi trùng chỉ cảnh báo, không chặn nữa
+
+- **Bỏ khoá gửi trùng.** Trước đây phần mềm tự bỏ qua người đã nhận y nguyên, nên bấm gửi lại là
+  không gửi được gì. Nay **gửi lại luôn được**, phần mềm chỉ cảnh báo và đánh dấu mục nào từng nhận
+  đúng nội dung đó. Máy đã dùng bản cũ được gỡ khoá tự động một lần.
+- Muốn khỏi gửi trùng thì tự tích **Bỏ qua người đã nhận y nguyên** hoặc **Chỉ gửi người có thay đổi**.
+- Bảng xem trước đổi nhãn cho đúng nghĩa: *lần đầu* · *có thay đổi* · *gửi lại · đã nhận y nguyên*.
+- Hướng dẫn ghi rõ **tệp duy nhất cần có**: tệp Excel tổng tên bắt đầu bằng `SS.`
+  (ví dụ `SS.2609201832133477.xlsx`), lấy từ *Hệ thống → Chuyển đổi dữ liệu sang Excel*.
+
+---
+
 ## 0.1.6 — Gửi vào nhóm Zalo, hộp gửi nói rõ ai nhận được
 
 **Nhóm Zalo**

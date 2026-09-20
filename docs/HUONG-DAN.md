@@ -17,7 +17,7 @@
 - [7. Kết nối Zalo](#zalo)
 - [8. Vì sao có người không nhận được](#ket-ban)
 - [9. Gửi thời khoá biểu](#gui)
-- [10. Chống gửi trùng](#trung)
+- [10. Gửi lại và cảnh báo trùng](#trung)
 - [11. Lịch sử gửi](#lich-su)
 - [12. Thống kê số tiết](#thong-ke)
 - [13. Lỗi thường gặp](#loi)
@@ -80,7 +80,10 @@ Cập nhật **không mất** dữ liệu. Gỡ app cũng không xoá thư mục
 
 ### Cần ít nhất bao nhiêu tệp?
 
-**Một tệp là chạy được.** Ảnh thời khoá biểu do phần mềm tự vẽ từ số liệu trong tệp Excel tổng, không cần tệp Word nào. Thêm tệp chỉ để tiện hơn:
+> **Một tệp duy nhất là chạy được: tệp Excel tổng, tên bắt đầu bằng `SS.` — ví dụ `SS.2609201832133477.xlsx`.** Lấy bằng **Hệ thống → Chuyển đổi dữ liệu sang Excel** trong phần mềm xếp thời khoá biểu.
+> Nhận ra tệp đúng bằng cách mở lên xem có sheet tên `PCGD` và các sheet `TKB_LOP_…`, `TKB_GV_…` hay không.
+
+Ảnh thời khoá biểu do phần mềm tự vẽ từ số liệu trong tệp đó, không cần tệp Word nào. Thêm tệp chỉ để tiện hơn:
 
 | Mức | Tệp cần có | Người nhận được gì |
 |---|---|---|
@@ -374,23 +377,28 @@ Hạn mức tính theo **từng tài khoản Zalo**: đổi sang tài khoản kh
 
 <a id="trung"></a>
 
-## 10. Chống gửi trùng
+## 10. Gửi lại và cảnh báo trùng
 
-App nhớ **nội dung lịch dạy** của từng người ở mỗi lần gửi thành công, nên biết lần này có gì khác không.
+Phần mềm nhớ **nội dung lịch dạy** của từng người ở mỗi lần gửi thành công, nên biết lần này có gì khác lần trước không.
 
-| Trạng thái | Nghĩa là |
+> **Gửi lại luôn được, phần mềm không chặn.** Giáo viên xoá mất tin, đổi máy, hay nhà trường muốn nhắc lại — đều gửi lại bình thường.
+> Phần mềm chỉ **cảnh báo** và đánh dấu mục nào đã từng nhận y nguyên nội dung đó.
+
+### Ba nhãn trong bảng xem trước
+
+|   |   |
 |---|---|
-| [lần đầu] | Chưa từng nhận. |
-| [có thay đổi] | Từng nhận, nay lịch dạy khác. |
-| [trùng] | **Đã nhận đúng nội dung này rồi.** |
+| [lần đầu] | Người này chưa từng nhận thời khoá biểu này. |
+| [có thay đổi] | Từng nhận rồi, nhưng lịch dạy nay đã khác. |
+| [gửi lại · đã nhận y nguyên] | Từng nhận đúng nội dung này. Vẫn gửi, chỉ là bạn nên biết. |
 
 
-### Hai tuỳ chọn
+### Muốn khỏi gửi trùng thì tích thêm
 
-- **Bỏ qua người đã nhận y nguyên** (bật sẵn). Bỏ tích thì vẫn gửi được, app hiện cảnh báo gửi trùng.
-- **Chỉ gửi người có thay đổi** — hợp khi sửa TKB giữa chừng mà chỉ vài người bị ảnh hưởng.
+- **Bỏ qua người đã nhận y nguyên** — chỉ gửi cho ai chưa nhận.
+- **Chỉ gửi người có thay đổi** — bỏ qua cả người chưa từng nhận, chỉ gửi ai có lịch khác trước.
 
-App so nội dung lịch dạy, không so số TKB. Đổi số mà lịch không đổi thì vẫn tính là trùng.
+Dấu nhận biết là nội dung lịch dạy, không phải số thời khoá biểu. Đổi số mà lịch y nguyên thì vẫn tính là trùng.
 
 ---
 

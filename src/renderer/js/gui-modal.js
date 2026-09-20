@@ -16,7 +16,8 @@ const CHU_BO_QUA = {
 function veTomTat(tt) {
   return `<div class="luoi c4" style="margin-bottom:.6rem">
     <div class="o-so vach-ok"><b>Sẽ gửi</b><span class="v">${so(tt.se_gui)}</span><span class="g">${so(tt.so_nguoi)} người · ${so(tt.so_tin)} tin</span></div>
-    <div class="o-so ${tt.trung ? "vach-xau" : "vach"}"><b>Trùng</b><span class="v">${so(tt.trung)}</span><span class="g">đã gửi y nguyên</span></div>
+    <div class="o-so vach"><b>Gửi lại</b><span class="v">${so(tt.trung)}</span>
+      <span class="g">từng nhận y nguyên nội dung này</span></div>
     <div class="o-so vach"><b>Có thay đổi</b><span class="v">${so(tt.thay_doi)}</span><span class="g">lần đầu: ${so(tt.lan_dau)}</span></div>
     <div class="o-so ${tt.bo_qua ? "vach-xau" : "vach"}"><b>Bỏ qua</b><span class="v">${so(tt.bo_qua)}</span>
       <span class="g">thiếu Zalo ${so(tt.thieu_uid)} · thiếu tệp ${so(tt.thieu_tep)}</span></div>
@@ -36,7 +37,7 @@ function veBangMuc(muc) {
         <br><button class="nut nho" data-dt="${esc(m.loai)}:${esc(m.ma)}" title="Xem như trên điện thoại người nhận">Trên ĐT</button></td>
       <td class="nho">${m.bo_qua
         ? `<span class="nhan n-xam">${esc(CHU_BO_QUA[m.bo_qua] || m.bo_qua)}</span><br><span class="mo">${esc(m.ly_do || "")}</span>`
-        : m.trung ? '<span class="nhan n-canh">gửi lại (trùng)</span>'
+        : m.trung ? '<span class="nhan n-xam">gửi lại · đã nhận y nguyên</span>'
         : m.thay_doi ? '<span class="nhan n-coral">có thay đổi</span>' : '<span class="nhan n-ok">lần đầu</span>'}</td>
     </tr>`).join("")}</tbody></table></div>`;
 }
@@ -199,11 +200,13 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
               <option value="chieu" ${tc.anh_gom === "chieu" ? "selected" : ""}>Chỉ chiều</option>
             </select></div>
 
-          <h3>Tránh gửi trùng</h3>
-          <label class="tich"><input type="checkbox" id="t-botrung" ${tc.bo_qua_trung !== false ? "checked" : ""}>
-            <span>Bỏ qua người <b>đã nhận y nguyên</b></span></label>
+          <h3>Gửi lại</h3>
+          <p class="nho mo" style="margin:0 0 .3rem">Mặc định <b>gửi lại được thoải mái</b>.
+            Phần mềm chỉ đánh dấu mục nào từng gửi y nguyên để bạn biết, không chặn.</p>
+          <label class="tich"><input type="checkbox" id="t-botrung" ${tc.bo_qua_trung === true ? "checked" : ""}>
+            <span>Bỏ qua người <b>đã nhận y nguyên</b><span class="g">Tích vào nếu chỉ muốn gửi cho người chưa nhận.</span></span></label>
           <label class="tich"><input type="checkbox" id="t-thaydoi" ${tc.chi_thay_doi ? "checked" : ""}>
-            <span>Chỉ gửi người <b>có thay đổi</b></span></label>
+            <span>Chỉ gửi người <b>có thay đổi</b><span class="g">Bỏ qua cả người chưa từng nhận.</span></span></label>
         </div>
       </div>
     </div>

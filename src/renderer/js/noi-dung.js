@@ -89,8 +89,13 @@ Tự kiểm tra bất cứ lúc nào: bấm số hiệu ở cuối thanh bên, h
     ma: "chuan-bi", ten: "3. Chuẩn bị tệp",
     noi: `
 <h3>Cần ít nhất bao nhiêu tệp?</h3>
-<p><b>Một tệp là chạy được.</b> Ảnh thời khoá biểu do phần mềm tự vẽ từ số liệu trong tệp Excel tổng,
-không cần tệp Word nào. Thêm tệp chỉ để tiện hơn:</p>
+<div class="bao ok"><b>Một tệp duy nhất là chạy được: tệp Excel tổng, tên bắt đầu bằng
+  <span class="mono">SS.</span> — ví dụ <span class="mono">SS.2609201832133477.xlsx</span>.</b>
+  <span class="sua">Lấy bằng <b>Hệ thống → Chuyển đổi dữ liệu sang Excel</b> trong phần mềm xếp thời khoá biểu.
+  Nhận ra tệp đúng bằng cách mở lên xem có sheet tên <span class="mono">PCGD</span> và các sheet
+  <span class="mono">TKB_LOP_…</span>, <span class="mono">TKB_GV_…</span> hay không.</span></div>
+<p>Ảnh thời khoá biểu do phần mềm tự vẽ từ số liệu trong tệp đó, không cần tệp Word nào.
+Thêm tệp chỉ để tiện hơn:</p>
 
 <table class="b"><thead><tr><th style="width:14%">Mức</th><th>Tệp cần có</th><th>Người nhận được gì</th></tr></thead><tbody>
   <tr><td><b>Tối thiểu</b><br><span class="nhan n-ok">1 tệp</span></td>
@@ -376,21 +381,29 @@ Hết mức người lạ thì app <b>vẫn gửi tiếp cho người đã kết
 Gặp <b>3 lỗi liên tiếp</b> thì tự dừng.</p>`,
   },
   {
-    ma: "trung", ten: "10. Chống gửi trùng",
+    ma: "trung", ten: "10. Gửi lại và cảnh báo trùng",
     noi: `
-<p>App nhớ <b>nội dung lịch dạy</b> của từng người ở mỗi lần gửi thành công, nên biết lần này có gì khác không.</p>
-<table class="b"><thead><tr><th>Trạng thái</th><th>Nghĩa là</th></tr></thead><tbody>
-  <tr><td><span class="nhan n-ok">lần đầu</span></td><td>Chưa từng nhận.</td></tr>
-  <tr><td><span class="nhan n-coral">có thay đổi</span></td><td>Từng nhận, nay lịch dạy khác.</td></tr>
-  <tr><td><span class="nhan n-canh">trùng</span></td><td><b>Đã nhận đúng nội dung này rồi.</b></td></tr>
+<p>Phần mềm nhớ <b>nội dung lịch dạy</b> của từng người ở mỗi lần gửi thành công, nên biết lần này
+có gì khác lần trước không.</p>
+
+<div class="bao ok"><b>Gửi lại luôn được, phần mềm không chặn.</b>
+  <span class="sua">Giáo viên xoá mất tin, đổi máy, hay nhà trường muốn nhắc lại — đều gửi lại bình thường.
+  Phần mềm chỉ <b>cảnh báo</b> và đánh dấu mục nào đã từng nhận y nguyên nội dung đó.</span></div>
+
+<h3>Ba nhãn trong bảng xem trước</h3>
+<table class="b"><tbody>
+  <tr><td style="width:34%"><span class="nhan n-ok">lần đầu</span></td><td>Người này chưa từng nhận thời khoá biểu này.</td></tr>
+  <tr><td><span class="nhan n-coral">có thay đổi</span></td><td>Từng nhận rồi, nhưng lịch dạy nay đã khác.</td></tr>
+  <tr><td><span class="nhan n-xam">gửi lại · đã nhận y nguyên</span></td><td>Từng nhận đúng nội dung này. Vẫn gửi, chỉ là bạn nên biết.</td></tr>
 </tbody></table>
 
-<h3>Hai tuỳ chọn</h3>
+<h3>Muốn khỏi gửi trùng thì tích thêm</h3>
 <ul>
-  <li><b>Bỏ qua người đã nhận y nguyên</b> (bật sẵn). Bỏ tích thì vẫn gửi được, app hiện cảnh báo gửi trùng.</li>
-  <li><b>Chỉ gửi người có thay đổi</b> — hợp khi sửa TKB giữa chừng mà chỉ vài người bị ảnh hưởng.</li>
+  <li><b>Bỏ qua người đã nhận y nguyên</b> — chỉ gửi cho ai chưa nhận.</li>
+  <li><b>Chỉ gửi người có thay đổi</b> — bỏ qua cả người chưa từng nhận, chỉ gửi ai có lịch khác trước.</li>
 </ul>
-<p class="nho mo">App so nội dung lịch dạy, không so số TKB. Đổi số mà lịch không đổi thì vẫn tính là trùng.</p>`,
+<p class="nho mo">Dấu nhận biết là nội dung lịch dạy, không phải số thời khoá biểu. Đổi số mà lịch y nguyên
+thì vẫn tính là trùng.</p>`,
   },
   {
     ma: "lich-su", ten: "11. Lịch sử gửi",

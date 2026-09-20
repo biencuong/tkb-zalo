@@ -13,7 +13,10 @@ export const TUY_CHON_MAC_DINH = {
   gui_anh: true,
   gui_docx: true,
   chi_thay_doi: false,       // chỉ gửi người có thay đổi so với lần gửi trước
-  bo_qua_trung: true,        // bỏ qua người đã nhận y nguyên nội dung này
+  // Mặc định KHÔNG chặn gửi lại. Gửi lại là việc bình thường: giáo viên xoá mất tin,
+  // đổi máy, hoặc đơn giản là nhà trường muốn nhắc lại. Phần mềm vẫn NHẬN RA và ghi rõ
+  // mục nào đã gửi y nguyên để người dùng tự quyết, chứ không tự ý bỏ qua.
+  bo_qua_trung: false,
   anh_gom: "ca_ngay",        // ca_ngay | sang | chieu
   kho_giay: "",              // "" = theo TKB
   chi_chon: null,            // [{nguoi_loai,nguoi_id}] nếu người dùng chọn tay
@@ -181,9 +184,9 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
   };
 
   if (tomTat.trung && tc.bo_qua_trung) {
-    canhBao.push(`Bỏ qua ${tomTat.trung} mục đã gửi y nguyên.`);
+    canhBao.push(`Đang bỏ qua ${tomTat.trung} mục đã gửi y nguyên. Bỏ tích "Bỏ qua người đã nhận y nguyên" nếu muốn gửi lại.`);
   } else if (tomTat.trung) {
-    canhBao.push(`GỬI TRÙNG: ${tomTat.trung} mục đã gửi y nguyên trước đó.`);
+    canhBao.push(`${tomTat.trung} mục đã từng gửi y nguyên nội dung này — lần này sẽ gửi lại.`);
   }
   if (tomTat.thieu_uid) canhBao.push(`${tomTat.thieu_uid} người chưa dò được Zalo.`);
   if (tomTat.chua_la_ban) {

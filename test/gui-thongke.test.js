@@ -166,16 +166,17 @@ test("CẢNH BÁO GỬI TRÙNG sau khi đã gửi, và tuỳ chọn chỉ gửi 
   assert.equal(lichSuGui({}).length, 44);
   assert.equal(thongKeGui().thanh_cong, 44);
 
-  // Lần 2: mọi thứ y nguyên → tất cả là trùng
+  // Lần 2: mọi thứ y nguyên → nhận ra là trùng, NHƯNG KHÔNG CHẶN.
+  // Gửi lại là việc bình thường (giáo viên xoá mất tin, đổi máy…), phần mềm chỉ cảnh báo.
   const r2 = chuanBiDotGui(tkbId, { gui_anh: false, gui_docx: true });
   assert.equal(r2.tom_tat.trung, 44);
-  assert.equal(r2.tom_tat.se_gui, 0, "bỏ qua trùng theo mặc định");
-  assert.ok(r2.canh_bao.some((c) => c.includes("đã gửi y nguyên")));
+  assert.equal(r2.tom_tat.se_gui, 44, "mặc định vẫn gửi lại được, chỉ cảnh báo");
+  assert.ok(r2.canh_bao.some((c) => c.includes("đã từng gửi y nguyên")), "phải có cảnh báo gửi trùng");
 
-  // Bỏ tích "bỏ qua trùng" → vẫn gửi được nhưng có cảnh báo
-  const r3 = chuanBiDotGui(tkbId, { gui_anh: false, gui_docx: true, bo_qua_trung: false });
-  assert.equal(r3.tom_tat.se_gui, 44);
-  assert.ok(r3.canh_bao.some((c) => c.includes("GỬI TRÙNG")));
+  // Ai muốn chặn thì tự tích "bỏ qua người đã nhận y nguyên"
+  const r3 = chuanBiDotGui(tkbId, { gui_anh: false, gui_docx: true, bo_qua_trung: true });
+  assert.equal(r3.tom_tat.se_gui, 0, "tích vào thì mới bỏ qua");
+  assert.ok(r3.canh_bao.some((c) => c.includes("Đang bỏ qua")));
 
   // Đổi lịch dạy của 1 giáo viên → chỉ người đó "thay đổi"
   const gv = chiTietTkb(tkbId).gv.find((g) => g.ma_trong_tkb === "Thuy Ha");

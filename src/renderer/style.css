@@ -548,3 +548,6 @@ button.lien:hover{color:var(--accent-nut)}
 /* ---------- Hàng chọn thời khoá biểu rồi gửi ---------- */
 .hang-gui{display:flex;align-items:flex-end;gap:.7rem;flex-wrap:wrap;margin-top:.4rem}
 .hang-gui .nut.chinh{white-space:nowrap}
+
+/* Nhắc khi người dùng chọn thời khoá biểu cũ thay vì bản mới nhất */
+.goi-y.nhac-cu{color:var(--warn);font-weight:600}

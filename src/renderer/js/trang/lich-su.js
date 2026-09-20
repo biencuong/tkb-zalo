@@ -120,8 +120,9 @@ export async function ve(khung, thamSo = {}) {
         <div class="hang-gui">
           <div class="o-nhap" style="margin:0;flex:1;min-width:220px"><label>Chọn thời khoá biểu</label>
             <select id="g-chon-tkb">
-              ${rTkb.ds.map((t) => `<option value="${t.id}">Số ${t.so_tkb} · ${esc(t.nam_hoc)}${t.hoc_ky ? ` · HK${t.hoc_ky}` : ""} · từ ${esc(ngayVn(t.ngay_ap_dung)) || "?"}</option>`).join("")}
-            </select></div>
+              ${rTkb.ds.map((t, i) => `<option value="${t.id}" ${i === 0 ? "selected" : ""}>Số ${t.so_tkb} · ${esc(t.nam_hoc)}${t.hoc_ky ? ` · HK${t.hoc_ky}` : ""} · từ ${esc(ngayVn(t.ngay_ap_dung)) || "?"}${i === 0 ? " · mới nhất" : ""}</option>`).join("")}
+            </select>
+            <div class="goi-y" id="g-nhac">Mặc định gửi bản mới nhất.</div></div>
           <button class="nut chinh" id="g-gui">Gửi qua Zalo</button>
         </div>
         <p class="nho mo" style="margin:.5rem 0 0">Bấm gửi sẽ hiện hộp tuỳ chọn, bảng xem trước ai nhận gì,
@@ -204,6 +205,18 @@ export async function ve(khung, thamSo = {}) {
       khung.querySelector(`[data-khu-g="${t.ma}"]`).hidden = t.ma !== tabG;
     }
     document.getElementById("chinh").scrollTop = 0;
+  });
+
+  // Chọn bản cũ thì nhắc ngay, kẻo gửi nhầm thời khoá biểu đã hết hiệu lực.
+  const oChon = khung.querySelector("#g-chon-tkb");
+  oChon?.addEventListener("change", () => {
+    const nhac = khung.querySelector("#g-nhac");
+    if (!nhac) return;
+    const laMoiNhat = oChon.selectedIndex === 0;
+    nhac.textContent = laMoiNhat
+      ? "Mặc định gửi bản mới nhất."
+      : `Đang chọn bản cũ. Bản mới nhất là số ${tkbMoi.so_tkb} (${tkbMoi.nam_hoc}).`;
+    nhac.classList.toggle("nhac-cu", !laMoiNhat);
   });
 
   khung.querySelector("#tab-ls")?.addEventListener("click", (e) => {

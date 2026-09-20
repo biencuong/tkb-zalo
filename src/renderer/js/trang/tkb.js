@@ -11,8 +11,11 @@ export async function ve(khung, thamSo = {}) {
   const gon = Boolean(thamSo.gon);
   const r = await window.api.tkb.ds();
   const ds = r.ds || [];
+  // ds đã xếp mới nhất lên đầu. Mặc định luôn là BẢN MỚI NHẤT; bản đang xem mà bị xoá
+  // hoặc chưa chọn gì thì quay về bản mới nhất, không để trỏ vào chỗ trống.
   if (thamSo?.tkbId) dangXem = thamSo.tkbId;
-  if (!dangXem && ds.length) dangXem = ds[0].id;
+  if (ds.length && !ds.some((t) => t.id === dangXem)) dangXem = ds[0].id;
+  const idMoiNhat = ds.length ? ds[0].id : null;
 
   if (!ds.length) {
     khung.innerHTML = `<div class="dau-trang"><div><h1>Thời khoá biểu</h1></div></div>
@@ -35,7 +38,7 @@ export async function ve(khung, thamSo = {}) {
     <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
       <${gon ? "h2" : "h1"} style="margin:0">Thời khoá biểu</${gon ? "h2" : "h1"}>
       <select id="chon-tkb" style="max-width:300px;width:auto">
-        ${ds.map((t) => `<option value="${t.id}" ${t.id === dangXem ? "selected" : ""}>Số ${t.so_tkb} · ${esc(t.nam_hoc)}${t.hoc_ky ? ` · HK${t.hoc_ky}` : ""} · từ ${esc(ngayVn(t.ngay_ap_dung)) || "?"}</option>`).join("")}
+        ${ds.map((t) => `<option value="${t.id}" ${t.id === dangXem ? "selected" : ""}>Số ${t.so_tkb} · ${esc(t.nam_hoc)}${t.hoc_ky ? ` · HK${t.hoc_ky}` : ""} · từ ${esc(ngayVn(t.ngay_ap_dung)) || "?"}${t.id === idMoiNhat ? " · mới nhất" : ""}</option>`).join("")}
       </select>
     </div>
     <div class="hang-nut">
@@ -45,6 +48,12 @@ export async function ve(khung, thamSo = {}) {
       <button class="nut chinh" id="di-gui">Gửi qua Zalo</button>
     </div>
   </div>
+
+  ${dangXem !== idMoiNhat ? `<div class="bao canh" style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap">
+    <span><b>Đây không phải thời khoá biểu mới nhất.</b>
+      <span class="sua">Bản mới nhất là số ${ds[0].so_tkb} (${esc(ds[0].nam_hoc)}), thực hiện từ ${esc(ngayVn(ds[0].ngay_ap_dung)) || "?"}.</span></span>
+    <button class="nut nho chinh" id="ve-moi-nhat">Xem bản mới nhất</button>
+  </div>` : ""}
 
   <div class="luoi c4" style="margin-bottom:.75rem">
     <div class="o-so vach"><b>Quy mô</b><span class="v">${so(ct.lop.length)}</span>
@@ -160,6 +169,7 @@ export async function ve(khung, thamSo = {}) {
   khung.addEventListener("click", async (e) => {
     const b = e.target.closest("button");
     if (!b) return;
+    if (b.id === "ve-moi-nhat") { dangXem = idMoiNhat; return ve(khung, { ...thamSo, tkbId: idMoiNhat }); }
     if (b.id === "di-gui") { await moGui(dangXem); return ve(khung, thamSo); }
     if (b.dataset.dt) {
       const [loai, ...r] = b.dataset.dt.split(":");

@@ -160,7 +160,8 @@ export async function kiemTraBanMoi({ dungCache = true } = {}) {
     ban_moi: moiNhat?.ban || banHienTai,
     ngay: moiNhat?.ngay || "",
     ghi_chu: moiNhat?.ghi_chu || "",
-    sha256: (moiNhat?.ghi_chu.match(/SHA-?256\s*[:=]\s*([0-9a-f]{64})/i) || [])[1] || "",
+    // Ghi chú phát hành viết bằng Markdown nên giữa nhãn và mã băm hay có ** hoặc dấu nháy ngược.
+    sha256: (moiNhat?.ghi_chu.match(/SHA-?256[^0-9a-fA-F]{0,24}([0-9a-fA-F]{64})/) || [])[1]?.toLowerCase() || "",
     tep: moiNhat?.tep ? { ten: moiNhat.tep.name, url: moiNhat.tep.browser_download_url, co: moiNhat.tep.size } : null,
     lich_su: ds.slice(0, 8).map((x) => ({
       ban: x.ban, ngay: x.ngay, ghi_chu: x.ghi_chu,

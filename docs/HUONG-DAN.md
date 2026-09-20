@@ -258,7 +258,12 @@ Phiên Zalo đứt giữa chừng thì đèn tắt trong vòng 30 giây, không 
 > **Gửi vào nhóm không cần số điện thoại và không cần kết bạn.** Mình đã ở trong nhóm rồi nên tin chắc chắn tới.
 > Hợp với nhóm tổ chuyên môn hoặc nhóm toàn trường: một lần gửi là cả nhóm thấy.
 
-Nhóm đã chọn hiện ở **Dữ liệu → Giáo viên → Người nhận ngoài danh sách**, ghi rõ tên nhóm và số thành viên. Muốn nhóm nhận thời khoá biểu nào thì đặt đăng ký cho nhóm đó như với người ngoài.
+> **Phải chọn nhóm nhận thời khoá biểu nào, nếu không gửi sẽ không ra tin.** Ngay trong hộp chọn nhóm có ô **Nhóm được nhận thời khoá biểu nào**: tất cả các lớp, hoặc tất cả giáo viên.
+> Phần mềm không tự đoán được nên không đặt thì nó không biết gửi gì vào nhóm.
+
+Nhóm đã chọn hiện ở **Dữ liệu → Giáo viên → Người nhận ngoài danh sách**, ghi rõ tên nhóm và số thành viên. Sửa lại ở đó nếu muốn nhóm nhận thứ khác.
+
+Bấm **Dò Zalo** thì phần mềm **làm mới cả nhóm**: cập nhật tên và số thành viên, và báo nếu bạn đã rời nhóm nào đó.
 
 ### Nút nối nhanh
 

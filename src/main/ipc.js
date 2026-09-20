@@ -291,8 +291,17 @@ export function dangKyTatCa() {
   }));
   dangKy("zalo:dang-xuat", (xoaPhien) => ({ ok: true, ...zalo.dangXuat({ xoaPhien: xoaPhien !== false }) }));
   dangKy("zalo:do-uid", async ({ chiThieu = true } = {}) => {
+    // Dò là dò CẢ NHÓM: tên nhóm và số thành viên đổi theo thời gian, nhóm đã rời thì phải biết.
+    const nhom = await lamMoiNhom();
     const ds = gv.canDoUid({ chiThieu });
-    if (!ds.length) return { ok: true, n: 0, ghi_chu: "Không có ai cần dò (mọi người đã có Zalo UID)." };
+    if (!ds.length) {
+      return {
+        ok: true, n: 0, so_nhom: nhom.so_nhom, nhom_mat: nhom.mat,
+        ghi_chu: nhom.so_nhom
+          ? `Mọi người đã có Zalo. Đã làm mới ${nhom.so_nhom} nhóm.`
+          : "Không có ai cần dò (mọi người đã có Zalo UID).",
+      };
+    }
     const map = await zalo.doUid(ds.map((x) => x.dien_thoai), (t) => day("zalo:do-tien-do", t));
     const capNhatDs = ds.map((x) => {
       const u = map.get(x.dien_thoai);
@@ -300,42 +309,82 @@ export function dangKyTatCa() {
     });
     gv.capNhatUid(capNhatDs);
     const thay = capNhatDs.filter((x) => x.uid).length;
-    db.ghiNhatKy("do_uid", { mo_ta: `Dò ${ds.length} số, tìm thấy ${thay}` });
-    return { ok: true, n: ds.length, tim_thay: thay, khong_thay: ds.length - thay };
+    db.ghiNhatKy("do_uid", { mo_ta: `Dò ${ds.length} số, tìm thấy ${thay}, làm mới ${nhom.so_nhom} nhóm` });
+    return {
+      ok: true, n: ds.length, tim_thay: thay, khong_thay: ds.length - thay,
+      so_nhom: nhom.so_nhom, nhom_mat: nhom.mat,
+    };
   });
   dangKy("zalo:doi-chieu-ban-be", async () => {
     const tap = await zalo.dsBanBe();
     gv.capNhatLaBan(tap);
-    return { ok: true, so_ban: tap.size };
+    const nhom = await lamMoiNhom();
+    return { ok: true, so_ban: tap.size, so_nhom: nhom.so_nhom, nhom_mat: nhom.mat };
   });
+
+  /**
+   * Làm mới các NHÓM đã nhận: tên nhóm và số thành viên đổi theo thời gian, và nhóm mình đã rời
+   * thì phải đánh dấu để khỏi gửi vào chỗ không còn ở đó.
+   */
+  async function lamMoiNhom() {
+    const daCo = db.nhieu("SELECT id, zalo_uid, ho_ten FROM nguoi_nhan WHERE ifnull(la_nhom,0)=1");
+    if (!daCo.length) return { so_nhom: 0, mat: [] };
+    let ds = [];
+    try { ds = await zalo.dsNhom(); } catch { return { so_nhom: 0, mat: [] }; }
+    const theoId = new Map(ds.map((n) => [String(n.id), n]));
+    const mat = [];
+    for (const x of daCo) {
+      const n = theoId.get(String(x.zalo_uid));
+      if (n) {
+        db.chay(
+          "UPDATE nguoi_nhan SET ho_ten=?, zalo_ten=?, ghi_chu=?, la_ban=1, zalo_trang_thai='da_co' WHERE id=?",
+          n.ten, n.ten, `Nhóm Zalo · ${n.so_thanh_vien || 0} thành viên`, x.id
+        );
+      } else {
+        db.chay("UPDATE nguoi_nhan SET zalo_trang_thai='khong_thay', ghi_chu=? WHERE id=?",
+          "Nhóm Zalo · không còn thấy nhóm này (có thể đã rời nhóm)", x.id);
+        mat.push(x.ho_ten);
+      }
+    }
+    return { so_nhom: daCo.length, mat };
+  }
   dangKy("zalo:ds-nhom", async () => ({ ok: true, ds: await zalo.dsNhom() }));
 
   /**
    * Thêm nhóm Zalo vào danh sách người nhận. Nhóm không cần số điện thoại — dùng thẳng mã nhóm,
    * và coi như đã kết bạn vì mình vốn ở trong nhóm.
    */
-  dangKy("gv:them-nhom", (ds) => {
+  dangKy("gv:them-nhom", (ds, nhan = "tat_ca_lop") => {
     let them = 0, capNhat = 0;
     for (const n of ds || []) {
       const cu2 = db.mot("SELECT id FROM nguoi_nhan WHERE zalo_uid=?", String(n.id));
+      let id;
       if (cu2) {
         db.chay(
           "UPDATE nguoi_nhan SET ho_ten=?, ghi_chu=?, la_nhom=1, la_ban=1, zalo_trang_thai='da_co', hoat_dong=1 WHERE id=?",
           n.ten, `Nhóm Zalo · ${n.so_thanh_vien || 0} thành viên`, cu2.id
         );
+        id = cu2.id;
         capNhat += 1;
       } else {
-        db.chay(
+        const r = db.chay(
           `INSERT INTO nguoi_nhan(ho_ten,chuc_danh,dien_thoai,zalo_uid,zalo_ten,zalo_trang_thai,la_ban,la_nhom,ghi_chu,hoat_dong)
            VALUES(?,?,?,?,?,?,?,?,?,1)`,
           n.ten, "Nhóm Zalo", "", String(n.id), n.ten, "da_co", 1, 1,
           `Nhóm Zalo · ${n.so_thanh_vien || 0} thành viên`
         );
+        id = Number(r.lastInsertRowid);
         them += 1;
       }
+      // KHÔNG CÓ ĐĂNG KÝ THÌ KHÔNG CÓ GÌ ĐỂ GỬI — đây là lý do trước đây thêm nhóm xong
+      // bấm gửi vẫn không có tin nào vào nhóm.
+      if (nhan && nhan !== "khong") {
+        const daCo = db.mot("SELECT id FROM nguoi_nhan_dk WHERE nguoi_nhan_id=? AND loai=?", id, nhan);
+        if (!daCo) db.chay("INSERT INTO nguoi_nhan_dk(nguoi_nhan_id,loai,lop,giao_vien_id) VALUES(?,?,'',NULL)", id, nhan);
+      }
     }
-    db.ghiNhatKy("them_nhom_zalo", { mo_ta: `${them} thêm mới, ${capNhat} cập nhật` });
-    return { ok: true, them, capNhat };
+    db.ghiNhatKy("them_nhom_zalo", { mo_ta: `${them} thêm mới, ${capNhat} cập nhật, nhận: ${nhan}` });
+    return { ok: true, them, capNhat, nhan };
   });
 
   dangKy("zalo:moi-ket-ban", async (uid, loiNhan) => zalo.moiKetBan(uid, loiNhan));

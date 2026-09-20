@@ -40,6 +40,7 @@ export async function moChonNhom() {
     ((await window.api.gv.nguoiNhan()).ds || []).filter((x) => x.la_nhom).map((x) => String(x.zalo_uid))
   );
   let chonHienTai = new Set(daCo);
+  let nhanGi = "tat_ca_lop";
 
   const chon = await moHop({
     tieuDe: `Chọn nhóm Zalo — ${ds.length} nhóm`, rong: "rong",
@@ -47,6 +48,16 @@ export async function moChonNhom() {
       <p class="nho mo" style="margin:0 0 .5rem">Gửi vào nhóm <b>không cần số điện thoại</b> và
         không cần kết bạn. Tích nhóm nào thì nhóm đó thành người nhận, hiện ở tab Giáo viên,
         mục Người nhận ngoài danh sách.</p>
+      <div class="o-nhap" style="margin-bottom:.5rem">
+        <label for="nhom-nhan">Nhóm được nhận thời khoá biểu nào</label>
+        <select id="nhom-nhan">
+          <option value="tat_ca_lop">Thời khoá biểu của tất cả các lớp</option>
+          <option value="tat_ca_gv">Thời khoá biểu của tất cả giáo viên</option>
+          <option value="khong">Chưa chọn — tự đặt sau ở mục Người nhận ngoài danh sách</option>
+        </select>
+        <div class="goi-y">Không đặt mục này thì nhóm không nhận được gì, vì phần mềm không biết
+          phải gửi thời khoá biểu nào vào nhóm.</div>
+      </div>
       <div class="hang-nut" style="margin-bottom:.5rem">
         <input type="search" id="tim-nhom" placeholder="Gõ tên nhóm để lọc…" style="flex:1;min-width:220px">
         <button type="button" class="nut nho" id="nhom-bo-het">Bỏ tích hết</button>
@@ -76,6 +87,7 @@ export async function moChonNhom() {
       });
       hop.querySelector(".hop-chan .nut.chinh").addEventListener("click", () => {
         chonHienTai = new Set($$('input[name="nhom"]:checked', hop).map((x) => x.value));
+        nhanGi = hop.querySelector("#nhom-nhan").value;
       }, true);
     },
   });
@@ -84,7 +96,12 @@ export async function moChonNhom() {
   const themVao = ds.filter((n) => chonHienTai.has(n.id));
   if (!themVao.length) { baoXau("<b>Chưa chọn nhóm nào.</b>"); return 0; }
 
-  const r = await window.api.gv.themNhom(themVao);
-  if (!baoKetQua(r, `Đã thêm ${r.them} nhóm, cập nhật ${r.capNhat} nhóm.`)) return 0;
+  const r = await window.api.gv.themNhom(themVao, nhanGi);
+  if (!r.ok) { baoKetQua(r); return 0; }
+  const chuNhan = { tat_ca_lop: "thời khoá biểu tất cả các lớp", tat_ca_gv: "thời khoá biểu tất cả giáo viên" }[nhanGi];
+  baoOk(`Đã thêm ${r.them} nhóm, cập nhật ${r.capNhat} nhóm.` + (chuNhan ? ` Nhóm sẽ nhận ${chuNhan}.` : ""));
+  if (nhanGi === "khong") {
+    baoXau("<b>Nhóm chưa đăng ký nhận gì.</b><br>Vào Dữ liệu › Giáo viên › Người nhận ngoài danh sách để đặt.");
+  }
   return themVao.length;
 }

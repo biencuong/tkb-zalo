@@ -298,6 +298,10 @@ function taoLuocDo() {
   db.exec(LUOC_DO);
   vaCotThieu();
   goKhoaGuiTrung();
+  // Nhóm Zalo không nằm trong danh sách bạn bè nên hay bị đánh dấu "chưa kết bạn" rồi bị chặn.
+  // Mình vốn ở trong nhóm nên luôn gửi được — chạy mỗi lần mở cho chắc.
+  try { db.prepare("UPDATE nguoi_nhan SET la_ban=1 WHERE ifnull(la_nhom,0)=1 AND la_ban<>1").run(); }
+  catch { /* bảng chưa có cột thì thôi */ }
   const v = db.prepare("SELECT phien_ban FROM luoc_do LIMIT 1").get();
   if (!v) db.prepare("INSERT INTO luoc_do(phien_ban) VALUES (?)").run(PHIEN_BAN_LUOC_DO);
 }

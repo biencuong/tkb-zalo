@@ -250,11 +250,16 @@ export function capNhatLaBan(tapUid) {
   return giaoDich(() => {
     let n = 0;
     for (const bang of ["giao_vien", "nguoi_nhan"]) {
-      for (const r of nhieu(`SELECT id, zalo_uid FROM ${bang} WHERE zalo_uid<>''`)) {
+      // NHÓM ZALO không nằm trong danh sách bạn bè, nhưng mình vốn ở trong nhóm nên luôn gửi được.
+      // Không loại trừ ở đây thì mỗi lần đối chiếu là nhóm bị đánh dấu "chưa kết bạn" rồi bị chặn.
+      const boNhom = bang === "nguoi_nhan" ? " AND ifnull(la_nhom,0)=0" : "";
+      for (const r of nhieu(`SELECT id, zalo_uid FROM ${bang} WHERE zalo_uid<>''${boNhom}`)) {
         chay(`UPDATE ${bang} SET la_ban=? WHERE id=?`, t.has(String(r.zalo_uid)) ? 1 : 0, r.id);
         n++;
       }
     }
+    // Nhóm luôn ở trạng thái gửi được
+    chay("UPDATE nguoi_nhan SET la_ban=1 WHERE ifnull(la_nhom,0)=1");
     return { ok: true, n };
   });
 }

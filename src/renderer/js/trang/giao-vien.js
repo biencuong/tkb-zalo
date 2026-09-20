@@ -392,7 +392,12 @@ export async function ve(khung, tuyChon = {}) {
       finally { boNghe(); cho.dong(); await cho.doi; }
       if (kq.ok) {
         await window.api.zalo.doiChieuBanBe().catch(() => {});
-        baoOk(`Dò xong ${kq.n} số: tìm thấy ${kq.tim_thay}, không có Zalo ${kq.khong_thay}.`);
+        baoOk(`Dò xong ${kq.n} số: tìm thấy ${kq.tim_thay}, không có Zalo ${kq.khong_thay}.`
+          + (kq.so_nhom ? ` Làm mới ${kq.so_nhom} nhóm Zalo.` : ""));
+        if (kq.nhom_mat?.length) {
+          baoXau(`<b>Không còn thấy ${kq.nhom_mat.length} nhóm:</b><br>${esc(kq.nhom_mat.join(", "))}`
+            + "<br>Có thể bạn đã rời nhóm. Gửi vào đó sẽ lỗi.");
+        }
         ve(khung, tuyChon);
       } else baoKetQua(kq);
       return;

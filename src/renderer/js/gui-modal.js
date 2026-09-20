@@ -88,7 +88,12 @@ export async function moHopLoi(dotId) {
 
 /** Xếp hạng người nhận: gửi được ngay / gửi được nhưng rủi ro / chưa gửi được. */
 function xepHang(g) {
-  if (g.la_nhom) return { ma: "nhom", nhan: '<span class="nhan n-ok">Nhóm Zalo</span>', thu: 0 };
+  if (g.la_nhom) {
+    // Nhóm chưa đăng ký nhận gì thì gửi cũng không ra tin nào — phải nói ngay, đừng để im lặng.
+    return (g.dang_ky || []).length
+      ? { ma: "nhom", nhan: '<span class="nhan n-ok">Nhóm Zalo</span>', thu: 0 }
+      : { ma: "nhom_trong", nhan: '<span class="nhan n-xau">Chưa đặt nhận gì</span>', thu: 2 };
+  }
   if (!g.dien_thoai) return { ma: "thieu_sdt", nhan: '<span class="nhan n-xau">Chưa có số</span>', thu: 3 };
   if (!g.zalo_uid) {
     return g.zalo_trang_thai === "khong_thay"
@@ -102,7 +107,7 @@ function xepHang(g) {
 /** Một dòng người nhận trong bảng chọn tay. */
 function veDongNguoi(g) {
   const h = xepHang(g);
-  const chonDuoc = h.ma !== "thieu_sdt" && h.ma !== "khong_zalo";
+  const chonDuoc = h.ma !== "thieu_sdt" && h.ma !== "khong_zalo" && h.ma !== "nhom_trong";
   return `<label class="ng-o ${chonDuoc ? "" : "tat"} h-${h.ma}"
       data-tim="${esc((g.ho_ten + " " + (g.ma_gv || "") + " " + (g.dien_thoai || "") + " " + (g.to_chuyen_mon || "")).toLowerCase())}"
       data-hang="${h.ma}">
@@ -125,7 +130,7 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
   const nguoi = [...dsNhom.map((n) => ({ ...n, la_nhom: 1 })), ...dsGv]
     .sort((a, b) => xepHang(a).thu - xepHang(b).thu || String(a.ho_ten).localeCompare(String(b.ho_ten), "vi"));
 
-  const dem = { san_sang: 0, nhom: 0, chua_ban: 0, chua_do: 0, thieu_sdt: 0, khong_zalo: 0 };
+  const dem = { san_sang: 0, nhom: 0, nhom_trong: 0, chua_ban: 0, chua_do: 0, thieu_sdt: 0, khong_zalo: 0 };
   for (const g of nguoi) dem[xepHang(g).ma] += 1;
   const guiDuoc = dem.san_sang + dem.nhom + dem.chua_ban;
 
@@ -147,6 +152,9 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
         <span class="sua">Tra xong mới gửi được cho họ.</span></span>
       <button type="button" class="nut nho chinh" id="do-ngay">Dò Zalo ngay</button>
     </div>` : ""}
+    ${dem.nhom_trong ? `<div class="bao xau"><b>${so(dem.nhom_trong)} nhóm Zalo chưa đặt nhận thời khoá biểu nào.</b>
+      <span class="sua">Gửi cũng không ra tin nào. Vào <b>Dữ liệu › Giáo viên › Người nhận ngoài danh sách</b>,
+      sửa nhóm đó và chọn nhận tất cả lớp hoặc tất cả giáo viên.</span></div>` : ""}
     ${dem.chua_ban ? `<div class="bao canh"><b>${so(dem.chua_ban)} người chưa kết bạn Zalo.</b>
       <span class="sua">Tin rơi vào mục “Tin nhắn từ người lạ”, nhiều người không mở. Nên kết bạn trước.</span></div>` : ""}
     ${NHAC_NGAN}
@@ -166,6 +174,7 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
           <option value="nhom">Chỉ nhóm Zalo</option>
           <option value="chua_ban">Chỉ người chưa kết bạn</option>
           <option value="chua_do">Chỉ người chưa dò Zalo</option>
+          <option value="nhom_trong">Chỉ nhóm chưa đặt nhận gì</option>
         </select>
         <button type="button" class="nut nho" id="chon-het">Chọn hết</button>
         <button type="button" class="nut nho" id="bo-het">Bỏ hết</button>
@@ -184,8 +193,9 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
             <span>Thời khoá biểu <b>cá nhân</b> cho giáo viên</span></label>
           <label class="tich"><input type="checkbox" id="t-lop" ${tc.gui_tkb_lop_gvcn !== false ? "checked" : ""}>
             <span>Thời khoá biểu <b>lớp</b> cho chủ nhiệm<span class="g">Lớp chưa có chủ nhiệm sẽ bị bỏ qua.</span></span></label>
-          <label class="tich"><input type="checkbox" id="t-ngoai" ${tc.gui_nguoi_ngoai ? "checked" : ""}>
-            <span>Người <b>ngoài danh sách</b> và <b>nhóm Zalo</b> đã đăng ký</span></label>
+          <label class="tich"><input type="checkbox" id="t-ngoai" ${tc.gui_nguoi_ngoai || dsNhom.length ? "checked" : ""}>
+            <span>Người <b>ngoài danh sách</b> và <b>nhóm Zalo</b> đã đăng ký
+              <span class="g">${dsNhom.length ? `Đang có ${dsNhom.length} nhóm.` : "Chưa có nhóm nào."}</span></span></label>
         </div>
         <div>
           <h3>Dạng tệp</h3>
@@ -271,8 +281,12 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
         const daChon = $$('input[name="ng"]:checked', hop)
           .map((x) => { const [l, i] = x.value.split(":"); return { nguoi_loai: l, nguoi_id: Number(i) }; });
         const tongChonDuoc = $$('input[name="ng"]:not(:disabled)', hop).length;
+        // Có tích nhóm hay người ngoài thì phải bật tuỳ chọn tương ứng, nếu không
+        // bộ dựng danh sách bỏ qua hết và "gửi vào nhóm" chẳng ra tin nào.
+        const coNgoai = daChon.some((x) => x.nguoi_loai === "ngoai");
         Object.assign(tc, {
-          gui_tkb_gv: g("#t-gv").checked, gui_tkb_lop_gvcn: g("#t-lop").checked, gui_nguoi_ngoai: g("#t-ngoai").checked,
+          gui_tkb_gv: g("#t-gv").checked, gui_tkb_lop_gvcn: g("#t-lop").checked,
+          gui_nguoi_ngoai: g("#t-ngoai").checked || coNgoai,
           gui_anh: g("#t-anh").checked, gui_docx: g("#t-docx").checked, anh_gom: g("#t-gom").value,
           bo_qua_trung: g("#t-botrung").checked, chi_thay_doi: g("#t-thaydoi").checked,
           chi_gvcn: false,

@@ -269,8 +269,14 @@ của tài khoản đang đăng nhập, gõ tên để lọc, tích nhóm nào t
 <div class="bao tin"><b>Gửi vào nhóm không cần số điện thoại và không cần kết bạn.</b>
   <span class="sua">Mình đã ở trong nhóm rồi nên tin chắc chắn tới. Hợp với nhóm tổ chuyên môn
   hoặc nhóm toàn trường: một lần gửi là cả nhóm thấy.</span></div>
+<div class="bao canh"><b>Phải chọn nhóm nhận thời khoá biểu nào, nếu không gửi sẽ không ra tin.</b>
+  <span class="sua">Ngay trong hộp chọn nhóm có ô <b>Nhóm được nhận thời khoá biểu nào</b>:
+  tất cả các lớp, hoặc tất cả giáo viên. Phần mềm không tự đoán được nên không đặt thì nó không
+  biết gửi gì vào nhóm.</span></div>
 <p>Nhóm đã chọn hiện ở <b>Dữ liệu → Giáo viên → Người nhận ngoài danh sách</b>, ghi rõ tên nhóm và
-số thành viên. Muốn nhóm nhận thời khoá biểu nào thì đặt đăng ký cho nhóm đó như với người ngoài.</p>
+số thành viên. Sửa lại ở đó nếu muốn nhóm nhận thứ khác.</p>
+<p>Bấm <b>Dò Zalo</b> thì phần mềm <b>làm mới cả nhóm</b>: cập nhật tên và số thành viên, và báo nếu
+bạn đã rời nhóm nào đó.</p>
 
 <h3>Nút nối nhanh</h3>
 <p>Không cần vào tận màn đó: nút tròn <b>Nối Zalo</b> có mặt ở cuối thanh bên, trang Tổng quan,

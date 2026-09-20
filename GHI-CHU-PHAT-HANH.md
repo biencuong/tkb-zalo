@@ -5,6 +5,27 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.8 — SỬA LỖI KHÔNG GỬI ĐƯỢC VÀO NHÓM ZALO
+
+Thêm nhóm vào danh sách nhận rồi mà bấm gửi không có tin nào vào nhóm. Ba nguyên nhân, đã sửa cả ba:
+
+- **Nhóm chưa đăng ký nhận gì.** Phần mềm không tự đoán được nhóm cần nhận thời khoá biểu nào nên
+  không sinh ra mục gửi nào. Nay hộp chọn nhóm có ô **Nhóm được nhận thời khoá biểu nào**
+  (tất cả các lớp / tất cả giáo viên), đặt luôn lúc thêm nhóm. Nhóm nào còn thiếu thì hộp gửi
+  hiện nhãn đỏ **Chưa đặt nhận gì** kèm cách sửa.
+- **Nhóm bị đánh dấu "chưa kết bạn" rồi bị chặn.** Nhóm không nằm trong danh sách bạn bè nên mỗi
+  lần đối chiếu bạn bè là bị gạt ra. Nay đối chiếu bỏ qua nhóm, và nhóm luôn ở trạng thái gửi được.
+- **Tuỳ chọn gửi cho người ngoài và nhóm đang tắt.** Nay tự bật khi trong máy đã có nhóm, và tích
+  một nhóm trong danh sách người nhận là tự bật.
+
+**Dò Zalo nay dò cả nhóm**
+
+- Bấm **Dò Zalo** thì ngoài việc tra số điện thoại, phần mềm **làm mới danh sách nhóm**:
+  cập nhật tên nhóm và số thành viên.
+- Nhóm nào không còn thấy (đã rời nhóm) thì báo rõ, để khỏi gửi vào chỗ mình không còn ở đó.
+
+---
+
 ## 0.1.7 — Gửi trùng chỉ cảnh báo, không chặn nữa
 
 - **Bỏ khoá gửi trùng.** Trước đây phần mềm tự bỏ qua người đã nhận y nguyên, nên bấm gửi lại là

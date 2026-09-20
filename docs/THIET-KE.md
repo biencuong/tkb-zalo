@@ -208,6 +208,22 @@ cả hai việc: `package.json` đúng chuẩn, và bảng so sánh mười cặ
    chép được sang Excel.
 6. **Lịch sử** và **thống kê**.
 
+## 6b. Lưu nhiều thời khoá biểu và nhiều bản của cùng một số
+
+Hai mức khác nhau, đừng lẫn:
+
+| Mức | Lưu ở đâu | Khi nào sinh ra |
+|---|---|---|
+| **Nhiều thời khoá biểu** (số 1, số 2, … theo năm học và học kỳ) | mỗi cái một dòng trong bảng `tkb` | nhập tệp có số khác |
+| **Nhiều bản của CÙNG một số** | `tkb_phien_ban` giữ ảnh chụp bản cũ, `tkb.phien_ban` tăng dần | nhập lại đúng số đó và chọn *Cập nhật* |
+
+`dsTkb()` xếp `nam_hoc DESC, hoc_ky DESC, so_tkb DESC` nên **phần tử đầu luôn là bản mới nhất**.
+Giao diện lấy đó làm mặc định ở cả khu Thời khoá biểu lẫn bước Gửi, đánh dấu "mới nhất" trong ô chọn,
+và nhắc ngay khi người dùng chuyển sang bản cũ — gửi nhầm thời khoá biểu đã hết hiệu lực là lỗi
+không sửa lại được.
+
+Lịch sử gửi lưu kèm `tkb_phien_ban` của lúc gửi, nên tra lại biết người đó nhận bản nào.
+
 ## 7. Xác định giáo viên chủ nhiệm
 
 Nguồn theo thứ tự: (1) cột `CN` của PCGD; (2) mã trong ngoặc ở tiêu đề cột lớp; (3) người dùng chọn tay.

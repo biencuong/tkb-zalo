@@ -47,7 +47,7 @@ Cập nhật: 20/9/2026 · Bản 0.1.0 · Đã đóng gói và chạy thử trê
 | Việc | Ghi chú |
 |---|---|
 | **Chưa gửi thử Zalo thật** | Toàn bộ luồng gửi mới kiểm bằng Zalo giả trong kiểm thử. Cần một lần gửi thật cho chính số của người dùng để xác nhận ảnh và tệp hiển thị đúng trên điện thoại. |
-| **Chưa có kho phát hành** | `cap-nhat.js` trỏ `biencuong/tkb-zalo` trên GitHub. Chưa tạo kho, chưa phát hành bản nào nên chức năng cập nhật chưa chạy thật được. Đổi kho bằng biến môi trường `TKBZALO_REPO`. |
+| ~~Chưa có kho phát hành~~ **ĐÃ XONG 21/9** | Kho công khai `https://github.com/biencuong/tkb-zalo`, đã phát hành `v0.1.0` và `v0.1.1` kèm bộ cài. Máy khách bản cũ đã thử và phát hiện đúng bản mới, đọc được ghi chú và mã băm SHA-256. Đổi kho bằng biến môi trường `TKBZALO_REPO`. |
 | **Chưa ký số bộ cài** | Windows SmartScreen sẽ cảnh báo lần đầu. Muốn hết thì mua chứng thư ký mã hoặc dùng SignPath. |
 | **Mã lỗi Zalo khi bị chặn tin** | Chưa xác định được mã cụ thể. App đã ghi `ma_loi` + `loi` vào lịch sử; sau đợt gửi thật đầu tiên nên xem lại để bổ sung bảng mã “bỏ qua người này” và “dừng cả đợt”. |
 | **Bản macOS** | Chưa làm. Cấu hình `build` mới có phần Windows. |

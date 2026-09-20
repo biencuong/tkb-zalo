@@ -8,8 +8,8 @@ import crypto from "node:crypto";
 import { mot, nhieu, chay, giaoDich, ghiNhatKy } from "./db.js";
 import { docTkbSs } from "./nhap-xlsx.js";
 import { catDocx, lietKeBang } from "./cat-docx.js";
-import { timTheoMa, timTheoTen } from "./kho-gv.js";
-import { chuanHoaKhoangTrang, chuanHoaLop, chuanHoaMa } from "./khop.js";
+import { timTheoMa, timTheoTen, luuGiaoVien } from "./kho-gv.js";
+import { chuanHoaKhoangTrang, chuanHoaLop, chuanHoaMa, suyMaTuPhanCong } from "./khop.js";
 
 export const khoiCuaLop = (lop) => (String(lop).match(/^(\d+)/)?.[1] || "");
 
@@ -120,6 +120,37 @@ export async function nhapTkb(p) {
   for (const r of d.pcgd) {
     const id = ghep[`ten:${r.ho_ten}`] || timTheoTen(r.ho_ten)?.id || null;
     if (id) gvTheoTen.set(r.ho_ten, id);
+  }
+
+  /**
+   * TẠO GIÁO VIÊN THẲNG TỪ BẢNG PHÂN CÔNG khi chưa có danh sách giáo viên.
+   * Bảng phân công có đủ họ tên; mã viết tắt suy ra từ chữ ký phân công (môn + lớp) đối chiếu
+   * với lưới thời khoá biểu giáo viên. Chỉ thiếu số điện thoại, người dùng điền sau ngay trên
+   * bảng — nhờ vậy chỉ cần MỘT tệp Excel tổng là chạy được.
+   */
+  const gvTaoMoi = [];
+  const gvBoQua = [];
+  if (p.taoGvThieu) {
+    const maSuyRa = suyMaTuPhanCong(d.pcgd, d.tiet_gv || []);
+    for (const r of d.pcgd) {
+      if (gvTheoTen.has(r.ho_ten)) continue;
+      const phan = String(r.ho_ten || "").trim().split(/\s+/).filter(Boolean);
+      if (!phan.length) continue;
+      const ma = maSuyRa.get(r.ho_ten) || "";
+      if (!ma) { gvBoQua.push({ ho_ten: r.ho_ten, ly_do: "không suy được mã viết tắt" }); continue; }
+      const ten = phan.pop();
+      const kq = luuGiaoVien({
+        ho_dem: phan.join(" "), ten, ma_gv: ma, lop_cn_mac_dinh: r.cn || "",
+        ghi_chu: "Tạo từ bảng phân công — cần điền số điện thoại",
+      });
+      if (kq?.ok && kq.id) {
+        gvTheoTen.set(r.ho_ten, kq.id);
+        gvTheoMa.set(chuanHoaMa(ma), kq.id);
+        gvTaoMoi.push({ ho_ten: r.ho_ten, ma_gv: ma });
+      } else {
+        gvBoQua.push({ ho_ten: r.ho_ten, ly_do: (kq?.loi || []).join(" ") || "không lưu được" });
+      }
+    }
   }
 
   const cu = mot(
@@ -237,7 +268,7 @@ export async function nhapTkb(p) {
     thuMuc, p.docxGv || "", p.docxLop || "", ketQuaCat?.kho || "", ketQua.tkbId);
 
   return {
-    ok: true, tkb_id: ketQua.tkbId, phien_ban: ketQua.phienBan,
+    ok: true, tkb_id: ketQua.tkbId, phien_ban: ketQua.phienBan, gv_tao_moi: gvTaoMoi, gv_bo_qua: gvBoQua,
     so_tiet: d.tiet.length, so_lop: d.lop.length, so_gv: d.pcgd.length,
     cat_docx: ketQuaCat, canh_bao: d.canh_bao,
   };

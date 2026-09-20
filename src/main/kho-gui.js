@@ -266,6 +266,23 @@ export function chiTietDotGui(dotId) {
 }
 
 /** Lịch sử gửi có lọc đa chiều — "gửi gì cho ai, lúc nào". */
+/**
+ * Ghi nhận tin đã tới máy người nhận (hoặc đã được xem).
+ * Khớp theo mã tin của ảnh hoặc của tệp. Trả về số dòng vừa đánh dấu.
+ */
+export function danhDauTrangThaiTin(loai, dsMsgId) {
+  const cot = loai === "xem" ? "xem_luc" : "nhan_luc";
+  let n = 0;
+  for (const m of dsMsgId || []) {
+    const r = chay(
+      `UPDATE lich_su_gui SET ${cot}=datetime('now','localtime')
+       WHERE ${cot}='' AND (msg_id_anh=? OR msg_id_file=?)`, String(m), String(m)
+    );
+    n += r?.changes || 0;
+  }
+  return n;
+}
+
 export function lichSuGui(loc = {}, gioiHan = 500) {
   let sql = "SELECT * FROM lich_su_gui WHERE 1=1";
   const t = [];

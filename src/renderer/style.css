@@ -546,8 +546,10 @@ button.lien{
 button.lien:hover{color:var(--accent-nut)}
 
 /* ---------- Hàng chọn thời khoá biểu rồi gửi ---------- */
-.hang-gui{display:flex;align-items:flex-end;gap:.7rem;flex-wrap:wrap;margin-top:.4rem}
-.hang-gui .nut.chinh{white-space:nowrap}
+/* Ô chọn và nút Gửi nằm cùng một hàng, cao bằng nhau, đáy thẳng nhau. */
+.hang-gui{display:flex;align-items:stretch;gap:.6rem;flex-wrap:wrap}
+.hang-gui select{flex:1;min-width:240px;margin:0}
+.hang-gui .nut{white-space:nowrap;flex:0 0 auto;margin:0;display:inline-flex;align-items:center}
 
 /* Nhắc khi người dùng chọn thời khoá biểu cũ thay vì bản mới nhất */
 .goi-y.nhac-cu{color:var(--warn);font-weight:600}

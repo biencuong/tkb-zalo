@@ -16,6 +16,18 @@ let tabLs = "chi-tiet";
 const TAB_G = [{ ma: "gui", ten: "Gửi" }, { ma: "lich-su", ten: "Lịch sử gửi" }];
 
 const CHU_KQ = { xong: "Thành công", loi: "Lỗi" };
+
+/**
+ * Trạng thái THẬT của tin, do Zalo báo lại qua kênh sự kiện:
+ *   đã xem > đã tới máy > mới gửi đi.
+ * "Đã gửi" chỉ nghĩa là máy chủ Zalo nhận, chưa chắc tới tay người ta.
+ */
+function nhanDenNoi(x) {
+  if (x.ket_qua !== "xong") return '<span class="mo">—</span>';
+  if (x.xem_luc) return `<span class="nhan n-ok">Đã xem</span><br><span class="nho mo">${esc(gioVn(x.xem_luc))}</span>`;
+  if (x.nhan_luc) return `<span class="nhan n-ok">Đã tới máy</span><br><span class="nho mo">${esc(gioVn(x.nhan_luc))}</span>`;
+  return '<span class="nhan n-canh">Chưa xác nhận</span><br><span class="nho mo">chưa thấy báo nhận</span>';
+}
 const CHU_LOAI = { gv: "Thời khoá biểu cá nhân", lop: "Thời khoá biểu lớp" };
 
 /** Bộ lọc lịch sử có khác mặc định không. */
@@ -102,6 +114,8 @@ export async function ve(khung, thamSo = {}) {
 
   const thanhCong = ds.filter((x) => x.ket_qua === "xong").length;
   const soLoi = ds.filter((x) => x.ket_qua === "loi").length;
+  const daToiNoi = ds.filter((x) => x.nhan_luc || x.xem_luc).length;
+  const daXem = ds.filter((x) => x.xem_luc).length;
   const tkbMoi = rTkb.ds?.[0] || null;
   const dot = (await window.api.gui.dsDot(6).catch(() => ({ ds: [] }))).ds || [];
   const dotDo = dot.find((d) => d.trang_thai === "dang" || d.trang_thai === "tam_dung") || null;
@@ -117,13 +131,15 @@ export async function ve(khung, thamSo = {}) {
     <div class="the">
       <div class="the-dau"><h2 style="margin:0">Gửi thời khoá biểu</h2>${chipZalo()}</div>
       ${tkbMoi ? `
-        <div class="hang-gui">
-          <div class="o-nhap" style="margin:0;flex:1;min-width:220px"><label>Chọn thời khoá biểu</label>
+        <div class="o-nhap" style="margin:0">
+          <label for="g-chon-tkb">Chọn thời khoá biểu</label>
+          <div class="hang-gui">
             <select id="g-chon-tkb">
               ${rTkb.ds.map((t, i) => `<option value="${t.id}" ${i === 0 ? "selected" : ""}>Số ${t.so_tkb} · ${esc(t.nam_hoc)}${t.hoc_ky ? ` · HK${t.hoc_ky}` : ""} · từ ${esc(ngayVn(t.ngay_ap_dung)) || "?"}${i === 0 ? " · mới nhất" : ""}</option>`).join("")}
             </select>
-            <div class="goi-y" id="g-nhac">Mặc định gửi bản mới nhất.</div></div>
-          <button class="nut chinh" id="g-gui">Gửi qua Zalo</button>
+            <button class="nut chinh" id="g-gui">Gửi qua Zalo</button>
+          </div>
+          <div class="goi-y" id="g-nhac">Mặc định gửi bản mới nhất.</div>
         </div>
         <p class="nho mo" style="margin:.5rem 0 0">Bấm gửi sẽ hiện hộp tuỳ chọn, bảng xem trước ai nhận gì,
           rồi mới chạy. Luôn gửi thử vài người trước.</p>`
@@ -148,11 +164,13 @@ export async function ve(khung, thamSo = {}) {
       <button class="nut nho" id="bo-loc"${daLoc(loc) ? "" : " disabled"}>Bỏ lọc</button>
     </div>
 
-    <div class="luoi c3" style="margin-bottom:.75rem">
+    <div class="luoi c4" style="margin-bottom:.75rem">
       <div class="o-so vach-ok"><b>Lượt thành công</b><span class="v">${so(thanhCong)}</span></div>
       <div class="o-so ${soLoi ? "vach-xau" : "vach"}"><b>Lượt lỗi</b><span class="v">${so(soLoi)}</span></div>
       <div class="o-so vach"><b>Người đã nhận</b>
         <span class="v">${so(new Set(ds.filter((x) => x.ket_qua === "xong").map((x) => x.nguoi_loai + ":" + x.nguoi_id)).size)}</span></div>
+      <div class="o-so ${daToiNoi ? "vach-ok" : "vach"}"><b>Zalo xác nhận tới nơi</b><span class="v">${so(daToiNoi)}</span>
+        <span class="g">${so(daXem)} lượt đã xem</span></div>
     </div>
 
     <div class="tab" id="tab-ls">
@@ -167,6 +185,7 @@ export async function ve(khung, thamSo = {}) {
         { ten: "Nội dung", ve: (x) => `${x.loai === "lop" ? "TKB lớp <b>" + esc(x.ma) + "</b>" : "TKB cá nhân"}<br><span class="nho mo">số ${x.so_tkb ?? "?"} · ${esc(x.nam_hoc || "")}${x.tkb_phien_ban > 1 ? " · bản " + x.tkb_phien_ban : ""}</span>` },
         { ten: "Tệp đã gửi", ve: (x) => `<span class="nho">${x.co_anh ? esc(x.anh_ten) : ""}${x.co_anh && x.co_docx ? "<br>" : ""}${x.co_docx ? esc(x.docx_ten) : ""}${!x.co_anh && !x.co_docx ? '<span class="mo">chỉ tin nhắn</span>' : ""}</span>` },
         { ten: "Kết quả", ve: (x) => nhanKetQuaGui(x.ket_qua) + (x.loi ? `<br><span class="nho mo">${esc(x.loi)}</span>` : "") },
+        { ten: "Đến nơi", ve: nhanDenNoi },
         { ten: "", ve: (x) => `<button class="nut nho" data-xem="${x.id}">Xem tin</button>` },
       ], { trong: "Chưa có lượt gửi nào khớp bộ lọc." })}</div>
     </div>
@@ -195,6 +214,11 @@ export async function ve(khung, thamSo = {}) {
   </div>
 
   ${TAB_G.map((t) => `<section data-khu-g="${t.ma}" ${t.ma === tabG ? "" : "hidden"}>${NOI[t.ma]}</section>`).join("")}`;
+
+  // Zalo báo tin tới nơi / đã xem thì làm mới bảng, khỏi bắt người dùng bấm lại.
+  const boNgheTin = window.api.gui.onTrangThaiTin(() => {
+    if (tabG === "lich-su") ve(khung);
+  });
 
   khung.querySelector("#tab-g").addEventListener("click", (e) => {
     const b = e.target.closest("[data-tab-g]");
@@ -268,4 +292,6 @@ export async function ve(khung, thamSo = {}) {
       });
     }
   });
+
+  return () => boNgheTin?.();
 }

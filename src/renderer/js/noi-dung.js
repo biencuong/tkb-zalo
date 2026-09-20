@@ -88,50 +88,61 @@ Tự kiểm tra bất cứ lúc nào: bấm số hiệu ở cuối thanh bên, h
   {
     ma: "chuan-bi", ten: "3. Chuẩn bị tệp",
     noi: `
-<p>Mỗi lần phát hành cần <b>ba tệp</b>:</p>
-<table class="b"><thead><tr><th>Tệp</th><th>Bắt buộc</th><th>Để làm gì</th></tr></thead><tbody>
-  <tr><td><b>Excel tổng</b> (<span class="mono">SS.</span>…)</td><td><span class="nhan n-xau">Bắt buộc</span></td>
-      <td>Bảng phân công và toàn bộ tiết học.</td></tr>
-  <tr><td><b>Word TKB giáo viên</b> (A4 hoặc A5)</td><td><span class="nhan n-canh">Nên có</span></td>
-      <td>Cắt riêng cho từng giáo viên in. Thiếu thì chỉ gửi ảnh.</td></tr>
-  <tr><td><b>Word TKB lớp</b> (A4 hoặc A5)</td><td><span class="nhan n-canh">Nên có</span></td>
-      <td>Gửi cho giáo viên chủ nhiệm.</td></tr>
+<h3>Cần ít nhất bao nhiêu tệp?</h3>
+<p><b>Một tệp là chạy được.</b> Ảnh thời khoá biểu do phần mềm tự vẽ từ số liệu trong tệp Excel tổng,
+không cần tệp Word nào. Thêm tệp chỉ để tiện hơn:</p>
+
+<table class="b"><thead><tr><th style="width:14%">Mức</th><th>Tệp cần có</th><th>Người nhận được gì</th></tr></thead><tbody>
+  <tr><td><b>Tối thiểu</b><br><span class="nhan n-ok">1 tệp</span></td>
+      <td><b>Excel tổng</b> (<span class="mono">SS….xlsx</span>)</td>
+      <td>Một <b>ảnh</b> thời khoá biểu xem ngay trên điện thoại.
+          Phần mềm tạo luôn danh sách giáo viên từ bảng phân công trong tệp này;
+          bạn chỉ cần điền <b>số điện thoại</b> ngay trên bảng.</td></tr>
+  <tr><td><b>Nên dùng</b><br><span class="nhan n-ok">2 tệp</span></td>
+      <td>Thêm <b>Excel danh sách giáo viên</b></td>
+      <td>Như trên, nhưng số điện thoại có sẵn trong tệp, khỏi gõ tay từng người.</td></tr>
+  <tr><td><b>Đầy đủ</b><br><span class="nhan n-ok">4 tệp</span></td>
+      <td>Thêm <b>2 tệp Word</b> (thời khoá biểu giáo viên và lớp)</td>
+      <td>Ảnh xem ngay <b>và</b> tệp Word để tải về in.</td></tr>
 </tbody></table>
 
-<h3>Nhớ nhập danh sách giáo viên chủ nhiệm</h3>
-<div class="bao canh"><b>Chưa nhập thì cột chủ nhiệm trống, app không biết gửi TKB lớp cho ai.</b>
-<span class="sua">Nhập “Danh sách giáo viên chủ nhiệm” trong phần mềm xếp TKB rồi xuất Excel lại. Hoặc chọn tay trong màn Thời khoá biểu.</span></div>
+<div class="bao tin"><b>Tệp Word chỉ dùng để cắt ra bản in.</b>
+  <span class="sua">Không có Word thì mọi thứ vẫn chạy, giáo viên vẫn nhận đủ thời khoá biểu của mình
+  dưới dạng ảnh. Chỉ khác là không tải về in được.</span></div>
 
 <h3>Lấy tệp ra khỏi phần mềm xếp thời khoá biểu</h3>
-<p>Làm đúng ba bước này, mỗi bước ra một loại tệp:</p>
-
 <table class="b"><thead><tr><th style="width:8%">Bước</th><th>Vào đâu</th><th>Ra tệp gì</th></tr></thead><tbody>
   <tr><td><b>1</b></td>
-      <td><b>Dữ liệu → Dữ liệu giáo viên → Danh sách giáo viên</b>, bấm <b>biểu tượng Excel</b>,
-          chọn <b>Copy file dữ liệu mẫu</b>.</td>
-      <td>Tệp Excel <b>danh sách giáo viên</b> đúng mẫu. Mở ra điền thêm
-          <b>số điện thoại</b> từng người rồi lưu lại.</td></tr>
+      <td><b>Hệ thống → Chuyển đổi dữ liệu sang Excel</b></td>
+      <td><b>Bắt buộc.</b> Tệp Excel tổng <span class="mono">SS….xlsx</span> — bảng phân công và toàn bộ tiết học.
+          Riêng tệp này là đủ để gửi ảnh.</td></tr>
   <tr><td><b>2</b></td>
-      <td><b>Hệ thống → Chuyển đổi dữ liệu sang Excel</b>.</td>
-      <td>Tệp Excel tổng (<span class="mono">SS….xlsx</span>) — bảng phân công và toàn bộ tiết học.</td></tr>
+      <td><b>Dữ liệu → Dữ liệu giáo viên → Danh sách giáo viên</b>, bấm <b>biểu tượng Excel</b>,
+          chọn <b>Copy file dữ liệu mẫu</b></td>
+      <td>Nên có. Tệp Excel danh sách giáo viên đúng mẫu. Mở ra điền <b>số điện thoại</b> từng người rồi lưu.</td></tr>
   <tr><td><b>3</b></td>
-      <td><b>Hệ thống → In ấn → Thời khoá biểu theo lớp</b>, rồi
-          <b>Thời khoá biểu theo giáo viên</b>, xuất ra tệp Word.</td>
-      <td>Hai tệp Word để giáo viên tải về in.</td></tr>
+      <td><b>Hệ thống → In ấn → Thời khoá biểu theo lớp</b>, rồi <b>theo giáo viên</b>, xuất ra tệp Word</td>
+      <td>Tuỳ chọn. Hai tệp Word để giáo viên tải về in.</td></tr>
 </tbody></table>
 
-<div class="bao tin"><b>Đủ ba loại tệp trên rồi thì kéo thả tất cả vào phần mềm này một lượt.</b>
+<div class="bao tin"><b>Thả tất cả vào phần mềm này một lượt.</b>
   <span class="sua">Thả cùng lượt thì tệp Word mới biết nó thuộc thời khoá biểu số mấy.
-  Phần mềm tự phân loại, đặt tên chuẩn và cất đúng chỗ, sau đó bạn bấm nhập vào hệ thống.</span></div>
+  Phần mềm tự phân loại, đặt tên chuẩn và cất đúng chỗ.</span></div>
+
+<h3>Nhớ nhập danh sách giáo viên chủ nhiệm</h3>
+<div class="bao canh"><b>Chưa nhập thì cột chủ nhiệm trống, phần mềm không biết gửi thời khoá biểu lớp cho ai.</b>
+  <span class="sua">Nhập “Danh sách giáo viên chủ nhiệm” trong phần mềm xếp thời khoá biểu rồi xuất Excel lại.
+  Hoặc chọn tay từng lớp trong khu Thời khoá biểu.</span></div>
 
 <h3>Thứ tự nạp</h3>
 <ol>
-  <li><b>Danh sách giáo viên trước.</b> Chưa có ai trong danh sách thì thời khoá biểu không khớp
-      vào người được, nút nhập sẽ bị khoá.</li>
-  <li><b>Thời khoá biểu sau</b> — phần mềm tự tạo ảnh luôn sau khi nhập.</li>
+  <li><b>Danh sách giáo viên trước</b> — nếu có tệp danh sách. Không có thì bỏ qua, phần mềm tự tạo
+      từ bảng phân công khi bạn nhập thời khoá biểu.</li>
+  <li><b>Thời khoá biểu sau</b> — nhập xong phần mềm tạo ảnh luôn.</li>
+  <li><b>Điền số điện thoại</b> còn thiếu ngay trên bảng ở tab Giáo viên, rời ô là tự lưu.</li>
 </ol>
 
-<p class="nho mo">Đóng Word và Excel trước khi nhập, nếu không app báo lỗi đọc tệp.</p>`,
+<p class="nho mo">Đóng Word và Excel trước khi nhập, nếu không phần mềm báo lỗi đọc tệp.</p>`,
   },
   {
     ma: "thu-muc", ten: "4. Thư mục dữ liệu",

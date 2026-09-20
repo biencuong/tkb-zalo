@@ -206,6 +206,14 @@ function hopChay(dotId, tomTat) {
         else if (t.kieu === "hoan_tat") themDongLog(log, "Hoàn tất.", "ok");
         else if (t.kieu === "da_dung") themDongLog(log, "Dừng: " + (t.ly_do_dung || ""), "canh");
       });
+      // Zalo báo lại khi tin thật sự tới máy người nhận — hiện ngay trong nhật ký.
+      const boNgheTin = window.api.gui.onTrangThaiTin((x) => {
+        themDongLog(log, x.loai === "xem"
+          ? `👁 ${x.so} tin đã được mở xem`
+          : `✓✓ ${x.so} tin đã tới máy người nhận`, "ok");
+      });
+      hop.addEventListener("tkb:dong", () => boNgheTin?.(), { once: true });
+
       const chay = async (n) => {
         hop.querySelector("#g-thu").disabled = true;
         hop.querySelector("#g-het").disabled = true;
@@ -229,6 +237,7 @@ function hopChay(dotId, tomTat) {
     },
   }).then(async (r) => {
     boNghe?.();
+    document.getElementById("hop")?.dispatchEvent(new CustomEvent("tkb:dong"));
     if (r === "loi") await moHopLoi(dotId);
   });
 }

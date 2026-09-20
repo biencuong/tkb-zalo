@@ -243,6 +243,8 @@ CREATE TABLE IF NOT EXISTS cai_dat (khoa TEXT PRIMARY KEY, gia_tri TEXT NOT NULL
  */
 const COT_THEM = [
   ["lich_su_gui", "la_ban", "INTEGER NOT NULL DEFAULT -1"],
+  ["lich_su_gui", "nhan_luc", "TEXT NOT NULL DEFAULT ''"],
+  ["lich_su_gui", "xem_luc", "TEXT NOT NULL DEFAULT ''"],
   ["giao_vien", "to_chuyen_mon", "TEXT NOT NULL DEFAULT ''"],
   ["giao_vien", "la_ban", "INTEGER NOT NULL DEFAULT -1"],
   ["nguoi_nhan", "la_ban", "INTEGER NOT NULL DEFAULT -1"],

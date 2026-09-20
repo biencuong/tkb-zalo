@@ -93,6 +93,7 @@ contextBridge.exposeInMainWorld("api", {
     dsLoi: goi("gui:ds-loi"),
     xemThu: goi("gui:xem-thu"),
     onTienDo: nghe("gui:tien-do"),
+    onTrangThaiTin: nghe("gui:trang-thai-tin"),
   },
   tk: {
     nguonLoc: goi("tk:nguon-loc"),

@@ -5,6 +5,37 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.5 — Ảnh thời khoá biểu vẽ lại cho điện thoại, chỉ cần một tệp là chạy
+
+**Ảnh thời khoá biểu**
+
+- Vẽ lại cho **màn hình điện thoại**: bỏ hẳn cột ngày cả tuần không có tiết và các tiết trống ở cuối
+  buổi, nên cột rộng ra, chữ to hơn, nhìn trong khung chat Zalo vẫn đọc được.
+- Gộp sáng và chiều vào **một bảng**, ngăn nhau bằng một hàng mỏng, thay cho hai bảng lặp hàng tiêu đề.
+- Thông tin đầu ảnh chuyển thành các **thẻ tròn** gọn: số thời khoá biểu, ngày thực hiện, học kỳ,
+  năm học, lớp chủ nhiệm.
+- **Ảnh không bị co kéo**: chiều cao chạy theo đúng nội dung, giữ dáng tự nhiên.
+
+**Chuẩn bị dữ liệu nhẹ đi**
+
+- **Chỉ cần MỘT tệp Excel tổng là gửi được.** Ảnh vốn được vẽ từ số liệu trong tệp này, không cần
+  tệp Word nào. Khi chưa có danh sách giáo viên, phần mềm **tạo giáo viên thẳng từ bảng phân công**
+  (suy mã viết tắt từ môn và lớp dạy); bạn chỉ cần điền số điện thoại ngay trên bảng.
+- Thả tệp vào là **báo rõ tệp nào cần, tệp nào không**: Bắt buộc / Nên có / Tuỳ chọn / Không dùng được,
+  kèm một câu giải thích thiếu nó thì mất gì.
+- Mục *Chuẩn bị tệp* viết lại theo ba mức: tối thiểu 1 tệp · nên dùng 2 tệp · đầy đủ 4 tệp.
+
+- Nút **Gửi qua Zalo** ở bước 3 nay thẳng hàng và cao bằng ô chọn thời khoá biểu.
+
+**Biết tin có đến nơi thật không**
+
+- Zalo báo lại khi tin **đã tới máy người nhận** và khi họ **đã xem** — phần mềm ghi vào lịch sử và
+  hiện cột *Đến nơi*: Đã xem / Đã tới máy / Chưa xác nhận.
+- Trong lúc gửi, nhật ký hiện ngay dòng *✓✓ đã tới máy người nhận*.
+- Lưu ý: chỉ bắt được tin báo khi phần mềm đang mở. Tin tới nơi lúc đã tắt máy thì không ghi nhận được.
+
+---
+
 ## 0.1.4 — SỬA LỖI KHÔNG GỬI ĐƯỢC TỆP WORD
 
 - **Người nhận chỉ thấy ảnh, không thấy tệp Word.** Nguyên nhân: thư viện Zalo tải tệp đính kèm

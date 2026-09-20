@@ -98,6 +98,15 @@ export function tenChuan(loai, thongTin = {}, duoi = ".xlsx") {
   return tenSach(thongTin.ten_goc) || "tep" + duoi;
 }
 
+/** Tệp này dùng vào việc gì, và thiếu nó thì mất gì. Nói thẳng để người dùng khỏi chuẩn bị thừa. */
+const TAC_DUNG = {
+  [LOAI.SS]: { can: "bat_buoc", chu: "Bắt buộc — toàn bộ tiết học và bảng phân công lấy từ đây. Ảnh thời khoá biểu cũng vẽ từ tệp này." },
+  [LOAI.DSGV]: { can: "nen_co", chu: "Nên có — lấy sẵn số điện thoại. Không có cũng được, phần mềm tạo giáo viên từ bảng phân công rồi bạn điền số sau." },
+  [LOAI.DOCX_GV]: { can: "tuy_chon", chu: "Tuỳ chọn — chỉ để cắt bản in cho giáo viên tải về. Không có thì họ vẫn nhận ảnh đầy đủ." },
+  [LOAI.DOCX_LOP]: { can: "tuy_chon", chu: "Tuỳ chọn — chỉ để cắt bản in thời khoá biểu lớp. Không có thì chủ nhiệm vẫn nhận ảnh." },
+  [LOAI.LA]: { can: "khong_can", chu: "Không dùng được — phần mềm chỉ đọc Excel tổng, Excel danh sách giáo viên và Word thời khoá biểu." },
+};
+
 const CHU_LOAI = {
   [LOAI.SS]: "Excel tổng hợp thời khoá biểu",
   [LOAI.DSGV]: "Danh sách giáo viên",
@@ -189,6 +198,7 @@ export async function xepTepVaoKho(dsDuongDan, duongDan) {
     const duoi = path.extname(x.ten_goc).toLowerCase();
     const muc = {
       ten_goc: x.ten_goc, loai: x.loai, chu_loai: CHU_LOAI[x.loai] || x.loai,
+      can: TAC_DUNG[x.loai]?.can || "khong_can", tac_dung: TAC_DUNG[x.loai]?.chu || "",
       dat: false, ten_moi: "", thu_muc: "", noi: "", ghi_de: false,
       dung_duoc: Boolean(x.dung_duoc), tom_tat: x.tom_tat || "",
       kiem: x.kiem || [], thong_tin: x.thong_tin || {},
@@ -258,9 +268,14 @@ export async function xepTepVaoKho(dsDuongDan, duongDan) {
   }
 
   const nhan = bao.filter((x) => x.dat);
+  const coLoai = (l) => nhan.some((x) => x.loai === l) ;
   return {
     ok: true,
     bao_cao: bao,
+    // Nói thẳng còn thiếu tệp nào THẬT SỰ cần, và tệp nào thả vào cũng chẳng để làm gì.
+    thieu_bat_buoc: coLoai(LOAI.SS) ? [] : ["Excel tổng (SS….xlsx) — thiếu tệp này thì chưa nhập được gì"],
+    thua: bao.filter((x) => x.can === "khong_can").map((x) => x.ten_goc),
+    du_de_gui_anh: coLoai(LOAI.SS),
     so_nhan: nhan.length,
     so_trung: bao.filter((x) => x.trung).length,
     so_thay: nhan.filter((x) => x.ghi_de).length,

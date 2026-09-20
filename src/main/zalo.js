@@ -61,6 +61,10 @@ function batGhiPhienDinhKy() {
 }
 
 let dangNghe = false;
+let baoTrangThaiTin = null;
+
+/** Đăng ký nơi nhận tin báo "đã tới máy" / "đã xem" từ Zalo. */
+export function datBaoTrangThaiTin(fn) { baoTrangThaiTin = fn; }
 
 /**
  * BẮT BUỘC bật trình nghe WebSocket sau khi đăng nhập.
@@ -75,6 +79,13 @@ function batTrinhNghe() {
   try {
     api.listener.on("error", (e) => { console.error("[zalo] trình nghe lỗi:", e?.message || e); });
     api.listener.on("closed", () => { dangNghe = false; });
+
+    // Zalo báo lại khi tin ĐÃ TỚI MÁY người nhận và khi họ ĐÃ XEM.
+    // Đây là bằng chứng thật, khác hẳn với "app đã gửi đi".
+    const gom = (ds) => (Array.isArray(ds) ? ds : [ds])
+      .map((x) => String(x?.data?.msgId ?? x?.msgId ?? "")).filter(Boolean);
+    api.listener.on("delivered_messages", (ds) => { try { baoTrangThaiTin?.("nhan", gom(ds)); } catch { /* */ } });
+    api.listener.on("seen_messages", (ds) => { try { baoTrangThaiTin?.("xem", gom(ds)); } catch { /* */ } });
     api.listener.start({ retryOnClose: true });
     dangNghe = true;
   } catch (e) {

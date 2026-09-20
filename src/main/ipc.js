@@ -42,6 +42,15 @@ function dangKy(ten, fn) {
 }
 
 export function dangKyTatCa() {
+  // Zalo báo lại khi tin ĐÃ TỚI MÁY người nhận và khi họ ĐÃ XEM — ghi vào lịch sử
+  // rồi đẩy lên giao diện, để người dùng biết tin có thật sự đến nơi hay không.
+  zalo.datBaoTrangThaiTin((loai, dsMsgId) => {
+    try {
+      const n = gui.danhDauTrangThaiTin(loai, dsMsgId);
+      if (n > 0) cua?.webContents.send("gui:trang-thai-tin", { loai, so: n });
+    } catch (e) { console.error("[gui] ghi trạng thái tin lỗi:", e?.message || e); }
+  });
+
   // ------------------------------------------------ CHUNG
   dangKy("app:thong-tin", () => ({
     ok: true, phien_ban: phienBan(), ten: app.getName(),

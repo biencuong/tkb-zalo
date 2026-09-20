@@ -78,40 +78,44 @@ Cập nhật **không mất** dữ liệu. Gỡ app cũng không xoá thư mục
 
 ## 3. Chuẩn bị tệp
 
-Mỗi lần phát hành cần **ba tệp**:
+### Cần ít nhất bao nhiêu tệp?
 
-| Tệp | Bắt buộc | Để làm gì |
+**Một tệp là chạy được.** Ảnh thời khoá biểu do phần mềm tự vẽ từ số liệu trong tệp Excel tổng, không cần tệp Word nào. Thêm tệp chỉ để tiện hơn:
+
+| Mức | Tệp cần có | Người nhận được gì |
 |---|---|---|
-| **Excel tổng** (`SS.`…) | [Bắt buộc] | Bảng phân công và toàn bộ tiết học. |
-| **Word TKB giáo viên** (A4 hoặc A5) | [Nên có] | Cắt riêng cho từng giáo viên in. Thiếu thì chỉ gửi ảnh. |
-| **Word TKB lớp** (A4 hoặc A5) | [Nên có] | Gửi cho giáo viên chủ nhiệm. |
+| **Tối thiểu** [1 tệp] | **Excel tổng** (`SS….xlsx`) | Một **ảnh** thời khoá biểu xem ngay trên điện thoại. Phần mềm tạo luôn danh sách giáo viên từ bảng phân công trong tệp này; bạn chỉ cần điền **số điện thoại** ngay trên bảng. |
+| **Nên dùng** [2 tệp] | Thêm **Excel danh sách giáo viên** | Như trên, nhưng số điện thoại có sẵn trong tệp, khỏi gõ tay từng người. |
+| **Đầy đủ** [4 tệp] | Thêm **2 tệp Word** (thời khoá biểu giáo viên và lớp) | Ảnh xem ngay **và** tệp Word để tải về in. |
 
 
-### Nhớ nhập danh sách giáo viên chủ nhiệm
-
-> **Chưa nhập thì cột chủ nhiệm trống, app không biết gửi TKB lớp cho ai.** Nhập “Danh sách giáo viên chủ nhiệm” trong phần mềm xếp TKB rồi xuất Excel lại.
-> Hoặc chọn tay trong màn Thời khoá biểu.
+> **Tệp Word chỉ dùng để cắt ra bản in.** Không có Word thì mọi thứ vẫn chạy, giáo viên vẫn nhận đủ thời khoá biểu của mình dưới dạng ảnh.
+> Chỉ khác là không tải về in được.
 
 ### Lấy tệp ra khỏi phần mềm xếp thời khoá biểu
 
-Làm đúng ba bước này, mỗi bước ra một loại tệp:
-
 | Bước | Vào đâu | Ra tệp gì |
 |---|---|---|
-| **1** | **Dữ liệu → Dữ liệu giáo viên → Danh sách giáo viên**, bấm **biểu tượng Excel**, chọn **Copy file dữ liệu mẫu**. | Tệp Excel **danh sách giáo viên** đúng mẫu. Mở ra điền thêm **số điện thoại** từng người rồi lưu lại. |
-| **2** | **Hệ thống → Chuyển đổi dữ liệu sang Excel**. | Tệp Excel tổng (`SS….xlsx`) — bảng phân công và toàn bộ tiết học. |
-| **3** | **Hệ thống → In ấn → Thời khoá biểu theo lớp**, rồi **Thời khoá biểu theo giáo viên**, xuất ra tệp Word. | Hai tệp Word để giáo viên tải về in. |
+| **1** | **Hệ thống → Chuyển đổi dữ liệu sang Excel** | **Bắt buộc.** Tệp Excel tổng `SS….xlsx` — bảng phân công và toàn bộ tiết học. Riêng tệp này là đủ để gửi ảnh. |
+| **2** | **Dữ liệu → Dữ liệu giáo viên → Danh sách giáo viên**, bấm **biểu tượng Excel**, chọn **Copy file dữ liệu mẫu** | Nên có. Tệp Excel danh sách giáo viên đúng mẫu. Mở ra điền **số điện thoại** từng người rồi lưu. |
+| **3** | **Hệ thống → In ấn → Thời khoá biểu theo lớp**, rồi **theo giáo viên**, xuất ra tệp Word | Tuỳ chọn. Hai tệp Word để giáo viên tải về in. |
 
 
-> **Đủ ba loại tệp trên rồi thì kéo thả tất cả vào phần mềm này một lượt.** Thả cùng lượt thì tệp Word mới biết nó thuộc thời khoá biểu số mấy.
-> Phần mềm tự phân loại, đặt tên chuẩn và cất đúng chỗ, sau đó bạn bấm nhập vào hệ thống.
+> **Thả tất cả vào phần mềm này một lượt.** Thả cùng lượt thì tệp Word mới biết nó thuộc thời khoá biểu số mấy.
+> Phần mềm tự phân loại, đặt tên chuẩn và cất đúng chỗ.
+
+### Nhớ nhập danh sách giáo viên chủ nhiệm
+
+> **Chưa nhập thì cột chủ nhiệm trống, phần mềm không biết gửi thời khoá biểu lớp cho ai.** Nhập “Danh sách giáo viên chủ nhiệm” trong phần mềm xếp thời khoá biểu rồi xuất Excel lại.
+> Hoặc chọn tay từng lớp trong khu Thời khoá biểu.
 
 ### Thứ tự nạp
 
-1. **Danh sách giáo viên trước.** Chưa có ai trong danh sách thì thời khoá biểu không khớp vào người được, nút nhập sẽ bị khoá.
-2. **Thời khoá biểu sau** — phần mềm tự tạo ảnh luôn sau khi nhập.
+1. **Danh sách giáo viên trước** — nếu có tệp danh sách. Không có thì bỏ qua, phần mềm tự tạo từ bảng phân công khi bạn nhập thời khoá biểu.
+2. **Thời khoá biểu sau** — nhập xong phần mềm tạo ảnh luôn.
+3. **Điền số điện thoại** còn thiếu ngay trên bảng ở tab Giáo viên, rời ô là tự lưu.
 
-Đóng Word và Excel trước khi nhập, nếu không app báo lỗi đọc tệp.
+Đóng Word và Excel trước khi nhập, nếu không phần mềm báo lỗi đọc tệp.
 
 ---
 

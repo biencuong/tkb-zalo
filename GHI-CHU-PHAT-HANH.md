@@ -5,6 +5,17 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.3 — Nói đúng thứ còn thiếu ở bước Gửi
+
+- **Sửa lỗi gây hiểu nhầm:** đã quét mã QR xong mà bước Gửi vẫn báo *"Còn thiếu: chưa kết nối Zalo"*.
+  Thật ra còn thiếu việc **dò Zalo theo số điện thoại của từng giáo viên**. Nay bước bị khoá nêu
+  đúng từng thứ còn thiếu, không nói gộp nữa.
+- Trang **Kết nối Zalo** nay phân biệt rõ hai việc: kết nối xong nhưng chưa dò được ai thì hiện
+  ngay *"Kết nối xong, nhưng chưa gửi được"* kèm số người đã có Zalo và nút **Dò Zalo ngay**.
+- Bỏ dòng *"Tệp tối đa 0 MB"* khi chưa đọc được giới hạn thật từ Zalo.
+
+---
+
 ## 0.1.2 — Đèn báo kết nối Zalo
 
 - **Đèn nhịp ở góc trên bên phải**, thấy ở mọi trang: chấm **xanh đang đập** là đang kết nối,

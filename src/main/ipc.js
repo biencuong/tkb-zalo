@@ -117,9 +117,11 @@ export function dangKyTatCa() {
     const daGui = db.mot("SELECT COUNT(*) n FROM lich_su_gui WHERE ket_qua='xong'").n;
     b3.xong = daGui > 0;
     b3.viec = b3.khoa ? "Hoàn tất hai bước trên" : daGui ? "Đã gửi " + daGui + " lượt" : "Gửi thời khoá biểu";
+    // Nêu ĐÚNG thứ còn thiếu, đừng nói gộp. Trước đây hễ bước 2 chưa xong là báo
+    // "chưa kết nối Zalo", nên người đã quét QR xong vẫn thấy câu đó và không hiểu vì sao.
     if (b3.khoa) {
-      if (!b1.xong) b3.thieu.push("thiếu dữ liệu");
-      if (!b2.xong) b3.thieu.push("chưa kết nối Zalo");
+      b3.thieu.push(...b1.thieu, ...b2.thieu);
+      if (!b3.thieu.length) b3.thieu.push("hoàn tất hai bước trên");
     }
 
     return {

@@ -1,12 +1,18 @@
 /** Kết nối Zalo bằng quét mã QR. */
 import { esc, so, baoOk, baoXau, baoKetQua, hoi, chuTrangThaiZalo, hopCho } from "../chung.js";
 import { moHopRuiRo } from "../rui-ro.js";
+import { di, capNhatTienDo } from "../app.js";
 
 export async function ve(khung) {
   let t = await window.api.zalo.trangThai();
+  // Kết nối xong chưa đủ để gửi: còn phải dò Zalo theo số điện thoại của từng giáo viên.
+  let dem = await window.api.app.tienDo().catch(() => null);
 
   const veNoiDung = () => {
     const daNoi = t.status === "da_ket_noi";
+    const s = dem?.so || {};
+    const chuaDo = daNoi && !s.uid;
+    const thieuSdt = (s.gv || 0) - (s.sdt || 0);
     khung.innerHTML = `
     <div class="dau-trang">
       <div><h1>Kết nối Zalo</h1>
@@ -23,9 +29,16 @@ export async function ve(khung) {
             <tr><td style="width:38%">Tài khoản</td><td><b>${esc(t.ten || "(không rõ tên)")}</b></td></tr>
             ${t.sdt ? `<tr><td>Số điện thoại</td><td class="mono">${esc(t.sdt)}</td></tr>` : ""}
             <tr><td>Zalo UID</td><td class="mono nho">${esc(t.uid || "")}</td></tr>
-            ${t.gioi_han_tep ? `<tr><td>Tệp tối đa</td><td>${so(t.gioi_han_tep.max_size_mb)} MB</td></tr>` : ""}
+            ${t.gioi_han_tep?.max_size_mb > 0 ? `<tr><td>Tệp tối đa</td><td>${so(t.gioi_han_tep.max_size_mb)} MB</td></tr>` : ""}
           </tbody></table>
-          <div class="bao ok" style="margin-top:.6rem">Sẵn sàng gửi.</div>
+          ${chuaDo ? `<div class="bao canh" style="margin-top:.6rem">
+              <b>Kết nối xong, nhưng chưa gửi được.</b>
+              <span class="sua">Phần mềm còn phải tra Zalo theo số điện thoại của từng giáo viên.
+              Hiện ${so(s.uid || 0)}/${so(s.sdt || 0)} người đã có Zalo${thieuSdt > 0 ? `, và ${so(thieuSdt)} người chưa có số điện thoại` : ""}.</span>
+              <span class="hang-nut" style="margin-top:.5rem">
+                <button class="nut nho chinh" id="di-do-zalo">Dò Zalo ngay</button>
+              </span></div>`
+            : `<div class="bao ok" style="margin-top:.6rem">Sẵn sàng gửi. ${so(s.uid || 0)} giáo viên đã có Zalo.</div>`}
           <div class="hang-nut" style="margin-top:.6rem">
             <button class="nut" id="quet-lai">Quét bằng tài khoản khác</button>
             <button class="nut xau" id="dang-xuat">Đăng xuất</button>
@@ -62,12 +75,18 @@ export async function ve(khung) {
   };
   veNoiDung();
 
-  const boNghe = window.api.zalo.onDoi((moi) => { t = { ...t, ...moi }; veNoiDung(); });
+  const boNghe = window.api.zalo.onDoi(async (moi) => {
+    t = { ...t, ...moi };
+    dem = await window.api.app.tienDo().catch(() => dem);
+    veNoiDung();
+    capNhatTienDo();
+  });
 
   khung.addEventListener("click", async (e) => {
     const b = e.target.closest("button");
     if (!b) return;
     if (b.id === "xem-rui-ro") return moHopRuiRo({});
+    if (b.id === "di-do-zalo") return di("du-lieu", { tab: "gv" });
     if (b.id === "dang-nhap") { await window.api.zalo.dangNhap(false); return; }
     if (b.id === "quet-lai") {
       if (t.status === "da_ket_noi" && !(await hoi("Đổi tài khoản Zalo?",

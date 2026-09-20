@@ -193,6 +193,15 @@ app.whenReady().then(async () => {
     })()`, true);
     kiem(hopQr.dang_lay && !hopQr.nut_thua, `mở hộp là tự lấy mã QR, không phải bấm thêm (${hopQr.chu})`);
 
+    // Bước bị khoá phải nêu ĐÚNG thứ còn thiếu. Đã quét QR mà chưa dò Zalo thì
+    // không được báo "chưa kết nối Zalo" — người dùng vừa quét xong sẽ không hiểu.
+    const td = await cua.webContents.executeJavaScript(`window.api.app.tienDo()`, true);
+    const b3 = td?.buoc?.[2] || {};
+    const thieu = (b3.thieu || []).join(", ");
+    kiem(!(thieu.includes("chưa kết nối Zalo") && td.zalo?.status === "da_ket_noi"),
+      `bước Gửi nêu đúng thứ còn thiếu (${thieu || "không thiếu gì"})`);
+    kiem(!b3.khoa || (b3.thieu || []).length > 0, "bước bị khoá luôn nói rõ vì sao");
+
     // Đèn nhịp góc phải: xám đứng yên khi chưa nối, xanh đập khi đã nối.
     const den = await cua.webContents.executeJavaScript(`(async () => {
       const e = document.getElementById("nhip-zalo");

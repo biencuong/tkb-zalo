@@ -83,7 +83,7 @@ function veThan(t, conLai) {
         <tr><td style="width:40%">Tài khoản</td><td><b>${esc(t.ten || "(không rõ tên)")}</b></td></tr>
         ${t.sdt ? `<tr><td>Số điện thoại</td><td class="mono">${esc(t.sdt)}</td></tr>` : ""}
         <tr><td>Zalo UID</td><td class="mono nho">${esc(t.uid || "")}</td></tr>
-        ${t.gioi_han_tep ? `<tr><td>Tệp tối đa</td><td>${so(t.gioi_han_tep.max_size_mb)} MB</td></tr>` : ""}
+        ${t.gioi_han_tep?.max_size_mb > 0 ? `<tr><td>Tệp tối đa</td><td>${so(t.gioi_han_tep.max_size_mb)} MB</td></tr>` : ""}
       </tbody></table>
       <p class="nho mo" style="margin:.6rem 0 0">Tự đóng sau <b id="zn-dem">${conLai}</b> giây.</p>
     </div>`;

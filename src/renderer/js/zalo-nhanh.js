@@ -24,8 +24,26 @@ export function chipZalo({ chu = true } = {}) {
     <span class="cz-bd">○</span><span class="cz-chu">Nối Zalo</span></button>`;
 }
 
+/**
+ * Đèn nhịp ở góc phải: XANH ĐẬP = đang kết nối, VÀNG = đang chờ quét mã, XÁM ĐỨNG YÊN = chưa nối.
+ * Còn đập là còn online — đập do CSS nên chỉ cần đổi lớp, không tốn gì.
+ */
+function veNhipZalo(t) {
+  const e = document.getElementById("nhip-zalo");
+  if (!e) return;
+  const noi = t?.status === "da_ket_noi";
+  const cho = t?.status === "cho_quet_qr" || t?.status === "dang_dang_nhap";
+  e.className = noi ? "noi" : cho ? "cho" : "tat";
+  const chu = e.querySelector(".nz-chu");
+  if (chu) chu.textContent = noi ? (t.ten || "Zalo") : cho ? "Đang nối" : "Zalo";
+  e.title = noi
+    ? `Đang kết nối Zalo: ${t.ten || ""} ${t.sdt || ""}`.trim()
+    : cho ? "Đang chờ quét mã QR" : "Chưa kết nối Zalo — bấm để quét mã";
+}
+
 /** Vẽ lại mọi chip trên màn hình theo trạng thái mới. */
 export function veChipZalo(t) {
+  veNhipZalo(t);
   const n = NHAN[t?.status] || NHAN_TAT;
   for (const el of document.querySelectorAll("[data-chip-zalo]")) {
     el.className = "chip-zalo " + n.lop + (t?.status === "da_ket_noi" ? " noi" : "");
@@ -46,8 +64,14 @@ export function veChipZalo(t) {
 /** Bắt sự kiện bấm chip ở bất kỳ đâu (gắn một lần ở app.js). */
 export function ganChipZalo() {
   document.addEventListener("click", (e) => {
-    if (e.target.closest("[data-chip-zalo]")) moKetNoiZalo();
+    if (e.target.closest("[data-chip-zalo]") || e.target.closest("#nhip-zalo")) moKetNoiZalo();
   });
+
+  // Phiên Zalo có thể đứt lặng lẽ (hết hạn, đăng nhập chỗ khác). Hỏi lại định kỳ để đèn
+  // không đập tiếp khi thật ra đã mất kết nối — "còn đập là còn online" phải đúng.
+  setInterval(async () => {
+    try { veChipZalo(await window.api.zalo.trangThai()); } catch { /* */ }
+  }, 30000);
 }
 
 function veThan(t, conLai) {

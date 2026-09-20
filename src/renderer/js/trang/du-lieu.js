@@ -9,7 +9,6 @@ import {
   esc, so, ngayVn, gioVn, moHop, hoi, baoOk, baoXau, baoKetQua, hopCho, vungTha, htmlVungTha,
 } from "../chung.js";
 import { di, capNhatTienDo } from "../app.js";
-import { chipZalo } from "../zalo-nhanh.js";
 
 let thuMucDangXem = "";
 let boTha = [];
@@ -432,7 +431,6 @@ export async function ve(khung, thamSo = {}) {
     <div><h1>Dữ liệu</h1>
       <p class="mo-ta">Kéo tệp vào là xong. Danh sách giáo viên và thời khoá biểu đều nằm ở trang này.</p></div>
     <div class="hang-nut">
-      ${chipZalo()}
       <button class="nut nho" id="mo-kho-win">Mở thư mục</button>
     </div>
   </div>

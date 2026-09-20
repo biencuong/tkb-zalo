@@ -5,6 +5,15 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.2 — Đèn báo kết nối Zalo
+
+- **Đèn nhịp ở góc trên bên phải**, thấy ở mọi trang: chấm **xanh đang đập** là đang kết nối,
+  chấm **vàng** là đang chờ quét mã, chấm **xám đứng yên** là chưa kết nối. Bấm vào để quét mã.
+- Phiên Zalo đứt giữa chừng thì đèn tắt trong vòng 30 giây, không để gửi nhầm khi đã mất kết nối.
+- Bỏ nút Zalo trùng ở đầu trang Tổng quan và Dữ liệu, vì đèn góc phải đã nói đủ.
+
+---
+
 ## 0.1.1 — Gọn lại giao diện, sửa kiểm tra cập nhật
 
 - **Cài đặt** chia bốn tab: Chung · An toàn khi gửi · Lời nhắn · Hệ thống.

@@ -150,8 +150,9 @@ app.whenReady().then(async () => {
     }
     kiem(khu.length === 3, `trang Dữ liệu đủ ba tab có nội dung (${khu.join(" ") || "không tab nào"})`);
 
-    const soChip = await cua.webContents.executeJavaScript(`document.querySelectorAll("[data-chip-zalo]").length`, true);
-    kiem(soChip >= 2, `có nút kết nối Zalo nhanh (${soChip} nút)`);
+    const soChip = await cua.webContents.executeJavaScript(
+      `document.querySelectorAll("[data-chip-zalo], #nhip-zalo").length`, true);
+    kiem(soChip >= 2, `có chỗ kết nối Zalo nhanh (${soChip} chỗ: đèn góc phải + chân thanh bên)`);
 
     const rongThuong = await cua.webContents.executeJavaScript(
       `import("./js/app.js").then(m => { m.datMini(true, false); return document.getElementById("ben").offsetWidth; })`, true);
@@ -191,6 +192,36 @@ app.whenReady().then(async () => {
       return co;
     })()`, true);
     kiem(hopQr.dang_lay && !hopQr.nut_thua, `mở hộp là tự lấy mã QR, không phải bấm thêm (${hopQr.chu})`);
+
+    // Đèn nhịp góc phải: xám đứng yên khi chưa nối, xanh đập khi đã nối.
+    const den = await cua.webContents.executeJavaScript(`(async () => {
+      const e = document.getElementById("nhip-zalo");
+      if (!e) return { co: false };
+      // Bài kiểm mã QR ở trên để lại một phiên đang chờ quét — huỷ hẳn rồi mới đo,
+      // nếu không sự kiện trạng thái bay về sẽ ghi đè lên.
+      const m = await import("./js/zalo-nhanh.js");
+      await window.api.zalo.dangXuat(true).catch(() => {});
+      m.veChipZalo({ status: "chua_dang_nhap" });
+      await new Promise((r) => setTimeout(r, 600));
+      const g = getComputedStyle(e.querySelector(".nz-tim"));
+      return { co: true, lop: e.className, dap: g.animationName !== "none",
+               chu: e.querySelector(".nz-chu")?.textContent || "" };
+    })()`, true);
+    kiem(den.co, "có đèn nhịp Zalo ở góc phải");
+    kiem(den.lop === "tat" && !den.dap, `chưa nối thì đèn xám đứng yên (lớp ${den.lop}, đập ${den.dap})`);
+
+    const denNoi = await cua.webContents.executeJavaScript(`(async () => {
+      const m = await import("./js/zalo-nhanh.js");
+      m.veChipZalo({ status: "da_ket_noi", ten: "Tai khoan thu" });
+      await new Promise((r) => setTimeout(r, 120));
+      const e = document.getElementById("nhip-zalo");
+      const g = getComputedStyle(e.querySelector(".nz-tim"));
+      const kq = { lop: e.className, dap: g.animationName !== "none", chuky: g.animationDuration, chu: e.querySelector(".nz-chu").textContent };
+      m.veChipZalo({ status: "chua_dang_nhap" });
+      return kq;
+    })()`, true);
+    kiem(denNoi.lop === "noi" && denNoi.dap && denNoi.chuky === "1s",
+      `nối rồi thì đèn xanh đập mỗi giây (lớp ${denNoi.lop}, chu kỳ ${denNoi.chuky}, chữ "${denNoi.chu}")`);
 
     const chipBan = await cua.webContents.executeJavaScript(`document.getElementById("ban-app")?.textContent.trim() || ""`, true);
     kiem(/^v\d+\.\d+\.\d+/.test(chipBan), `chân thanh bên hiện số hiệu chuẩn (${chipBan})`);

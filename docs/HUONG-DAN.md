@@ -4,7 +4,7 @@
 > (`src/renderer/js/noi-dung.js`). Đừng sửa trực tiếp tệp này —
 > sửa ở mô-đun nội dung rồi chạy `npm run huong-dan`.
 >
-> Cập nhật: 20/9/2026
+> Cập nhật: 21/9/2026
 
 ## Mục lục
 
@@ -216,6 +216,19 @@ Vào màn **Thời khoá biểu** bấm **Tạo ảnh**. Mỗi giáo viên và m
 ## 7. Kết nối Zalo
 
 Vào **Kết nối Zalo** → **Đăng nhập Zalo (quét QR)**. Mở Zalo trên điện thoại, quét mã. Quét một lần, lần sau tự vào.
+
+### Đèn báo ở góc trên bên phải
+
+Lúc nào cũng thấy, ở mọi trang:
+
+|   |   |
+|---|---|
+| **Chấm xanh đang đập** | Đang kết nối, gửi được. Còn đập là còn kết nối. |
+| **Chấm vàng** | Đang chờ bạn quét mã QR. |
+| **Chấm xám đứng yên** | Chưa kết nối. Bấm vào để quét mã. |
+
+
+Phiên Zalo đứt giữa chừng thì đèn tắt trong vòng 30 giây, không để bạn gửi nhầm khi đã mất kết nối.
 
 ### Nút nối nhanh
 

@@ -1,7 +1,6 @@
 /** Tổng quan: quy trình 3 bước, chỉ hiện việc cần làm tiếp. */
 import { esc, so, ngayVn, hopCho, baoOk, baoXau } from "../chung.js";
 import { di, capNhatTienDo } from "../app.js";
-import { chipZalo } from "../zalo-nhanh.js";
 
 /** Thanh 3 bước — bấm vào là nhảy tới bước đó. Dùng lại ở các trang khác. */
 export function thanhBuoc(td, { hienViec = true } = {}) {
@@ -50,7 +49,6 @@ export async function ve(khung) {
     <div class="hang-nut">
       <button class="nut chinh" id="lam-ngay">${esc(viecTiep.nut)}</button>
       ${s.da_gui ? '<button class="nut" data-di-trang="gui">Lịch sử gửi</button>' : ""}
-      ${chipZalo()}
     </div>
   </div>
 

@@ -214,6 +214,15 @@ Bấm <b>Xem</b> ở từng dòng để soi trước.</p>`,
 <p>Vào <b>Kết nối Zalo</b> → <b>Đăng nhập Zalo (quét QR)</b>. Mở Zalo trên điện thoại, quét mã.
 Quét một lần, lần sau tự vào.</p>
 
+<h3>Đèn báo ở góc trên bên phải</h3>
+<p>Lúc nào cũng thấy, ở mọi trang:</p>
+<table class="b"><tbody>
+  <tr><td style="width:34%"><b>Chấm xanh đang đập</b></td><td>Đang kết nối, gửi được. Còn đập là còn kết nối.</td></tr>
+  <tr><td><b>Chấm vàng</b></td><td>Đang chờ bạn quét mã QR.</td></tr>
+  <tr><td><b>Chấm xám đứng yên</b></td><td>Chưa kết nối. Bấm vào để quét mã.</td></tr>
+</tbody></table>
+<p class="nho mo">Phiên Zalo đứt giữa chừng thì đèn tắt trong vòng 30 giây, không để bạn gửi nhầm khi đã mất kết nối.</p>
+
 <h3>Nút nối nhanh</h3>
 <p>Không cần vào tận màn đó: nút tròn <b>Nối Zalo</b> có mặt ở cuối thanh bên, trang Tổng quan,
 trang Dữ liệu và trang Gửi. Màu nút cho biết trạng thái:</p>

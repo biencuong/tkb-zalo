@@ -551,3 +551,48 @@ button.lien:hover{color:var(--accent-nut)}
 
 /* Nhắc khi người dùng chọn thời khoá biểu cũ thay vì bản mới nhất */
 .goi-y.nhac-cu{color:var(--warn);font-weight:600}
+
+/* ---------- Đèn nhịp Zalo ở góc trên bên phải ---------- */
+/* Chừa một dải mỏng trên cùng cho đèn nhịp, để nó không đè lên nút của trang. */
+#chinh{position:relative;padding-top:40px}
+#nhip-zalo{
+  position:absolute;top:11px;right:16px;z-index:20;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:.2rem .55rem .2rem .45rem;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow);
+  font-family:"Barlow Semi Condensed","Segoe UI",sans-serif;font-size:.74rem;font-weight:600;
+  letter-spacing:.02em;color:var(--muted);line-height:1;
+}
+#nhip-zalo:hover{border-color:var(--accent)}
+#nhip-zalo .nz-tim{
+  width:9px;height:9px;border-radius:50%;flex:0 0 9px;background:var(--muted);
+  position:relative;
+}
+/* Đang kết nối: chấm xanh, đập một nhịp mỗi giây. Còn đập là còn online. */
+#nhip-zalo.noi{border-color:color-mix(in srgb,var(--ok) 45%,var(--line));background:var(--ok-soft);color:var(--ok)}
+#nhip-zalo.noi .nz-tim{background:var(--ok);animation:nz-dap 1s ease-in-out infinite}
+#nhip-zalo.noi .nz-tim::after{
+  content:"";position:absolute;inset:0;border-radius:50%;background:var(--ok);
+  animation:nz-lan 1s ease-out infinite;
+}
+/* Đang chờ quét mã: vàng, đập chậm hơn cho khác hẳn lúc đã nối. */
+#nhip-zalo.cho{border-color:color-mix(in srgb,var(--warn) 50%,var(--line));background:var(--warn-soft);color:var(--warn)}
+#nhip-zalo.cho .nz-tim{background:var(--warn);animation:nz-dap 2s ease-in-out infinite}
+/* Chưa kết nối: xám, đứng yên. */
+#nhip-zalo.tat .nz-tim{background:var(--muted);opacity:.55;animation:none}
+#nhip-zalo.tat::after{content:none}
+
+@keyframes nz-dap{
+  0%,100%{transform:scale(1)}
+  18%{transform:scale(1.42)}
+  36%{transform:scale(1)}
+  54%{transform:scale(1.22)}
+  72%{transform:scale(1)}
+}
+@keyframes nz-lan{
+  0%{opacity:.5;transform:scale(1)}
+  100%{opacity:0;transform:scale(2.6)}
+}
+@media (prefers-reduced-motion: reduce){
+  #nhip-zalo .nz-tim,#nhip-zalo .nz-tim::after{animation:none !important}
+}

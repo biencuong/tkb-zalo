@@ -5,6 +5,24 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.1 — Gọn lại giao diện, sửa kiểm tra cập nhật
+
+- **Cài đặt** chia bốn tab: Chung · An toàn khi gửi · Lời nhắn · Hệ thống.
+- **Gửi** chia hai tab: Gửi và Lịch sử gửi. Lịch sử lọc bằng thanh tóm tắt cộng hộp thoại,
+  không còn bày sẵn sáu ô lọc chiếm chỗ.
+- **Bộ lọc thống kê** chia ba nhóm theo đúng câu hỏi đang tự hỏi: tính trên gì · của ai ·
+  phần nào của thời khoá biểu. Mỗi ô chọn nhiều có đếm số đã chọn, nút chọn hết / bỏ hết,
+  và ô tìm nhanh khi danh sách dài.
+- **Mặc định gửi thời khoá biểu mới nhất.** Chọn bản cũ thì nhắc ngay tại chỗ.
+- **Kiểm tra cập nhật**: chưa lập trang phát hành thì nói đúng bản chất, không còn hiện
+  "Máy chủ trả mã 404" làm người dùng tưởng máy mình hỏng. Các mã lỗi khác cũng dịch sang
+  câu nói rõ nên làm gì.
+- Bộ cài tải về nay **được kiểm mã băm SHA-256** trước khi chạy (trước đây hỏng vì ghi chú
+  phát hành viết bằng Markdown).
+- Ô chọn ngày hiện **dd/mm/yyyy** thay vì kiểu Mỹ.
+
+---
+
 ## 0.1.0 — Bản đầu tiên
 
 Gửi thời khoá biểu cho giáo viên qua Zalo cá nhân: mỗi người nhận một ảnh xem ngay và một tệp Word để in.
@@ -60,12 +78,3 @@ Gửi thời khoá biểu cho giáo viên qua Zalo cá nhân: mỗi người nh�
 - Nút **Trên ĐT** dựng lại đúng màn hình điện thoại người nhận: lời nhắn, ảnh và thẻ tệp Word.
 - **Sửa giáo viên ngay trên bảng**, rời ô là tự lưu, không phải mở hộp thoại.
 - Khuyến cáo đổi lại: **nên gửi bằng tài khoản Zalo phụ**, giữ tài khoản chính cho việc hằng ngày.
-
-**Gọn lại lần cuối**
-
-- Trang **Cài đặt** chia bốn tab: Chung · An toàn khi gửi · Lời nhắn · Hệ thống.
-- Bước **Gửi** chia hai tab: Gửi và Lịch sử gửi; lịch sử lọc bằng thanh chip cộng hộp thoại.
-- **Bộ lọc thống kê** chia ba nhóm câu hỏi (tính trên gì · của ai · phần nào của thời khoá biểu).
-  Mỗi ô chọn nhiều có đếm số đã chọn, nút chọn hết / bỏ hết, và ô tìm nhanh khi danh sách dài.
-- **Mặc định gửi thời khoá biểu mới nhất**; chọn bản cũ thì nhắc ngay tại chỗ.
-- Kiểm tra cập nhật: chưa có trang phát hành thì báo đúng bản chất, không còn hiện lỗi khó hiểu.

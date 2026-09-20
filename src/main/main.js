@@ -16,6 +16,8 @@ const GOC = path.dirname(path.dirname(fileURLToPath(import.meta.url)));   // …
 const RENDERER = path.join(GOC, "renderer");
 
 app.setName("TKB Zalo");
+// Đặt tiếng Việt cho cả Chromium: ô chọn ngày mới hiện dd/mm/yyyy thay vì mm/dd/yyyy kiểu Mỹ.
+app.commandLine.appendSwitch("lang", "vi-VN");
 
 /** Ghi một dòng vào loi.log trong thư mục dữ liệu người dùng (dùng cả cho vết khởi động). */
 function ghiLoiRaTep(chu) {

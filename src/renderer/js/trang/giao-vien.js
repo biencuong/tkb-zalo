@@ -1,6 +1,7 @@
 /** Danh sách giáo viên: xem đủ thông tin, thêm/sửa/xoá, dò Zalo, người nhận ngoài danh sách. */
 import {
   esc, so, moHop, hoi, baoOk, baoXau, baoCanh, baoKetQua, hopCho, bang, $, $$, coHoac, vungTha, htmlVungTha,
+  ganDsTich,
 } from "../chung.js";
 import { canZalo } from "../zalo-nhanh.js";
 
@@ -96,12 +97,14 @@ function moHopNguoiNhan(n, dsGv, dsLop) {
   const d = n || { dang_ky: [] };
   const dk = d.dang_ky || [];
   const coLoai = (l) => dk.some((x) => x.loai === l);
+  const soLop = dk.filter((x) => x.loai === "lop").length;
+  const soGv = dk.filter((x) => x.loai === "gv").length;
   // NHÓM ZALO gửi bằng mã nhóm, không có số điện thoại — đừng hỏi số, cũng đừng bắt buộc.
   const laNhom = Boolean(d.la_nhom);
   return new Promise((giai) => {
     moHop({
       tieuDe: laNhom ? "Nhóm Zalo nhận thời khoá biểu" : (n ? "Sửa người nhận" : "Thêm người nhận ngoài danh sách"),
-      rong: "rong",
+      rong: "rat-rong",
       noiDung: `
       ${laNhom
         ? `<div class="bao tin"><b>Đây là nhóm Zalo.</b>
@@ -122,14 +125,40 @@ function moHopNguoiNhan(n, dsGv, dsLop) {
         <div class="o-nhap"><label>Ghi chú</label><input type="text" id="n-ghi" value="${esc(d.ghi_chu || "")}"></div>
       </div>
       <hr class="tach"><h3>Nhận thời khoá biểu nào</h3>
-      <label class="tich"><input type="checkbox" id="dk-tat-lop" ${coLoai("tat_ca_lop") ? "checked" : ""}><span>Tất cả các lớp</span></label>
-      <label class="tich"><input type="checkbox" id="dk-tat-gv" ${coLoai("tat_ca_gv") ? "checked" : ""}><span>Tất cả giáo viên <span class="g">(rất nhiều tin)</span></span></label>
-      <div class="o-nhap" style="margin-top:.5rem"><label>Hoặc chọn từng lớp</label>
-        <div class="ds-tich" style="max-height:130px">${dsLop.map((l) =>
-          `<label class="tich"><input type="checkbox" name="dk-lop" value="${esc(l)}" ${dk.some((x) => x.loai === "lop" && x.lop === l) ? "checked" : ""}><span>${esc(l)}</span></label>`).join("") || '<span class="mo nho">Chưa có lớp nào</span>'}</div></div>
-      <div class="o-nhap"><label>Hoặc chọn từng giáo viên</label>
-        <div class="ds-tich" style="max-height:130px">${dsGv.map((g) =>
-          `<label class="tich"><input type="checkbox" name="dk-gv" value="${g.id}" ${dk.some((x) => x.loai === "gv" && x.giao_vien_id === g.id) ? "checked" : ""}><span>${esc(g.ho_ten)} <span class="g">${esc(g.ma_gv)}</span></span></label>`).join("")}</div></div>`,
+      <div class="hang-nut" style="margin-bottom:.5rem">
+        <label class="tich" style="margin:0"><input type="checkbox" id="dk-tat-lop" ${coLoai("tat_ca_lop") ? "checked" : ""}>
+          <span>Tất cả các lớp</span></label>
+        <label class="tich" style="margin:0"><input type="checkbox" id="dk-tat-gv" ${coLoai("tat_ca_gv") ? "checked" : ""}>
+          <span>Tất cả giáo viên <span class="g">(rất nhiều tin)</span></span></label>
+      </div>
+
+      <p class="nho mo" style="margin:0 0 .4rem">Hoặc chọn từng mục bên dưới. Hai cột để cuộn ít, dễ tìm.</p>
+      <div class="luoi c2">
+        <div class="o-loc">
+          <div class="o-loc-dau"><label>Từng lớp</label>
+            <span class="o-loc-dem ${soLop ? "co" : ""}" data-dem="dk-lop">${soLop ? soLop + " đã chọn" : "chưa chọn"}</span></div>
+          <input type="search" class="o-loc-tim" data-tim="dk-lop" placeholder="Tìm lớp…">
+          <div class="ds-tich" data-ds="dk-lop" style="max-height:300px">${dsLop.map((l) =>
+            `<label class="tich"><input type="checkbox" name="dk-lop" value="${esc(l)}" ${dk.some((x) => x.loai === "lop" && x.lop === l) ? "checked" : ""}><span>${esc(l)}</span></label>`).join("") || '<span class="mo nho">Chưa có lớp nào</span>'}</div>
+          <div class="o-loc-nut">
+            <button type="button" class="lien" data-chon-het="dk-lop">Chọn hết</button>
+            <button type="button" class="lien" data-bo-het="dk-lop">Bỏ hết</button>
+          </div>
+        </div>
+
+        <div class="o-loc">
+          <div class="o-loc-dau"><label>Từng giáo viên</label>
+            <span class="o-loc-dem ${soGv ? "co" : ""}" data-dem="dk-gv">${soGv ? soGv + " đã chọn" : "chưa chọn"}</span></div>
+          <input type="search" class="o-loc-tim" data-tim="dk-gv" placeholder="Tìm tên hoặc mã giáo viên…">
+          <div class="ds-tich" data-ds="dk-gv" style="max-height:300px">${dsGv.map((g) =>
+            `<label class="tich"><input type="checkbox" name="dk-gv" value="${g.id}" ${dk.some((x) => x.loai === "gv" && x.giao_vien_id === g.id) ? "checked" : ""}><span>${esc(g.ho_ten)} <span class="g">${esc(g.ma_gv)}</span></span></label>`).join("")}</div>
+          <div class="o-loc-nut">
+            <button type="button" class="lien" data-chon-het="dk-gv">Chọn hết</button>
+            <button type="button" class="lien" data-bo-het="dk-gv">Bỏ hết</button>
+          </div>
+        </div>
+      </div>`,
+      khiMo: (hop) => { ganDsTich(hop); },
       nut: [
         { ten: "Huỷ", giaTri: null },
         {

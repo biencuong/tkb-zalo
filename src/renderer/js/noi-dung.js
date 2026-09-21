@@ -219,6 +219,9 @@ kèm bốn con số đã nhận / trùng / không nhận / thiếu dữ liệu.<
 <h3>Người nhận ngoài danh sách</h3>
 <p>Hiệu trưởng, tổ trưởng… muốn nhận nhưng không dạy tiết nào thì thêm ở tab
 <b>Người nhận ngoài danh sách</b>, chọn nhận <b>tất cả lớp</b>, <b>một số lớp</b>, hoặc TKB của <b>một số giáo viên</b>.</p>
+<p>Phần <b>Nhận thời khoá biểu nào</b> xếp <b>hai cột</b>: bên trái <i>Từng lớp</i>, bên phải
+<i>Từng giáo viên</i>. Mỗi cột có ô tìm, số đã chọn và nút <b>Chọn hết</b> / <b>Bỏ hết</b> —
+trường đông giáo viên vẫn chọn nhanh, khỏi cuộn dài.</p>
 <h3>Sửa ngay trên bảng</h3>
 <p>Bấm thẳng vào ô <b>họ tên, mã GV, tổ, điện thoại, email, lớp chủ nhiệm</b> rồi gõ.
 Rời ô là <b>tự lưu</b>, ô sáng xanh một nhịp cho biết đã lưu. Enter để lưu nhanh, Esc để bỏ.</p>

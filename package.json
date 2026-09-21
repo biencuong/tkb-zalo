@@ -1,7 +1,7 @@
 {
   "name": "tkb-zalo",
   "productName": "TKB Zalo",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Gửi thời khoá biểu cho giáo viên qua Zalo cá nhân — ảnh xem ngay + file Word tải về in",
   "author": "TKB Zalo",
   "license": "MIT",

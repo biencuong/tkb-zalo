@@ -199,6 +199,8 @@ Nhập lại tệp thì người đã có được **cập nhật**, không nhâ
 
 Hiệu trưởng, tổ trưởng… muốn nhận nhưng không dạy tiết nào thì thêm ở tab **Người nhận ngoài danh sách**, chọn nhận **tất cả lớp**, **một số lớp**, hoặc TKB của **một số giáo viên**.
 
+Phần **Nhận thời khoá biểu nào** xếp **hai cột**: bên trái Từng lớp, bên phải Từng giáo viên. Mỗi cột có ô tìm, số đã chọn và nút **Chọn hết** / **Bỏ hết** — trường đông giáo viên vẫn chọn nhanh, khỏi cuộn dài.
+
 ### Sửa ngay trên bảng
 
 Bấm thẳng vào ô **họ tên, mã GV, tổ, điện thoại, email, lớp chủ nhiệm** rồi gõ. Rời ô là **tự lưu**, ô sáng xanh một nhịp cho biết đã lưu. Enter để lưu nhanh, Esc để bỏ.

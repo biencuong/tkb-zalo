@@ -5,6 +5,19 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.10 — Chọn lớp, chọn giáo viên thành hai cột
+
+Hộp **Sửa người nhận** (Dữ liệu › Giáo viên › Người nhận ngoài danh sách) trước đây xếp
+hai danh sách chồng lên nhau, mỗi ô chỉ cao 130 px nên phải cuộn rất lâu mới tìm ra người cần.
+
+- **Hai cột song song:** *Từng lớp* bên trái, *Từng giáo viên* bên phải, mỗi cột cao 300 px.
+  Nhìn thấy nhiều mục hơn, cuộn ít hơn hẳn.
+- **Mỗi cột có ô tìm** (gõ không dấu cũng ra), **số đã chọn** ngay cạnh tiêu đề, và hai nút
+  **Chọn hết** / **Bỏ hết** — chọn hết chỉ áp cho các mục đang hiện sau khi lọc.
+- Hộp thoại rộng hơn để hai cột thoáng.
+
+---
+
 ## 0.1.9 — Nhóm Zalo: tích được, sửa được, không đòi số điện thoại
 
 Bản trước báo *"nhóm chưa đặt nhận thời khoá biểu nào"* nhưng không cho chỗ nào sửa,

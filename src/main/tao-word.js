@@ -14,7 +14,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import JSZip from "jszip";
-import { mot, nhieu, chay, layCaiDat } from "./db.js";
+import { mot, nhieu, chay } from "./db.js";
+import { vanTayTep, vanTayMau, tenTruongIn } from "./du-lieu-tep.js";
 
 const THU_MUC_KHUON = path.join(path.dirname(fileURLToPath(import.meta.url)), "mau-word");
 export const SO_TIET = 5;
@@ -129,15 +130,18 @@ function dongNgay(iso) {
 
 /** Giá trị phần tiêu đề dùng chung cho mọi tệp của một thời khoá biểu. */
 function tieuDeChung(tkb) {
-  const truong = layCaiDat("ten_truong") || tkb.ten_truong || "";
   return {
-    TRUONG: truong,
+    TRUONG: tenTruongIn(tkb),
     DONG_NAM_HOC: tkb.nam_hoc ? "Năm học " + String(tkb.nam_hoc).replace(/\s*-\s*/, " - ") : "",
     DONG_HOC_KY: tkb.hoc_ky ? "Học kỳ " + tkb.hoc_ky : "",
     DONG_SO: tkb.so_tkb != null ? "Số " + tkb.so_tkb : "",
     DONG_NGAY: dongNgay(tkb.ngay_ap_dung),
   };
 }
+
+/** Vân tay của một bộ tệp Word = giá trị điền + phiên bản hai khuôn (A4, A5) của loại đó. */
+const vanTayWord = (loai, giaTri) => vanTayTep([giaTri,
+  vanTayMau(path.join(THU_MUC_KHUON, `${loai}-a4.docx`)), vanTayMau(path.join(THU_MUC_KHUON, `${loai}-a5.docx`))]);
 
 /** Gom các tiết vào ô {{S_thu_tiet}} / {{C_thu_tiet}}. Trả thêm các tiết nằm ngoài khuôn (nếu có). */
 function oTiet(dsTiet, chuO) {
@@ -158,10 +162,55 @@ const laTepTuTao = (f) => /[\\/]word[\\/](gv|lop)[\\/]/i.test(String(f || ""));
 export const KHO = ["A4", "A5"];
 const cotKho = (kho) => (kho === "A5" ? "docx_a5" : "docx_a4");
 
+/** Giá trị điền khuôn cho một dòng (giáo viên hoặc lớp) — cũng là số liệu tính vân tay. */
+function giaTriWord(tkbId, chung, loai, dong) {
+  if (loai === "gv") {
+    const ma = dong.ma_trong_tkb || dong.ho_ten_pcgd;
+    const tiet = nhieu("SELECT thu,buoi,tiet,lop,mon FROM tiet WHERE tkb_id=? AND giao_vien_id=?", tkbId, dong.giao_vien_id);
+    const { o, ngoai } = oTiet(tiet, (t) => `${t.mon} - ${t.lop}`);
+    return { ten: "Giáo viên " + ma, tenTep: tenTep(ma), giaTri: { ...chung, TIEU_DE: "Giáo viên " + ma, ...o }, ngoai };
+  }
+  const tiet = nhieu("SELECT thu,buoi,tiet,mon,ma_gv FROM tiet WHERE tkb_id=? AND upper(lop)=upper(?)", tkbId, dong.lop);
+  const { o, ngoai } = oTiet(tiet, (t) => `${t.mon} - ${t.ma_gv}`);
+  return { ten: "Lớp " + dong.lop, tenTep: tenTep(dong.lop), giaTri: { ...chung, TIEU_DE: "Lớp " + dong.lop, ...o }, ngoai };
+}
+
+/**
+ * Tệp này có phải tạo (lại) không. Tệp cắt từ Word Smart Scheduler thì KHÔNG đụng.
+ * Tệp tự tạo: tạo lại khi thiếu, khi vân tay số liệu lệch (đã cũ), hoặc khi được yêu cầu.
+ */
+function canTao(f, vtLuu, vtMoi, veLai) {
+  if (!f || !fs.existsSync(f)) return true;
+  if (!laTepTuTao(f)) return false;
+  return veLai || vtLuu !== vtMoi;
+}
+
+const dsDongWord = (tkbId) => ({
+  gv: nhieu(`SELECT id, giao_vien_id, ma_trong_tkb, ho_ten_pcgd, docx_path, docx_a4, docx_a5, word_vt FROM tkb_gv
+             WHERE tkb_id=? AND giao_vien_id IS NOT NULL AND so_tiet_dem>0`, tkbId),
+  lop: nhieu("SELECT id, lop, docx_path, docx_a4, docx_a5, word_vt FROM tkb_lop WHERE tkb_id=? ORDER BY lop", tkbId),
+});
+
+/** Số tệp Word còn thiếu hoặc đã cũ của một thời khoá biểu (mỗi khổ tính một tệp). */
+export function demWordCanTao(tkbId) {
+  const tkb = mot("SELECT * FROM tkb WHERE id=?", tkbId);
+  if (!tkb) return 0;
+  const chung = tieuDeChung(tkb);
+  const { gv, lop } = dsDongWord(tkbId);
+  let n = 0;
+  for (const [loai, ds] of [["gv", gv], ["lop", lop]]) {
+    for (const d of ds) {
+      const vt = vanTayWord(loai, giaTriWord(tkbId, chung, loai, d).giaTri);
+      for (const kho of KHO) if (canTao(d[cotKho(kho)], d.word_vt, vt, false)) n++;
+    }
+  }
+  return n;
+}
+
 /**
  * Tạo file Word CẢ HAI KHỔ (A4 và A5) cho mọi giáo viên có tiết và mọi lớp của một thời khoá biểu.
- * Tên tệp có đuôi _A4 / _A5 để người nhận cả hai không bị trùng tên.
- * Không đụng tệp đã cắt từ Word của Smart Scheduler. veLai = tạo lại cả tệp tự tạo cũ.
+ * Chỉ tạo tệp còn thiếu hoặc đã cũ; tạo lại thì GHI ĐÈ đúng tên cũ (…_A4.docx / …_A5.docx).
+ * Không đụng tệp đã cắt từ Word của Smart Scheduler. veLai = tạo lại cả tệp tự tạo còn mới.
  * khoUuTien: khổ ghi vào docx_path (bản mặc định khi không chọn khổ).
  * → { ok, tong, tao_moi, bo_qua, loi[], canh_bao[] }
  */
@@ -171,59 +220,36 @@ export async function taoWordTuDuLieu(tkbId, { thuMuc, khoUuTien = "A4", veLai =
   const goc = path.join(thuMuc || tkb.thu_muc || ".", "word");
   const chung = tieuDeChung(tkb);
   const uuTien = String(khoUuTien).toUpperCase() === "A5" ? "A5" : "A4";
-
-  const dsGv = nhieu(
-    `SELECT id, giao_vien_id, ma_trong_tkb, ho_ten_pcgd, docx_path, docx_a4, docx_a5 FROM tkb_gv
-     WHERE tkb_id=? AND giao_vien_id IS NOT NULL AND so_tiet_dem>0`, tkbId);
-  const dsLop = nhieu("SELECT id, lop, docx_path, docx_a4, docx_a5 FROM tkb_lop WHERE tkb_id=? ORDER BY lop", tkbId);
-  const tong = dsGv.length + dsLop.length;
+  const { gv, lop } = dsDongWord(tkbId);
+  const tong = gv.length + lop.length;
   let da = 0, taoMoi = 0, boQua = 0;
   const loi = [], canhBao = [];
-
-  const canTao = (f) => {
-    if (!f || !fs.existsSync(f)) return true;         // chưa có tệp
-    if (!laTepTuTao(f)) return false;                 // tệp cắt từ Word Smart Scheduler: giữ nguyên
-    return veLai;                                     // tệp tự tạo: chỉ tạo lại khi được yêu cầu
-  };
-
-  /** Tạo các khổ còn thiếu cho một dòng, rồi đặt docx_path = khổ ưu tiên. */
-  const taoChoDong = async (bang, dong, loai, ten, tieuDe, dsTiet, chuO) => {
-    const { o, ngoai } = oTiet(dsTiet, chuO);
-    if (ngoai.length) canhBao.push(`${ten}: ${ngoai.length} tiết ngoài khuôn (tiết > ${SO_TIET} hoặc Chủ nhật) không in được.`);
-    const tep = { A4: dong.docx_a4 || "", A5: dong.docx_a5 || "" };
-    for (const kho of KHO) {
-      if (!canTao(tep[kho])) { boQua++; continue; }
-      const buf = await dienKhuon(docKhuon(loai, kho), { ...chung, TIEU_DE: tieuDe, ...o });
-      const f = path.join(goc, loai, `${tenTep(loai === "gv" ? dong.ma_trong_tkb || dong.ho_ten_pcgd : dong.lop)}_${kho}.docx`);
-      fs.writeFileSync(f, buf);
-      chay(`UPDATE ${bang} SET ${cotKho(kho)}=? WHERE id=?`, f, dong.id);
-      tep[kho] = f;
-      taoMoi++;
-    }
-    // Bản mặc định: giữ tệp Smart Scheduler nếu có, không thì lấy khổ ưu tiên.
-    if (!dong.docx_path || laTepTuTao(dong.docx_path) || !fs.existsSync(dong.docx_path)) {
-      chay(`UPDATE ${bang} SET docx_path=? WHERE id=?`, tep[uuTien] || tep.A4 || tep.A5, dong.id);
-    }
-  };
-
   fs.mkdirSync(path.join(goc, "gv"), { recursive: true });
   fs.mkdirSync(path.join(goc, "lop"), { recursive: true });
 
-  for (const g of dsGv) {
-    const ma = g.ma_trong_tkb || g.ho_ten_pcgd;
-    try {
-      const tiet = nhieu("SELECT thu,buoi,tiet,lop,mon FROM tiet WHERE tkb_id=? AND giao_vien_id=?", tkbId, g.giao_vien_id);
-      await taoChoDong("tkb_gv", g, "gv", "Giáo viên " + ma, "Giáo viên " + ma, tiet, (t) => `${t.mon} - ${t.lop}`);
-    } catch (e) { loi.push(`Giáo viên ${ma}: ${e.message}`); }
-    onTienDo?.({ da: ++da, tong, ten: ma, loai: "word" });
+  for (const [loai, bang, ds] of [["gv", "tkb_gv", gv], ["lop", "tkb_lop", lop]]) {
+    for (const d of ds) {
+      const w = giaTriWord(tkbId, chung, loai, d);
+      try {
+        if (w.ngoai.length) canhBao.push(`${w.ten}: ${w.ngoai.length} tiết ngoài khuôn (tiết > ${SO_TIET} hoặc Chủ nhật) không in được.`);
+        const vt = vanTayWord(loai, w.giaTri);
+        const tep = { A4: d.docx_a4 || "", A5: d.docx_a5 || "" };
+        for (const kho of KHO) {
+          if (!canTao(tep[kho], d.word_vt, vt, veLai)) { boQua++; continue; }
+          const f = path.join(goc, loai, `${w.tenTep}_${kho}.docx`);
+          fs.writeFileSync(f, await dienKhuon(docKhuon(loai, kho), w.giaTri));
+          chay(`UPDATE ${bang} SET ${cotKho(kho)}=? WHERE id=?`, f, d.id);
+          tep[kho] = f;
+          taoMoi++;
+        }
+        chay(`UPDATE ${bang} SET word_vt=? WHERE id=?`, vt, d.id);
+        // Bản mặc định: giữ tệp Smart Scheduler nếu có, không thì lấy khổ ưu tiên.
+        if (!d.docx_path || laTepTuTao(d.docx_path) || !fs.existsSync(d.docx_path)) {
+          chay(`UPDATE ${bang} SET docx_path=? WHERE id=?`, tep[uuTien] || tep.A4 || tep.A5, d.id);
+        }
+      } catch (e) { loi.push(`${w.ten}: ${e.message}`); }
+      onTienDo?.({ da: ++da, tong, ten: w.ten, loai: "word" });
+    }
   }
-  for (const l of dsLop) {
-    try {
-      const tiet = nhieu("SELECT thu,buoi,tiet,mon,ma_gv FROM tiet WHERE tkb_id=? AND upper(lop)=upper(?)", tkbId, l.lop);
-      await taoChoDong("tkb_lop", l, "lop", "Lớp " + l.lop, "Lớp " + l.lop, tiet, (t) => `${t.mon} - ${t.ma_gv}`);
-    } catch (e) { loi.push(`Lớp ${l.lop}: ${e.message}`); }
-    onTienDo?.({ da: ++da, tong, ten: "Lớp " + l.lop, loai: "word" });
-  }
-
   return { ok: loi.length === 0, tong, tao_moi: taoMoi, bo_qua: boQua, loi, canh_bao: canhBao, thu_muc: goc };
 }

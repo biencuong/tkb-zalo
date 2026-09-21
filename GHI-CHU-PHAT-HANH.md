@@ -5,6 +5,25 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.15 — Ảnh và Word tự làm mới, không còn nút bấm; nhóm nhận gì chọn được đủ kiểu
+
+### Không còn nút "Tạo ảnh + Word"
+
+- Ảnh và file Word **tự tạo** khi nạp, và **tự làm mới** khi có gì làm chúng cũ đi: nạp bản cập nhật cùng số,
+  đổi chủ nhiệm, sửa tên giáo viên, đổi tên trường, đổi "ảnh gồm buổi nào". Làm mới thì **ghi đè đúng tên tệp cũ**.
+- **Mỗi lần gửi, phần mềm kiểm lại từng tệp** so với số liệu mới nhất; lệch là tạo lại ngay rồi mới gửi —
+  không bao giờ gửi thời khoá biểu cũ. Hộp *Xem trước đợt gửi* ghi rõ đã kiểm và vừa làm mới bao nhiêu tệp.
+- Tuỳ chọn **"Ảnh gồm buổi nào"** (cả ngày / chỉ sáng / chỉ chiều) nay có tác dụng thật.
+
+### Nhóm Zalo và người ngoài danh sách nhận gì
+
+- Hai ô **Tất cả lớp** và **Tất cả GV** tích được **cả hai**; tích ô này không còn xoá mất ô kia.
+- Các lớp / giáo viên chọn riêng được **giữ nguyên** khi bật tắt hai ô trên.
+- Nút **Chọn lớp, GV cụ thể…** mở hộp hai cột để chọn vài lớp, vài giáo viên; ghi sẵn số đang chọn.
+- Lưu xong hộp gửi **mở lại đúng tab** đang xem, các tuỳ chọn vừa chỉnh vẫn giữ.
+
+---
+
 ## 0.1.14 — Tự tạo file Word đúng mẫu, gửi A4 / A5 / cả hai
 
 ### Một tệp Excel là có cả ảnh và Word

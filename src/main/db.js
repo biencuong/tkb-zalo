@@ -260,6 +260,11 @@ const COT_THEM = [
   ["tkb_lop", "docx_a4", "TEXT NOT NULL DEFAULT ''"],
   ["tkb_lop", "docx_a5", "TEXT NOT NULL DEFAULT ''"],
   ["viec_gui", "docx_path_2", "TEXT NOT NULL DEFAULT ''"],
+  // Vân tay số liệu lúc tạo ảnh / Word — lệch là tệp đã cũ, tự tạo lại.
+  ["tkb_gv", "anh_vt", "TEXT NOT NULL DEFAULT ''"],
+  ["tkb_gv", "word_vt", "TEXT NOT NULL DEFAULT ''"],
+  ["tkb_lop", "anh_vt", "TEXT NOT NULL DEFAULT ''"],
+  ["tkb_lop", "word_vt", "TEXT NOT NULL DEFAULT ''"],
 ];
 
 /** Tệp Word cũ chỉ ghi ở docx_path — chia vào đúng cột khổ giấy theo tkb.kho_giay. Chạy mỗi lần mở. */

@@ -322,3 +322,19 @@ Cùng lúc lộ thêm: dòng kiểm `import("zca-js")` trần — Node tìm lên
 **Sửa:** mặc định soi `%TEMP%\tkbzalo-dist`, **so phiên bản trong gói với `package.json`** (khác là báo lỗi),
 nạp zca-js bằng đường dẫn trong `app.asar`. **Luật:** bộ kiểm nào cũng phải tự chứng minh nó đang kiểm đúng
 đối tượng (in ra đối tượng + phiên bản), nếu không một chữ "ĐẠT" chẳng nói lên gì.
+
+---
+
+## [21/9/2026] Đường dẫn Windows trong biểu thức chính quy: `[\\/]`, không phải `[\/]`
+
+`laTepTuTao()` nhận tệp Word tự tạo bằng `/[\\/]word[\\/](gv|lop)[\\/]/`. Một lần sinh mã bằng
+Python (chuỗi lồng heredoc) làm rơi mất một dấu `\`, còn `[\/]` — chỉ khớp `/`. Trên Windows đường dẫn
+dùng `\` nên mọi tệp tự tạo bị coi là tệp Smart Scheduler → **không bao giờ được làm mới**. Kiểm thử
+"đổi tên trường thì Word thành cũ" bắt được ngay. **Luật:** có kiểm thử chạy bằng đường dẫn thật của Windows
+cho mọi hàm nhận dạng đường dẫn; sinh mã có dấu `\` thì ghi bằng `chr(92)` rồi rà lại bằng máy.
+
+## [21/9/2026] Tuỳ chọn có trên giao diện mà không có tác dụng
+
+"Ảnh gồm buổi nào" (cả ngày / sáng / chiều) được lưu nhưng không ai đọc — ảnh luôn vẽ cả ngày. Lộ ra khi
+làm vân tay (buổi phải nằm trong số liệu ảnh). Nay mỗi lần gửi ảnh được đảm bảo đúng buổi đã chọn.
+**Luật:** mỗi tuỳ chọn trên giao diện phải có ít nhất một chỗ đọc nó — `grep` tên khoá trong `src/main`.

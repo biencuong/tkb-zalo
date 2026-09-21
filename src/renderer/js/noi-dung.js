@@ -261,7 +261,15 @@ Nút <b>⋯</b> mở hộp đầy đủ khi cần sửa nhiều trường một 
 
 <h3>Ảnh</h3>
 <p>Mỗi giáo viên và mỗi lớp một ảnh, chữ to, xem rõ trên điện thoại. Bấm <b>Xem</b> hoặc <b>Trên ĐT</b>
-ở từng dòng để soi trước. Sửa chủ nhiệm xong thì bấm <b>Tạo ảnh + Word</b> để tạo lại.</p>
+ở từng dòng để soi trước.</p>
+
+<h3>Không cần bấm tạo — phần mềm tự làm mới</h3>
+<p>Ảnh và file Word <b>tự tạo</b> khi nạp, và <b>tự làm mới</b> khi số liệu dùng để vẽ ra chúng thay đổi:
+nạp bản cập nhật cùng số, đổi chủ nhiệm, sửa tên giáo viên, đổi tên trường, đổi “ảnh gồm buổi nào”.
+Làm mới thì <b>ghi đè đúng tên tệp cũ</b>, không sinh thêm tệp.</p>
+<div class="bao ok"><b>Mỗi lần gửi, phần mềm kiểm lại từng tệp trước.</b>
+  <span class="sua">Tệp nào lệch với số liệu mới nhất thì tạo lại ngay rồi mới gửi — không bao giờ gửi tệp cũ.
+  Hộp <b>Xem trước đợt gửi</b> ghi rõ đã kiểm và vừa làm mới bao nhiêu tệp.</span></div>
 
 <h3>File Word</h3>
 <p>Nạp xong là phần mềm <b>tự tạo file Word</b> cho từng giáo viên và từng lớp, <b>đúng mẫu Word của
@@ -309,8 +317,11 @@ của tài khoản đang đăng nhập, gõ tên để lọc, tích nhóm nào t
 số thành viên. Sửa lại ở đó nếu muốn nhóm nhận thứ khác.</p>
 <h3>Sửa nhóm ở đâu</h3>
 <ul>
-  <li><b>Ngay trong hộp gửi:</b> tab <b>Gửi cho ai</b>, dòng nhóm chưa đặt nhận gì có sẵn ô
-      <b>Chọn nhận gì…</b>. Chọn xong là tích gửi được ngay.</li>
+  <li><b>Ngay trong hộp gửi:</b> tab <b>Gửi cái gì</b>, khối <b>Nhóm Zalo và người ngoài danh sách nhận gì</b>.
+      Mỗi dòng có hai ô <b>Tất cả lớp</b> và <b>Tất cả GV</b> — tích được <b>cả hai</b>. Muốn chỉ vài lớp,
+      vài giáo viên thì bấm <b>Chọn lớp, GV cụ thể…</b> (hộp hai cột, có ô tìm). Lưu xong quay lại đúng tab,
+      các tuỳ chọn đang chỉnh vẫn giữ.</li>
+  <li>Tab <b>Gửi cho ai</b>: dòng nhóm chưa đặt nhận gì có sẵn ô <b>Chọn nhận gì…</b> để đặt nhanh.</li>
   <li><b>Dữ liệu → Giáo viên → Người nhận ngoài danh sách:</b> có nút <b>Thêm nhóm Zalo</b> và
       <b>Dò nhóm Zalo</b>. Bấm <b>Sửa</b> ở dòng nhóm để đổi nhóm nhận thời khoá biểu nào.</li>
 </ul>
@@ -501,7 +512,7 @@ Dòng lệch tô đỏ.</p>
   <tr><td><b>Phiên Zalo hết hạn</b></td><td>Quét lại mã QR rồi bấm <b>Tiếp tục</b>. Phần đã gửi không bị gửi lại.</td></tr>
   <tr><td><b>Dừng vì 3 lỗi liên tiếp</b></td><td>Mất mạng, hoặc Zalo đang hạn chế. Thử gửi tay một tin trên Zalo xem còn được không.</td></tr>
   <tr><td><b>Chạm giới hạn an toàn</b></td><td>Đã gửi đủ mức trong 24 giờ. Hôm sau mở lại bấm <b>Tiếp tục</b>.</td></tr>
-  <tr><td><b>Ảnh chưa tạo</b></td><td>Ảnh tự tạo khi nạp. Thiếu thì vào tab Thời khoá biểu bấm <b>Tạo ảnh</b>.</td></tr>
+  <tr><td><b>Ảnh / Word chưa có</b></td><td>Tự tạo khi mở tab Thời khoá biểu hoặc khi bấm gửi — không cần làm gì.</td></tr>
   <tr><td><b>Thư mục báo “Có tệp mới hơn”</b></td><td>Bạn chép tệp mới mà chưa nạp lại. Bấm <b>Nạp lại</b>.</td></tr>
 </tbody></table>`,
   },

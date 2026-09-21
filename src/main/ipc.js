@@ -17,6 +17,7 @@ import * as zalo from "./zalo.js";
 import * as hangDoi from "./hang-doi.js";
 import * as anh from "./anh-tkb.js";
 import * as taoWord from "./tao-word.js";
+import * as duLieuTep from "./du-lieu-tep.js";
 import * as capNhat from "./cap-nhat.js";
 import * as tm from "./thu-muc.js";
 
@@ -40,6 +41,35 @@ function dangKy(ten, fn) {
       return { ok: false, loi: [String(e?.message || e)] };
     }
   });
+}
+
+/**
+ * Tạo ảnh + Word còn thiếu hoặc đã cũ cho một thời khoá biểu. MỘT LƯỢT mỗi lúc cho mỗi thời khoá biểu:
+ * gọi chồng (mở trang và bấm gửi cùng lúc) thì lượt sau chờ chung lượt đang chạy.
+ */
+const dangDamBao = new Map();
+function damBaoTep(tkbId, p = {}) {
+  const khoa = Number(tkbId);
+  if (dangDamBao.has(khoa) && !p.ve_lai) return dangDamBao.get(khoa);
+  const viec = (async () => {
+    const t = db.mot("SELECT thu_muc FROM tkb WHERE id=?", tkbId);
+    const thuMuc = t?.thu_muc || duongDan.goc_tai_lieu;
+    const r = await anh.chuanBiAnh(tkbId, {
+      thuMuc, html: duongDan.ve_tkb_html, gom: p.gom, veLai: p.ve_lai,
+      onTienDo: (x) => day("anh:tien-do", x),
+    });
+    let word;
+    try {
+      word = await taoWord.taoWordTuDuLieu(tkbId, {
+        thuMuc, khoUuTien: db.layCaiDat("kho_giay_mac_dinh") || "A4", veLai: p.ve_lai,
+        onTienDo: (x) => day("anh:tien-do", { ...x, ten: "Word · " + x.ten }),
+      });
+    } catch (e) { word = { ok: false, tao_moi: 0, loi: [String(e?.message || e)] }; }
+    return { ok: r.ok && word.ok !== false, ...r, word };
+  })();
+  dangDamBao.set(khoa, viec);
+  viec.finally(() => { if (dangDamBao.get(khoa) === viec) dangDamBao.delete(khoa); });
+  return viec;
 }
 
 export function dangKyTatCa() {
@@ -116,11 +146,10 @@ export function dangKyTatCa() {
     const b1 = { ma: "du-lieu", ten: "Dữ liệu", xong: false, thieu: [], viec: "" };
     if (!soTkb) b1.thieu.push("chưa nạp thời khoá biểu");
     if (!soNguoiNhan) b1.thieu.push(CHUA_CO_NGUOI);
-    if (soTkb && coAnh < canTep) b1.thieu.push(`mới có ${coAnh}/${canTep} ảnh`);
+    // Ảnh và Word tự tạo khi cần (tep:dam-bao) nên không còn là việc người dùng phải làm.
     b1.xong = b1.thieu.length === 0;
     b1.viec = !soTkb ? "Nạp tệp Excel từ Smart Scheduler"
-      : !soNguoiNhan ? "Điền số điện thoại hoặc chọn nhóm Zalo"
-      : coAnh < canTep ? "Tạo ảnh thời khoá biểu" : "Đã đủ dữ liệu";
+      : !soNguoiNhan ? "Điền số điện thoại hoặc chọn nhóm Zalo" : "Đã đủ dữ liệu";
 
     // Không khoá: chọn nhóm Zalo phải kết nối trước, và kết nối lúc nào cũng được.
     const b2 = { ma: "zalo", ten: "Kết nối Zalo", xong: false, thieu: [], viec: "", khoa: false };
@@ -231,6 +260,7 @@ export function dangKyTatCa() {
   dangKy("gv:luu-nguoi-nhan", (n) => gv.luuNguoiNhan(n));
   dangKy("gv:xoa-nguoi-nhan", (id) => gv.xoaNguoiNhan(id));
   dangKy("gv:dat-nhan-nhanh", (id, loai) => gv.datNhanNhanh(id, loai));
+  dangKy("gv:dat-nhan-tat-ca", (id, p) => gv.datNhanTatCa(id, p || {}));
 
   // ------------------------------------------------ THỜI KHOÁ BIỂU
   dangKy("tkb:ds", () => ({ ok: true, ds: tkb.dsTkb() }));
@@ -262,27 +292,15 @@ export function dangKyTatCa() {
   dangKy("tkb:luoi", (id, p) => ({ ok: true, ds: tkb.luoiTiet(id, p || {}) }));
 
   // ------------------------------------------------ ẢNH
-  dangKy("anh:chuan-bi", async (tkbId, p = {}) => {
-    const t = db.mot("SELECT thu_muc FROM tkb WHERE id=?", tkbId);
-    const r = await anh.chuanBiAnh(tkbId, {
-      thuMuc: t?.thu_muc || duongDan.goc_tai_lieu,
-      html: duongDan.ve_tkb_html,
-      gom: p.gom, veLai: p.ve_lai,
-      onTienDo: (x) => day("anh:tien-do", x),
-    });
-    // Word theo mẫu Smart Scheduler, cả A4 và A5, tạo thẳng từ dữ liệu Excel.
-    // Tệp cắt từ Word Smart Scheduler (nếu người dùng có thả) được giữ nguyên.
-    let word;
-    try {
-      word = await taoWord.taoWordTuDuLieu(tkbId, {
-        thuMuc: t?.thu_muc || duongDan.goc_tai_lieu,
-        khoUuTien: db.layCaiDat("kho_giay_mac_dinh") || "A4",
-        veLai: p.ve_lai,
-        onTienDo: (x) => day("anh:tien-do", { ...x, ten: "Word · " + x.ten }),
-      });
-    } catch (e) { word = { ok: false, tao_moi: 0, loi: [String(e?.message || e)] }; }
-    return { ok: r.ok, ...r, word };
+  // Ảnh + Word: TỰ ĐẢM BẢO, không cần nút bấm. Gọi khi nạp xong, khi mở thời khoá biểu, khi sắp gửi.
+  // Chỉ tạo tệp còn thiếu hoặc đã cũ (vân tay số liệu lệch); không có gì thì xong ngay.
+  dangKy("tep:thieu", (tkbId, p = {}) => {
+    const anhThieu = duLieuTep.demAnhCanTao(tkbId, p.gom || duLieuTep.gomDangChon());
+    const wordThieu = taoWord.demWordCanTao(tkbId);
+    return { ok: true, anh: anhThieu, word: wordThieu, tong: anhThieu + wordThieu };
   });
+  dangKy("tep:dam-bao", (tkbId, p = {}) => damBaoTep(tkbId, p));
+  dangKy("anh:chuan-bi", (tkbId, p = {}) => damBaoTep(tkbId, p));
   dangKy("anh:xem-truoc", (tkbId, p) => anh.xemTruocAnh(tkbId, {
     ...p, html: duongDan.ve_tkb_html, thuMucTam: app.getPath("temp"),
   }));

@@ -8,8 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { BrowserWindow } from "electron";
 import { nhieu, mot, chay } from "./db.js";
-import { ngayVn } from "./thong-ke.js";
-import { vanTay } from "./kho-tkb.js";
+import { duLieuAnhGv, duLieuAnhLop, vanTayAnh, dsGvCoTiet, dsLopCoTep, gomDangChon } from "./du-lieu-tep.js";
 
 const RONG = 1080;          // bề ngang trang (px CSS) — ảnh xuất ra gấp đôi
 const TI_LE = 2;
@@ -98,36 +97,6 @@ export async function veMotAnh(duLieu, duongDanRa, duongDanHtml) {
   return { duong_dan: duongDanRa, width: kt.width, height: kt.height };
 }
 
-/** Gom dữ liệu vẽ ảnh cho một giáo viên. */
-function duLieuGv(tkb, g, gom) {
-  const tiet = nhieu(
-    "SELECT thu,buoi,tiet,lop,mon FROM tiet WHERE tkb_id=? AND giao_vien_id=? ORDER BY thu,buoi DESC,tiet",
-    tkb.id, g.giao_vien_id
-  );
-  const phu = [];
-  if (g.lop_cn) phu.push("Chủ nhiệm lớp " + g.lop_cn);
-  if (g.kiem_nhiem) phu.push(g.kiem_nhiem);
-  return {
-    loai: "gv", ten: g.ho_ten || g.ho_ten_pcgd, phu: phu.join(" · "),
-    truong: tkb.ten_truong, so_tkb: tkb.so_tkb, ngay: ngayVn(tkb.ngay_ap_dung),
-    nam_hoc: tkb.nam_hoc, hoc_ky: tkb.hoc_ky, gom, tiet,
-  };
-}
-
-/** Gom dữ liệu vẽ ảnh cho một lớp. */
-function duLieuLop(tkb, l, gom) {
-  const tiet = nhieu(
-    "SELECT thu,buoi,tiet,mon,ma_gv FROM tiet WHERE tkb_id=? AND upper(lop)=upper(?) ORDER BY thu,buoi DESC,tiet",
-    tkb.id, l.lop
-  );
-  return {
-    loai: "lop", ten: "Lớp " + l.lop,
-    phu: l.gvcn_ten ? "Giáo viên chủ nhiệm: " + l.gvcn_ten : "",
-    truong: tkb.ten_truong, so_tkb: tkb.so_tkb, ngay: ngayVn(tkb.ngay_ap_dung),
-    nam_hoc: tkb.nam_hoc, hoc_ky: tkb.hoc_ky, gom, tiet,
-  };
-}
-
 const tenAnToan = (s) => String(s).replace(/[\\/:*?"<>|]/g, "_").trim() || "khong_ten";
 
 /**
@@ -138,18 +107,12 @@ const tenAnToan = (s) => String(s).replace(/[\\/:*?"<>|]/g, "_").trim() || "khon
 export async function chuanBiAnh(tkbId, p) {
   const tkb = mot("SELECT * FROM tkb WHERE id=?", tkbId);
   if (!tkb) throw new Error("Không tìm thấy thời khoá biểu.");
-  const gom = p.gom || "ca_ngay";
+  const gom = p.gom || gomDangChon();
   const thuMucAnh = path.join(p.thuMuc || tkb.thu_muc || ".", "anh");
   fs.mkdirSync(thuMucAnh, { recursive: true });
 
-  const dsGv = nhieu(
-    `SELECT g.*, v.ho_ten FROM tkb_gv g LEFT JOIN giao_vien v ON v.id=g.giao_vien_id
-     WHERE g.tkb_id=? AND g.giao_vien_id IS NOT NULL AND g.so_tiet_dem>0`, tkbId
-  );
-  const dsLop = nhieu(
-    `SELECT l.*, v.ho_ten gvcn_ten FROM tkb_lop l LEFT JOIN giao_vien v ON v.id=l.giao_vien_id
-     WHERE l.tkb_id=? ORDER BY l.lop`, tkbId
-  );
+  const dsGv = dsGvCoTiet(tkbId);
+  const dsLop = dsLopCoTep(tkbId);
   const tong = dsGv.length + dsLop.length;
   let da = 0, taoMoi = 0, boQua = 0;
   const loi = [];
@@ -157,10 +120,12 @@ export async function chuanBiAnh(tkbId, p) {
   for (const g of dsGv) {
     const f = path.join(thuMucAnh, "GV_" + tenAnToan(g.ma_trong_tkb || g.ho_ten_pcgd) + ".png");
     try {
-      if (!p.veLai && fs.existsSync(f) && g.anh_path === f) { boQua++; }
+      // Còn mới (đủ tệp, vân tay số liệu khớp) thì thôi; lệch là đã cũ → vẽ lại, ghi đè đúng tên.
+      const d = duLieuAnhGv(tkb, g, gom), vt = vanTayAnh(d);
+      if (!p.veLai && fs.existsSync(f) && g.anh_path === f && g.anh_vt === vt) { boQua++; }
       else {
-        const r = await veMotAnh(duLieuGv(tkb, g, gom), f, p.html);
-        chay("UPDATE tkb_gv SET anh_path=? WHERE id=?", r.duong_dan, g.id);
+        const r = await veMotAnh(d, f, p.html);
+        chay("UPDATE tkb_gv SET anh_path=?, anh_vt=? WHERE id=?", r.duong_dan, vt, g.id);
         taoMoi++;
       }
       if (g.anh_path !== f) chay("UPDATE tkb_gv SET anh_path=? WHERE id=?", f, g.id);
@@ -170,10 +135,11 @@ export async function chuanBiAnh(tkbId, p) {
   for (const l of dsLop) {
     const f = path.join(thuMucAnh, "LOP_" + tenAnToan(l.lop) + ".png");
     try {
-      if (!p.veLai && fs.existsSync(f) && l.anh_path === f) { boQua++; }
+      const d = duLieuAnhLop(tkb, l, gom), vt = vanTayAnh(d);
+      if (!p.veLai && fs.existsSync(f) && l.anh_path === f && l.anh_vt === vt) { boQua++; }
       else {
-        const r = await veMotAnh(duLieuLop(tkb, l, gom), f, p.html);
-        chay("UPDATE tkb_lop SET anh_path=? WHERE id=?", r.duong_dan, l.id);
+        const r = await veMotAnh(d, f, p.html);
+        chay("UPDATE tkb_lop SET anh_path=?, anh_vt=? WHERE id=?", r.duong_dan, vt, l.id);
         taoMoi++;
       }
       if (l.anh_path !== f) chay("UPDATE tkb_lop SET anh_path=? WHERE id=?", f, l.id);
@@ -187,7 +153,7 @@ export async function chuanBiAnh(tkbId, p) {
 }
 
 /** Vẽ một ảnh xem trước rồi trả về dạng data URL (không ghi vào kho). */
-export async function xemTruocAnh(tkbId, { loai, ma, gom = "ca_ngay", html, thuMucTam }) {
+export async function xemTruocAnh(tkbId, { loai, ma, gom = gomDangChon(), html, thuMucTam }) {
   const tkb = mot("SELECT * FROM tkb WHERE id=?", tkbId);
   if (!tkb) throw new Error("Không tìm thấy thời khoá biểu.");
   let d;
@@ -197,14 +163,14 @@ export async function xemTruocAnh(tkbId, { loai, ma, gom = "ca_ngay", html, thuM
        WHERE l.tkb_id=? AND upper(l.lop)=upper(?)`, tkbId, ma
     );
     if (!l) throw new Error("Không tìm thấy lớp " + ma);
-    d = duLieuLop(tkb, l, gom);
+    d = duLieuAnhLop(tkb, l, gom);
   } else {
     const g = mot(
       `SELECT g.*, v.ho_ten FROM tkb_gv g LEFT JOIN giao_vien v ON v.id=g.giao_vien_id
        WHERE g.tkb_id=? AND (lower(g.ma_trong_tkb)=lower(?) OR g.giao_vien_id=?)`, tkbId, ma, Number(ma) || -1
     );
     if (!g) throw new Error("Không tìm thấy giáo viên " + ma);
-    d = duLieuGv(tkb, g, gom);
+    d = duLieuAnhGv(tkb, g, gom);
   }
   const f = path.join(thuMucTam, `xem-truoc-${Date.now()}.png`);
   const r = await veMotAnh(d, f, html);

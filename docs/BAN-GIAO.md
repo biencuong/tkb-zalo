@@ -1,6 +1,6 @@
 # Bàn giao — TKB Zalo
 
-Cập nhật: 21/9/2026 · Bản 0.1.14 · Đã phát hành trên GitHub và cài chạy thật trên máy `bienc`
+Cập nhật: 21/9/2026 · Bản 0.1.15 · Đã phát hành trên GitHub và cài chạy thật trên máy `bienc`
 
 ## 1. Trạng thái
 
@@ -106,6 +106,7 @@ mà trình nghe chưa bật bao giờ — sửa bằng `api.listener.start({retr
 | 0.1.12 | **Chỉ cần một tệp Excel**: bỏ khoá "phải nạp giáo viên trước", tạo đủ 40/40 giáo viên kể cả chủ nhiệm không dạy; một hộp **Xem thử và nạp dữ liệu**; **Xoá thời khoá biểu** từng số / từng đợt / toàn bộ; **xoá toàn bộ giáo viên**; hướng dẫn viết lại theo luồng đơn giản |
 | 0.1.13 | Bước **Gửi** mở khi có thời khoá biểu và ít nhất 1 số điện thoại hoặc 1 nhóm Zalo; chưa kết nối Zalo không khoá (bấm Gửi là hiện QR); Kết nối Zalo không bao giờ khoá |
 | 0.1.14 | **Tự tạo file Word** đúng mẫu Smart Scheduler (A4 + A5) từ dữ liệu Excel; gửi chọn khổ **A4 / A5 / cả hai**; sửa thanh bên chặn Gửi bằng trạng thái cũ; lời nhắn không ảnh gửi đúng vào nhóm |
+| 0.1.15 | Bỏ nút tạo ảnh/Word: **tự làm mới bằng vân tay** khi mở thời khoá biểu và **mỗi lần gửi** (ghi đè đúng tên); "ảnh gồm buổi nào" nay có tác dụng; nhóm/người ngoài **tích được cả tất cả lớp + tất cả GV**, giữ lớp/GV chọn riêng, mở lại đúng tab |
 
 **Phát hành:** kho công khai `github.com/biencuong/tkb-zalo`. Quy trình mỗi bản: tăng `version` →
 viết khối đầu `GHI-CHU-PHAT-HANH.md` → `npm test` → `npx electron-builder --win nsis

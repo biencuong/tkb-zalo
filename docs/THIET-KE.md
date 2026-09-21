@@ -368,3 +368,29 @@ hàng đợi thêm bước `gui_file_2` (ghi bước ngay sau tệp thứ nhất
 
 `di()` trong `app.js`: bộ nhớ nói bước bị khoá thì **tính lại tiến độ một lần** rồi mới từ chối.
 Lưu số điện thoại trên bảng và dò Zalo xong cũng gọi `capNhatTienDo()` để biểu tượng khoá tắt ngay.
+
+## Ảnh + Word tự làm mới bằng vân tay (không nút bấm)
+
+Mỗi ảnh / bộ Word lưu kèm **vân tay** (`anh_vt`, `word_vt`) = sha1 của đúng số liệu vẽ ra nó
++ vân tay mẫu (`ve-tkb.html`, khuôn Word). `src/main/du-lieu-tep.js` dựng số liệu ảnh; `tao-word.js`
+dựng giá trị Word. Tệp **thiếu** hoặc **vân tay lệch** là cũ → tạo lại, **ghi đè đúng tên cũ**.
+
+| Việc làm tệp cũ đi | Vì sao lệch |
+|---|---|
+| Nạp bản cập nhật cùng số | dòng tkb_gv/tkb_lop tạo lại, đường dẫn trống |
+| Đổi chủ nhiệm | ảnh lớp có tên GVCN, ảnh giáo viên có "Chủ nhiệm lớp…" |
+| Sửa tên giáo viên | ảnh giáo viên có họ tên |
+| Đổi tên trường (Cài đặt) | ảnh và Word in tên trường |
+| Đổi "ảnh gồm buổi nào" | buổi nằm trong số liệu ảnh |
+| Cập nhật app đổi mẫu vẽ / khuôn | vân tay mẫu nằm trong vân tay tệp |
+
+`tep:thieu` đếm tệp thiếu/cũ (rẻ, không vẽ gì); `tep:dam-bao` = `damBaoTep()` — một lượt mỗi lúc cho mỗi
+thời khoá biểu. Giao diện gọi `damBaoTep` (`src/renderer/js/dam-bao-tep.js`) khi **mở tab Thời khoá biểu**
+và **mỗi lần gửi** (trước khi dựng danh sách, đúng buổi đã chọn); không thiếu thì không hiện gì.
+Hộp *Xem trước đợt gửi* ghi "đã kiểm lại theo số liệu mới nhất".
+
+## Nhóm / người ngoài nhận gì
+
+`datNhanTatCa(id, {lop, gv})`: hai ô **độc lập**, giữ các lớp / giáo viên chọn riêng. Khối trong hộp gửi:
+hai ô + nút "Chọn lớp, GV cụ thể…" (mở hộp hai cột). Lưu xong mở lại hộp gửi **đúng tab**, giữ tuỳ chọn
+đang chỉnh (`moGui(tkbId, { tab, tcTam })`).

@@ -27,10 +27,8 @@ export async function ve(khung) {
   const dang = td.buoc.find((x) => !x.xong && !x.khoa) || td.buoc[2];
 
   const viecTiep = {
-    "du-lieu": !s.gv ? { chu: "Nhập danh sách giáo viên từ Excel.", nut: "Mở Giáo viên", di: ["du-lieu", { neo: "khu-gv" }] }
-      : !s.sdt ? { chu: "Bổ sung số điện thoại cho giáo viên.", nut: "Mở Giáo viên", di: ["du-lieu", { neo: "khu-gv" }] }
-      : !s.tkb ? { chu: "Nhập thời khoá biểu từ tệp Excel và Word.", nut: "Nhập tệp", di: ["du-lieu", { neo: "khu-nhap" }] }
-      : { chu: `Tạo ảnh thời khoá biểu — mới có ${s.co_anh}/${s.can_tep}.`, nut: "Tạo ảnh ngay", lam: "tao-anh" },
+    "du-lieu": !s.tkb ? { chu: "Nạp tệp Excel xuất từ Smart Scheduler.", nut: "Nạp tệp", di: ["du-lieu", { neo: "khu-nhap" }] }
+      : { chu: "Điền số điện thoại giáo viên, hoặc chọn nhóm Zalo để gửi.", nut: "Mở Giáo viên", di: ["du-lieu", { neo: "khu-gv" }] },
     zalo: td.zalo.status !== "da_ket_noi"
       ? { chu: "Quét mã QR bằng Zalo trên điện thoại.", nut: "Kết nối Zalo", lam: "noi-zalo" }
       : { chu: "Dò Zalo theo số điện thoại giáo viên.", nut: "Mở Kết nối Zalo", di: ["zalo"] },
@@ -77,16 +75,6 @@ export async function ve(khung) {
       if (viecTiep.lam === "noi-zalo") {
         const { moKetNoiZalo } = await import("../zalo-nhanh.js");
         await moKetNoiZalo();
-        return ve(khung);
-      }
-      if (viecTiep.lam === "tao-anh") {
-        const cho = hopCho("Đang tạo ảnh thời khoá biểu", "Chuẩn bị…");
-        const boNghe = window.api.anh.onTienDo((x) => cho.capNhat(`${x.da}/${x.tong} — ${esc(x.ten)}`));
-        let kq;
-        try { kq = await window.api.anh.chuanBi(t.id, {}); }
-        finally { boNghe(); cho.dong(); await cho.doi; }
-        if (kq?.ok) baoOk(`Đã tạo ${kq.tao_moi} ảnh.`);
-        else baoXau("<b>Tạo ảnh có lỗi.</b><br>" + esc((kq?.loi || []).slice(0, 3).join("<br>")));
         return ve(khung);
       }
       return di(...viecTiep.di);

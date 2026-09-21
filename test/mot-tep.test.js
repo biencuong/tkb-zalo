@@ -9,10 +9,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { moDb, dongDb, mot } from "../src/main/db.js";
-import { dsGiaoVien, xemTruocDsGv, xoaTatCaGiaoVien } from "../src/main/kho-gv.js";
+import { moDb, dongDb, mot, datCaiDat } from "../src/main/db.js";
+import { dsGiaoVien, xemTruocDsGv, xoaTatCaGiaoVien, luuNguoiNhan, datNhanTatCa, dsNguoiNhan } from "../src/main/kho-gv.js";
 import { nhapTkb, dsTkb, xoaNhieuTkb } from "../src/main/kho-tkb.js";
-import { taoWordTuDuLieu } from "../src/main/tao-word.js";
+import { taoWordTuDuLieu, demWordCanTao } from "../src/main/tao-word.js";
 import { chuanBiDotGui } from "../src/main/kho-gui.js";
 import JSZip from "jszip";
 
@@ -84,6 +84,58 @@ test("gửi chọn khổ Word: A5, hoặc cả hai thì có tệp thứ hai", ()
   assert.ok(lopA5 && lopA5.docx_path.endsWith("_A5.docx") && !lopA5.docx_path_2);
   const lopCa = chuanBiDotGui(tkbId, { kho_word: "ca_hai" }).muc.find((m) => m.loai === "lop");
   assert.ok(lopCa.docx_path.endsWith("_A4.docx") && lopCa.docx_path_2.endsWith("_A5.docx"));
+});
+
+test("Word đã cũ thì tự tạo lại, ghi đè đúng tên (đổi tên trường)", async () => {
+  const tkbId = dsTkb()[0].id;
+  const thuMuc = path.join(kho, "tkb-word");
+  assert.equal(demWordCanTao(tkbId), 0, "vừa tạo xong thì không có tệp cũ");
+  const truoc = mot("SELECT docx_a4 FROM tkb_lop WHERE tkb_id=? AND lop='6A1'", tkbId).docx_a4;
+
+  datCaiDat("ten_truong", "Trường Thử Nghiệm");
+  const can = demWordCanTao(tkbId);
+  assert.ok(can > 0, "đổi tên trường thì Word phải thành cũ");
+  const r = await taoWordTuDuLieu(tkbId, { thuMuc });
+  assert.equal(r.tao_moi, can);
+  const sau = mot("SELECT docx_a4 FROM tkb_lop WHERE tkb_id=? AND lop='6A1'", tkbId).docx_a4;
+  assert.equal(sau, truoc, "ghi đè đúng tên tệp cũ, không đẻ tệp mới");
+  const xml = await (await JSZip.loadAsync(fs.readFileSync(sau))).file("word/document.xml").async("string");
+  assert.ok(xml.includes("Trường Thử Nghiệm"));
+  assert.equal(demWordCanTao(tkbId), 0);
+  datCaiDat("ten_truong", "");
+  await taoWordTuDuLieu(tkbId, { thuMuc });
+});
+
+test("nạp bản cập nhật cùng số: Word tạo lại, ghi đè đúng tên cũ", async () => {
+  const tkbId = dsTkb()[0].id;
+  const thuMuc = path.join(kho, "tkb-word");
+  const truoc = mot("SELECT docx_a5 FROM tkb_lop WHERE tkb_id=? AND lop='6A1'", tkbId).docx_a5;
+  const r = await nhapTkb({ duongDanXlsx: SS, thuMucKho: kho, chePhu: "cap_nhat",
+    docxGv: path.join(MAU, "TKBgvA4.docx") });
+  assert.equal(r.ok, true);
+  assert.equal(r.tkb_id, tkbId, "cùng số thì cập nhật đúng bản đó");
+  assert.ok(demWordCanTao(tkbId) > 0, "dữ liệu nạp lại thì tệp cũ phải được tạo lại");
+  await taoWordTuDuLieu(tkbId, { thuMuc });
+  assert.equal(mot("SELECT docx_a5 FROM tkb_lop WHERE tkb_id=? AND lop='6A1'", tkbId).docx_a5, truoc);
+  assert.equal(demWordCanTao(tkbId), 0);
+});
+
+test("người ngoài / nhóm nhận gì: tích được cả hai ô, giữ lớp chọn riêng", () => {
+  const r = luuNguoiNhan({ ho_ten: "Hiệu trưởng thử", dien_thoai: "0912000111",
+    dang_ky: [{ loai: "lop", lop: "6A1" }] });
+  assert.equal(r.ok, true);
+  const id = dsNguoiNhan().find((x) => x.ho_ten === "Hiệu trưởng thử").id;
+  const loai = () => dsNguoiNhan().find((x) => x.id === id).dang_ky.map((d) => d.loai).sort();
+
+  assert.equal(datNhanTatCa(id, { lop: true, gv: true }).ok, true);
+  assert.deepEqual(loai(), ["lop", "tat_ca_gv", "tat_ca_lop"], "cả hai ô + lớp chọn riêng vẫn còn");
+  datNhanTatCa(id, { lop: false, gv: true });
+  assert.deepEqual(loai(), ["lop", "tat_ca_gv"]);
+
+  const muc = chuanBiDotGui(dsTkb()[0].id, { gui_nguoi_ngoai: true }).muc
+    .filter((m) => m.nguoi_loai === "ngoai" && m.nguoi_id === id);
+  assert.ok(muc.some((m) => m.loai === "lop" && m.ma === "6A1"), "vẫn nhận lớp 6A1 đã chọn riêng");
+  assert.ok(muc.filter((m) => m.loai === "gv").length >= 30, "nhận thời khoá biểu của tất cả giáo viên");
 });
 
 test("xem thử danh sách giáo viên: không ghi gì, báo đúng ai được cập nhật", async () => {

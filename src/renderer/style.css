@@ -132,11 +132,14 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 .the-tich{align-items:center;margin:0;padding:.55rem .7rem;background:var(--chim);border:1px solid var(--line);border-radius:var(--r-nho)}
 .the-tich input{margin-top:0}
 /* Dòng chỉnh 'nhận gì' cho nhóm Zalo / người ngoài, ngay trong hộp gửi. */
-.hang-nhan{display:flex;align-items:center;gap:.5rem;padding:.35rem .1rem;border-bottom:1px solid var(--line)}
+.hang-nhan{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem .9rem;padding:.45rem .1rem;border-bottom:1px solid var(--line)}
 .hang-nhan:last-child{border-bottom:0}
-.hang-nhan-ten{flex:1 1 auto;min-width:0;font-size:.9rem}
-.hang-nhan-ten .nho{display:block}
+.hang-nhan-ten{flex:1 1 100%;min-width:0;font-size:.9rem}
+.hang-nhan-ten .nho{display:inline;margin-left:.35rem}
 .hang-nhan select{width:auto;min-width:150px;padding:.25rem .4rem;font-size:.85rem}
+.hang-nhan .o-tat{margin:0;white-space:nowrap;font-size:.85rem;align-items:center}
+.hang-nhan .o-tat input{margin-top:0}
+.hang-nhan .lien{white-space:nowrap;font-size:.85rem}
 .hang-nhan.thieu .hang-nhan-ten .nho{color:var(--bad)}
 /* Danh sách gọn trong hộp thoại giải thích. */
 .ds-gon{margin:.2rem 0 .8rem;padding-left:1.1rem}

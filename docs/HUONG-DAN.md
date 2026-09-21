@@ -239,7 +239,14 @@ Nạp xong, thời khoá biểu hiện ở tab **Thời khoá biểu** của tra
 
 ### Ảnh
 
-Mỗi giáo viên và mỗi lớp một ảnh, chữ to, xem rõ trên điện thoại. Bấm **Xem** hoặc **Trên ĐT** ở từng dòng để soi trước. Sửa chủ nhiệm xong thì bấm **Tạo ảnh + Word** để tạo lại.
+Mỗi giáo viên và mỗi lớp một ảnh, chữ to, xem rõ trên điện thoại. Bấm **Xem** hoặc **Trên ĐT** ở từng dòng để soi trước.
+
+### Không cần bấm tạo — phần mềm tự làm mới
+
+Ảnh và file Word **tự tạo** khi nạp, và **tự làm mới** khi số liệu dùng để vẽ ra chúng thay đổi: nạp bản cập nhật cùng số, đổi chủ nhiệm, sửa tên giáo viên, đổi tên trường, đổi “ảnh gồm buổi nào”. Làm mới thì **ghi đè đúng tên tệp cũ**, không sinh thêm tệp.
+
+> **Mỗi lần gửi, phần mềm kiểm lại từng tệp trước.** Tệp nào lệch với số liệu mới nhất thì tạo lại ngay rồi mới gửi — không bao giờ gửi tệp cũ.
+> Hộp **Xem trước đợt gửi** ghi rõ đã kiểm và vừa làm mới bao nhiêu tệp.
 
 ### File Word
 
@@ -292,7 +299,8 @@ Nhóm đã chọn hiện ở **Dữ liệu → Giáo viên → Người nhận n
 
 ### Sửa nhóm ở đâu
 
-- **Ngay trong hộp gửi:** tab **Gửi cho ai**, dòng nhóm chưa đặt nhận gì có sẵn ô **Chọn nhận gì…**. Chọn xong là tích gửi được ngay.
+- **Ngay trong hộp gửi:** tab **Gửi cái gì**, khối **Nhóm Zalo và người ngoài danh sách nhận gì**. Mỗi dòng có hai ô **Tất cả lớp** và **Tất cả GV** — tích được **cả hai**. Muốn chỉ vài lớp, vài giáo viên thì bấm **Chọn lớp, GV cụ thể…** (hộp hai cột, có ô tìm). Lưu xong quay lại đúng tab, các tuỳ chọn đang chỉnh vẫn giữ.
+- Tab **Gửi cho ai**: dòng nhóm chưa đặt nhận gì có sẵn ô **Chọn nhận gì…** để đặt nhanh.
 - **Dữ liệu → Giáo viên → Người nhận ngoài danh sách:** có nút **Thêm nhóm Zalo** và **Dò nhóm Zalo**. Bấm **Sửa** ở dòng nhóm để đổi nhóm nhận thời khoá biểu nào.
 
 > **Nhóm không có số điện thoại, và không cần.** Hộp sửa nhóm không hỏi số, chỉ hiện mã nhóm.
@@ -497,7 +505,7 @@ Xem theo giáo viên với đúng một TKB thì app so **số tiết đếm đ�
 | **Phiên Zalo hết hạn** | Quét lại mã QR rồi bấm **Tiếp tục**. Phần đã gửi không bị gửi lại. |
 | **Dừng vì 3 lỗi liên tiếp** | Mất mạng, hoặc Zalo đang hạn chế. Thử gửi tay một tin trên Zalo xem còn được không. |
 | **Chạm giới hạn an toàn** | Đã gửi đủ mức trong 24 giờ. Hôm sau mở lại bấm **Tiếp tục**. |
-| **Ảnh chưa tạo** | Ảnh tự tạo khi nạp. Thiếu thì vào tab Thời khoá biểu bấm **Tạo ảnh**. |
+| **Ảnh / Word chưa có** | Tự tạo khi mở tab Thời khoá biểu hoặc khi bấm gửi — không cần làm gì. |
 | **Thư mục báo “Có tệp mới hơn”** | Bạn chép tệp mới mà chưa nạp lại. Bấm **Nạp lại**. |
 
 

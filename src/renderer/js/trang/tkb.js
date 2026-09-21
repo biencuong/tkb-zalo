@@ -4,6 +4,7 @@ import { di, capNhatTienDo } from "../app.js";
 import { chipZalo } from "../zalo-nhanh.js";
 import { moGui } from "../gui-modal.js";
 import { moXemMobile } from "../xem-mobile.js";
+import { damBaoTep } from "../dam-bao-tep.js";
 
 let dangXem = null;
 
@@ -166,7 +167,6 @@ export async function ve(khung, thamSo = {}) {
     </div>
     <div class="hang-nut">
       ${chipZalo()}
-      <button class="nut nho" id="tao-anh" title="Tạo ảnh và file Word (A4, A5) còn thiếu">Tạo ảnh + Word</button>
       <button class="nut nho" id="mo-thu-muc">Mở thư mục</button>
       <button class="nut nho xau" id="xoa-nhieu-tkb" title="Xoá thời khoá biểu: từng số, từng đợt hoặc toàn bộ">${ICON_XOA} Xoá…</button>
       <button class="nut nho" id="len-csdl" title="Đưa thời khoá biểu lên cơ sở dữ liệu ngành giáo dục">
@@ -196,9 +196,6 @@ export async function ve(khung, thamSo = {}) {
     <b>${thieuCn.length} lớp chưa có giáo viên chủ nhiệm: ${esc(thieuCn.map((l) => l.lop).join(", "))}.</b>
     <span class="sua">Cách sửa: nhập “Danh sách giáo viên chủ nhiệm” trong phần mềm xếp thời khoá biểu rồi xuất lại, hoặc chọn tay bên dưới.</span>
   </div>` : ""}
-  ${coAnh < tongMuc ? `<div class="bao canh" style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
-    <span><b>Mới có ${coAnh}/${tongMuc} ảnh.</b> Thiếu ảnh thì không gửi được.</span>
-    <button class="nut nho chinh" id="tao-anh">Tạo ảnh + Word ngay</button></div>` : ""}
 
   <div class="tab">
     <button class="chon" data-tab="lop">Lớp (${ct.lop.length})</button>
@@ -209,9 +206,7 @@ export async function ve(khung, thamSo = {}) {
   <div id="tab-lop">
     <div class="the">
       <div class="the-dau"><h2>Các lớp</h2>
-        <span class="hang-nut">
-          <button class="nut nho" id="tao-anh-2">Tạo lại toàn bộ ảnh và Word</button>
-        </span></div>
+        <span class="nho mo">Ảnh và file Word tự tạo, tự cập nhật khi số liệu đổi.</span></div>
       <div class="bang-cuon"><table class="b">
         <thead><tr><th>Lớp</th><th class="so">Tiết/tuần</th><th>Giáo viên chủ nhiệm</th><th>Nguồn</th><th>Tệp</th><th></th></tr></thead>
         <tbody>${ct.lop.map((l) => `<tr class="${l.giao_vien_id ? "" : "lech"}">
@@ -281,17 +276,6 @@ export async function ve(khung, thamSo = {}) {
     for (const t of ["lop", "gv", "ban"]) khung.querySelector("#tab-" + t).hidden = t !== b.dataset.tab;
   });
 
-  const taoAnh = async () => {
-    const cho = hopCho("Đang tạo ảnh thời khoá biểu", "Chuẩn bị…");
-    const boNghe = window.api.anh.onTienDo((t) => cho.capNhat(`${t.da}/${t.tong} — ${esc(t.ten)}`));
-    let kq;
-    try { kq = await window.api.anh.chuanBi(dangXem, { ve_lai: true }); }
-    finally { boNghe(); cho.dong(); await cho.doi; }
-    if (kq.ok) baoOk(`Đã tạo ${kq.tao_moi} ảnh` + (kq.word?.tao_moi ? ` và ${kq.word.tao_moi} file Word.` : "."));
-    else baoXau("<b>Tạo ảnh có lỗi.</b><br>" + esc((kq.loi || []).slice(0, 3).join("<br>")));
-    ve(khung, thamSo);
-  };
-
   ganKhung(khung, "click", async (e) => {
     const b = e.target.closest("button");
     if (!b) return;
@@ -303,7 +287,6 @@ export async function ve(khung, thamSo = {}) {
     }
     if (b.id === "len-csdl") return moHopCsdlNganh();
     if (b.id === "mo-thu-muc") return window.api.app.moThuMuc(ct.thu_muc);
-    if (b.id === "tao-anh" || b.id === "tao-anh-2") return taoAnh();
 
     if (b.dataset.xemLop || b.dataset.xemGv) {
       const laLop = Boolean(b.dataset.xemLop);
@@ -363,4 +346,11 @@ export async function ve(khung, thamSo = {}) {
       return;
     }
   });
+
+  // Ảnh + Word tự đảm bảo: thiếu hoặc đã cũ (đổi chủ nhiệm, sửa tên, cập nhật số…) thì tự tạo lại.
+  // Vẽ lại MỘT lần sau khi tạo — lần vẽ lại đó không kiểm nữa, tránh vòng lặp khi có tệp lỗi.
+  if (dangXem && !thamSo.__daDamBao) {
+    const r = await damBaoTep(dangXem);
+    if (r.tao) ve(khung, { ...thamSo, tkbId: dangXem, __daDamBao: true });
+  }
 }

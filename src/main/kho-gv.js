@@ -216,13 +216,26 @@ export function dsNguoiNhan() {
  */
 export function datNhanNhanh(id, loai) {
   if (!["tat_ca_lop", "tat_ca_gv"].includes(loai)) return { ok: false, loi: ["Lựa chọn nhận không hợp lệ."] };
+  const co = new Set(nhieu("SELECT loai FROM nguoi_nhan_dk WHERE nguoi_nhan_id=?", id).map((x) => x.loai));
+  co.add(loai);
+  return datNhanTatCa(id, { lop: co.has("tat_ca_lop"), gv: co.has("tat_ca_gv") });
+}
+
+/**
+ * Bật / tắt "tất cả các lớp" và "tất cả giáo viên" — HAI Ô ĐỘC LẬP, bật cả hai được.
+ * GIỮ NGUYÊN các lớp / giáo viên đã chọn riêng (trước đây chọn một cái là xoá sạch cái khác).
+ */
+export function datNhanTatCa(id, { lop = false, gv = false } = {}) {
   const n = mot("SELECT id, ho_ten FROM nguoi_nhan WHERE id=?", id);
   if (!n) return { ok: false, loi: ["Không tìm thấy người nhận này."] };
   return giaoDich(() => {
-    chay("DELETE FROM nguoi_nhan_dk WHERE nguoi_nhan_id=?", id);
-    chay("INSERT INTO nguoi_nhan_dk(nguoi_nhan_id,loai,lop,giao_vien_id) VALUES(?,?,'',NULL)", id, loai);
-    ghiNhatKy("dat_nhan_nguoi_ngoai", { doi_tuong: n.ho_ten, mo_ta: loai });
-    return { ok: true, id, loai };
+    chay("DELETE FROM nguoi_nhan_dk WHERE nguoi_nhan_id=? AND loai IN ('tat_ca_lop','tat_ca_gv')", id);
+    if (lop) chay("INSERT INTO nguoi_nhan_dk(nguoi_nhan_id,loai,lop,giao_vien_id) VALUES(?,'tat_ca_lop','',NULL)", id);
+    if (gv) chay("INSERT INTO nguoi_nhan_dk(nguoi_nhan_id,loai,lop,giao_vien_id) VALUES(?,'tat_ca_gv','',NULL)", id);
+    ghiNhatKy("dat_nhan_nguoi_ngoai", {
+      doi_tuong: n.ho_ten, mo_ta: [lop ? "tất cả lớp" : "", gv ? "tất cả giáo viên" : ""].filter(Boolean).join(" + ") || "bỏ nhận tất cả",
+    });
+    return { ok: true, id, lop, gv };
   });
 }
 

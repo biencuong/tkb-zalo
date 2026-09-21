@@ -1,6 +1,6 @@
 /** Danh sách giáo viên: xem đủ thông tin, thêm/sửa/xoá, dò Zalo, người nhận ngoài danh sách. */
 import {
-  esc, so, moHop, hoi, baoOk, baoXau, baoKetQua, hopCho, bang, $, $$, coHoac, vungTha, htmlVungTha,
+  esc, so, moHop, hoi, baoOk, baoXau, baoCanh, baoKetQua, hopCho, bang, $, $$, coHoac, vungTha, htmlVungTha,
 } from "../chung.js";
 import { canZalo } from "../zalo-nhanh.js";
 
@@ -96,15 +96,29 @@ function moHopNguoiNhan(n, dsGv, dsLop) {
   const d = n || { dang_ky: [] };
   const dk = d.dang_ky || [];
   const coLoai = (l) => dk.some((x) => x.loai === l);
+  // NHÓM ZALO gửi bằng mã nhóm, không có số điện thoại — đừng hỏi số, cũng đừng bắt buộc.
+  const laNhom = Boolean(d.la_nhom);
   return new Promise((giai) => {
     moHop({
-      tieuDe: n ? "Sửa người nhận" : "Thêm người nhận ngoài danh sách", rong: "rong",
+      tieuDe: laNhom ? "Nhóm Zalo nhận thời khoá biểu" : (n ? "Sửa người nhận" : "Thêm người nhận ngoài danh sách"),
+      rong: "rong",
       noiDung: `
-      <p class="nho mo">Hiệu trưởng, tổ trưởng… muốn nhận nhưng không dạy tiết nào.</p>
+      ${laNhom
+        ? `<div class="bao tin"><b>Đây là nhóm Zalo.</b>
+             <span class="sua">Gửi bằng mã nhóm, không cần số điện thoại và không cần kết bạn.
+             Chỉ cần chọn nhóm nhận thời khoá biểu nào ở bên dưới.</span></div>`
+        : '<p class="nho mo">Hiệu trưởng, tổ trưởng… muốn nhận nhưng không dạy tiết nào.</p>'}
       <div class="luoi c2">
-        <div class="o-nhap"><label>Họ và tên <span style="color:var(--bad)">*</span></label><input type="text" id="n-ten" value="${esc(d.ho_ten || "")}"></div>
-        <div class="o-nhap"><label>Chức danh</label><input type="text" id="n-cd" value="${esc(d.chuc_danh || "")}" placeholder="Hiệu trưởng"></div>
-        <div class="o-nhap"><label>Điện thoại (Zalo) <span style="color:var(--bad)">*</span></label><input type="tel" id="n-sdt" value="${esc(d.dien_thoai || "")}"></div>
+        <div class="o-nhap"><label>${laNhom ? "Tên nhóm" : "Họ và tên"} <span style="color:var(--bad)">*</span></label>
+          <input type="text" id="n-ten" value="${esc(d.ho_ten || "")}"></div>
+        <div class="o-nhap"><label>${laNhom ? "Loại" : "Chức danh"}</label>
+          <input type="text" id="n-cd" value="${esc(d.chuc_danh || "")}" placeholder="${laNhom ? "Nhóm Zalo" : "Hiệu trưởng"}"></div>
+        ${laNhom
+          ? `<div class="o-nhap"><label>Mã nhóm Zalo</label>
+               <input type="text" class="mono" value="${esc(d.zalo_uid || "")}" readonly>
+               <div class="goi-y">Lấy tự động khi chọn nhóm ở màn Kết nối Zalo.</div></div>`
+          : `<div class="o-nhap"><label>Điện thoại (Zalo) <span style="color:var(--bad)">*</span></label>
+               <input type="tel" id="n-sdt" value="${esc(d.dien_thoai || "")}"></div>`}
         <div class="o-nhap"><label>Ghi chú</label><input type="text" id="n-ghi" value="${esc(d.ghi_chu || "")}"></div>
       </div>
       <hr class="tach"><h3>Nhận thời khoá biểu nào</h3>
@@ -127,9 +141,12 @@ function moHopNguoiNhan(n, dsGv, dsLop) {
             if (hop.querySelector("#dk-tat-gv").checked) dangKy.push({ loai: "tat_ca_gv" });
             $$('input[name="dk-lop"]:checked', hop).forEach((x) => dangKy.push({ loai: "lop", lop: x.value }));
             $$('input[name="dk-gv"]:checked', hop).forEach((x) => dangKy.push({ loai: "gv", giao_vien_id: Number(x.value) }));
+            if (!dangKy.length) {
+              return baoXau("<b>Chưa chọn nhận thời khoá biểu nào.</b><br>Không chọn thì người này sẽ không nhận được gì.");
+            }
             const r = await window.api.gv.luuNguoiNhan({
               id: d.id, ho_ten: v("#n-ten"), chuc_danh: v("#n-cd"), dien_thoai: v("#n-sdt"),
-              ghi_chu: v("#n-ghi"), dang_ky: dangKy,
+              ghi_chu: v("#n-ghi"), dang_ky: dangKy, la_nhom: laNhom ? 1 : 0,
             });
             if (!r.ok) return baoKetQua(r);
             baoOk("Đã lưu người nhận.");
@@ -219,13 +236,20 @@ export async function ve(khung, tuyChon = {}) {
   <div id="tab-nn" ${tab === "nn" ? "" : "hidden"}>
     <div class="the">
       <div class="the-dau"><h2>Người nhận ngoài danh sách</h2>
-        <button class="nut chinh nho" id="them-nn">Thêm người nhận</button></div>
+        <span class="hang-nut">
+          <button class="nut nho" id="do-nhom">Dò nhóm Zalo</button>
+          <button class="nut nho" id="them-nhom-zalo">Thêm nhóm Zalo</button>
+          <button class="nut chinh nho" id="them-nn">Thêm người nhận</button>
+        </span></div>
+      <p class="nho mo" style="margin:.1rem 0 .5rem">Nhóm Zalo gửi bằng <b>mã nhóm</b>, không cần số điện thoại
+        và không cần kết bạn. Bấm <b>Dò nhóm Zalo</b> để lấy lại mã nhóm, tên và số thành viên.</p>
       ${nn.length ? `<div class="bang-cuon"><table class="b">
         <thead><tr><th>Họ tên</th><th>Chức danh</th><th>Điện thoại</th><th>Zalo</th><th>Nhận thời khoá biểu</th><th></th></tr></thead>
         <tbody>${nn.map((n) => `<tr>
-          <td><b>${esc(n.ho_ten)}</b></td>
+          <td><b>${esc(n.ho_ten)}</b>${n.la_nhom ? ' <span class="nhan n-ok">nhóm</span>' : ""}
+            ${n.la_nhom && !n.dang_ky.length ? '<br><span class="nhan n-xau">chưa đặt nhận gì</span>' : ""}</td>
           <td>${coHoac(n.chuc_danh)}</td>
-          <td class="mono">${coHoac(n.dien_thoai)}</td>
+          <td class="mono">${n.la_nhom ? `<span class="nho mo">mã nhóm ${esc(String(n.zalo_uid).slice(0, 8))}…</span>` : coHoac(n.dien_thoai)}</td>
           <td>${nhanZalo(n)}</td>
           <td class="nho">${n.dang_ky.length ? esc(n.dang_ky.map((d) =>
             d.loai === "tat_ca_lop" ? "tất cả lớp" : d.loai === "tat_ca_gv" ? "tất cả giáo viên"
@@ -356,6 +380,29 @@ export async function ve(khung, tuyChon = {}) {
       return;
     }
     if (b.id === "them-nn") { if (await moHopNguoiNhan(null, ds, dsLop)) ve(khung, tuyChon); return; }
+    if (b.id === "them-nhom-zalo") {
+      const { moChonNhom } = await import("../chon-nhom.js");
+      if (await moChonNhom()) ve(khung, tuyChon);
+      return;
+    }
+    if (b.id === "do-nhom") {
+      const { canZalo } = await import("../zalo-nhanh.js");
+      if (!(await canZalo("Phải kết nối Zalo mới dò được nhóm."))) return;
+      const cho = hopCho("Đang dò nhóm Zalo", "Lấy lại mã nhóm, tên và số thành viên…");
+      let r;
+      try { r = await window.api.zalo.lamMoiNhom(); } finally { cho.dong(); await cho.doi; }
+      if (!r.ok) return baoKetQua(r);
+      if (!r.so_nhom) {
+        baoCanh("Chưa có nhóm nào trong danh sách nhận. Bấm “Thêm nhóm Zalo” để chọn.");
+      } else {
+        baoOk(`Đã dò xong ${r.so_nhom} nhóm.`);
+        if (r.nhom_mat?.length) {
+          baoXau(`<b>Không còn thấy ${r.nhom_mat.length} nhóm:</b><br>${esc(r.nhom_mat.join(", "))}`
+            + "<br>Có thể bạn đã rời nhóm. Gửi vào đó sẽ lỗi.");
+        }
+      }
+      return ve(khung, tuyChon);
+    }
     if (b.dataset.suaNn) { if (await moHopNguoiNhan(nn.find((x) => x.id === Number(b.dataset.suaNn)), ds, dsLop)) ve(khung, tuyChon); return; }
     if (b.dataset.xoaNn) {
       const n = nn.find((x) => x.id === Number(b.dataset.xoaNn));

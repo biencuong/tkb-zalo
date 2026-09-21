@@ -213,6 +213,7 @@ export function dangKyTatCa() {
   dangKy("gv:nguoi-nhan", () => ({ ok: true, ds: gv.dsNguoiNhan() }));
   dangKy("gv:luu-nguoi-nhan", (n) => gv.luuNguoiNhan(n));
   dangKy("gv:xoa-nguoi-nhan", (id) => gv.xoaNguoiNhan(id));
+  dangKy("gv:dat-nhan-nhanh", (id, loai) => gv.datNhanNhanh(id, loai));
 
   // ------------------------------------------------ THỜI KHOÁ BIỂU
   dangKy("tkb:ds", () => ({ ok: true, ds: tkb.dsTkb() }));
@@ -349,6 +350,11 @@ export function dangKyTatCa() {
     return { so_nhom: daCo.length, mat };
   }
   dangKy("zalo:ds-nhom", async () => ({ ok: true, ds: await zalo.dsNhom() }));
+  /** Dò RIÊNG NHÓM: lấy lại mã nhóm, tên và số thành viên cho các nhóm đã nhận. */
+  dangKy("zalo:lam-moi-nhom", async () => {
+    const r = await lamMoiNhom();
+    return { ok: true, so_nhom: r.so_nhom, nhom_mat: r.mat };
+  });
 
   /**
    * Thêm nhóm Zalo vào danh sách người nhận. Nhóm không cần số điện thoại — dùng thẳng mã nhóm,

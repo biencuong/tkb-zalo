@@ -263,7 +263,15 @@ Phiên Zalo đứt giữa chừng thì đèn tắt trong vòng 30 giây, không 
 
 Nhóm đã chọn hiện ở **Dữ liệu → Giáo viên → Người nhận ngoài danh sách**, ghi rõ tên nhóm và số thành viên. Sửa lại ở đó nếu muốn nhóm nhận thứ khác.
 
-Bấm **Dò Zalo** thì phần mềm **làm mới cả nhóm**: cập nhật tên và số thành viên, và báo nếu bạn đã rời nhóm nào đó.
+### Sửa nhóm ở đâu
+
+- **Ngay trong hộp gửi:** tab **Gửi cho ai**, dòng nhóm chưa đặt nhận gì có sẵn ô **Chọn nhận gì…**. Chọn xong là tích gửi được ngay.
+- **Dữ liệu → Giáo viên → Người nhận ngoài danh sách:** có nút **Thêm nhóm Zalo** và **Dò nhóm Zalo**. Bấm **Sửa** ở dòng nhóm để đổi nhóm nhận thời khoá biểu nào.
+
+> **Nhóm không có số điện thoại, và không cần.** Hộp sửa nhóm không hỏi số, chỉ hiện mã nhóm.
+> Nút **Dò Zalo** theo số điện thoại cũng bỏ qua nhóm; muốn làm mới nhóm thì bấm **Dò nhóm Zalo**.
+
+Bấm **Dò Zalo** hoặc **Dò nhóm Zalo** thì phần mềm cập nhật tên và số thành viên của nhóm, và báo nếu bạn đã rời nhóm nào đó.
 
 ### Nút nối nhanh
 

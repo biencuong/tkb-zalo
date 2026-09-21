@@ -275,8 +275,18 @@ của tài khoản đang đăng nhập, gõ tên để lọc, tích nhóm nào t
   biết gửi gì vào nhóm.</span></div>
 <p>Nhóm đã chọn hiện ở <b>Dữ liệu → Giáo viên → Người nhận ngoài danh sách</b>, ghi rõ tên nhóm và
 số thành viên. Sửa lại ở đó nếu muốn nhóm nhận thứ khác.</p>
-<p>Bấm <b>Dò Zalo</b> thì phần mềm <b>làm mới cả nhóm</b>: cập nhật tên và số thành viên, và báo nếu
-bạn đã rời nhóm nào đó.</p>
+<h3>Sửa nhóm ở đâu</h3>
+<ul>
+  <li><b>Ngay trong hộp gửi:</b> tab <b>Gửi cho ai</b>, dòng nhóm chưa đặt nhận gì có sẵn ô
+      <b>Chọn nhận gì…</b>. Chọn xong là tích gửi được ngay.</li>
+  <li><b>Dữ liệu → Giáo viên → Người nhận ngoài danh sách:</b> có nút <b>Thêm nhóm Zalo</b> và
+      <b>Dò nhóm Zalo</b>. Bấm <b>Sửa</b> ở dòng nhóm để đổi nhóm nhận thời khoá biểu nào.</li>
+</ul>
+<div class="bao tin"><b>Nhóm không có số điện thoại, và không cần.</b>
+  <span class="sua">Hộp sửa nhóm không hỏi số, chỉ hiện mã nhóm. Nút <b>Dò Zalo</b> theo số điện thoại
+  cũng bỏ qua nhóm; muốn làm mới nhóm thì bấm <b>Dò nhóm Zalo</b>.</span></div>
+<p>Bấm <b>Dò Zalo</b> hoặc <b>Dò nhóm Zalo</b> thì phần mềm cập nhật tên và số thành viên của nhóm,
+và báo nếu bạn đã rời nhóm nào đó.</p>
 
 <h3>Nút nối nhanh</h3>
 <p>Không cần vào tận màn đó: nút tròn <b>Nối Zalo</b> có mặt ở cuối thanh bên, trang Tổng quan,

@@ -643,3 +643,10 @@ button.lien:hover{color:var(--accent-nut)}
 .ng-chu b{font-size:.86rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ng-phu{font-size:.73rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ng-o.h-nhom{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+
+/* Dòng nhóm chưa đặt nhận gì: sửa ngay tại chỗ */
+.ng-o.h-nhom-trong{
+  background:var(--bad-soft);border-color:color-mix(in srgb,var(--bad) 45%,var(--line));
+  cursor:default;gap:.45rem;
+}
+.ng-o .dat-nhan{flex:0 0 auto;max-width:170px;padding:.2rem .4rem;font-size:.78rem;margin:0}

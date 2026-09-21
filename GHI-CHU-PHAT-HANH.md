@@ -5,6 +5,25 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.9 — Nhóm Zalo: tích được, sửa được, không đòi số điện thoại
+
+Bản trước báo *"nhóm chưa đặt nhận thời khoá biểu nào"* nhưng không cho chỗ nào sửa,
+mà dòng nhóm lại bị khoá không tích được. Nay sửa hết:
+
+- **Sửa ngay trên dòng.** Trong hộp gửi, tab *Gửi cho ai*, dòng nhóm chưa đặt nhận gì có sẵn ô
+  **Chọn nhận gì…** (tất cả các lớp / tất cả giáo viên). Chọn xong hộp tự tính lại và tích gửi được ngay.
+- **Hộp sửa người nhận không đòi số điện thoại với nhóm nữa.** Trước đây bắt buộc nhập số nên
+  bấm Lưu là báo lỗi, không đặt được gì. Nay hộp hiện **mã nhóm** thay cho ô số điện thoại.
+- **Không còn xoá mất mã nhóm khi lưu.** Lỗi cũ: sửa người nhận mà giao diện không gửi kèm mã Zalo
+  thì câu lệnh cập nhật ghi đè bằng chuỗi rỗng — với nhóm là mất luôn mã nhóm, hết gửi được.
+- **Dò riêng nhóm.** Mục *Người nhận ngoài danh sách* thêm nút **Dò nhóm Zalo** (lấy lại mã nhóm,
+  tên, số thành viên) và **Thêm nhóm Zalo**. Nút *Dò Zalo* theo số điện thoại nay **bỏ qua nhóm**
+  vì nhóm không có số.
+- Bảng người nhận đánh dấu rõ dòng nào là **nhóm**, nhóm nào **chưa đặt nhận gì**.
+- Thêm hoặc sửa người nhận mà chưa chọn nhận thời khoá biểu nào thì báo ngay, không lưu im lặng.
+
+---
+
 ## 0.1.8 — SỬA LỖI KHÔNG GỬI ĐƯỢC VÀO NHÓM ZALO
 
 Thêm nhóm vào danh sách nhận rồi mà bấm gửi không có tin nào vào nhóm. Ba nguyên nhân, đã sửa cả ba:

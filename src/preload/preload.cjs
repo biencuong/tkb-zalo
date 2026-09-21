@@ -52,6 +52,7 @@ contextBridge.exposeInMainWorld("api", {
     luuNguoiNhan: goi("gv:luu-nguoi-nhan"),
     xoaNguoiNhan: goi("gv:xoa-nguoi-nhan"),
     themNhom: goi("gv:them-nhom"),
+    datNhanNhanh: goi("gv:dat-nhan-nhanh"),
   },
   tkb: {
     ds: goi("tkb:ds"),
@@ -76,6 +77,7 @@ contextBridge.exposeInMainWorld("api", {
     doiChieuBanBe: goi("zalo:doi-chieu-ban-be"),
     moiKetBan: goi("zalo:moi-ket-ban"),
     dsNhom: goi("zalo:ds-nhom"),
+    lamMoiNhom: goi("zalo:lam-moi-nhom"),
     onDoi: nghe("zalo:doi"),
     onDoTienDo: nghe("zalo:do-tien-do"),
   },

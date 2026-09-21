@@ -104,10 +104,45 @@ function xepHang(g) {
   return { ma: "san_sang", nhan: '<span class="nhan n-ok">Sẵn sàng</span>', thu: 0 };
 }
 
-/** Một dòng người nhận trong bảng chọn tay. */
+/** Nhóm đang đăng ký nhận gì, viết gọn một dòng. */
+function chuNhanNhom(g) {
+  const dk = g.dang_ky || [];
+  if (dk.some((x) => x.loai === "tat_ca_lop")) return "nhận tất cả các lớp";
+  if (dk.some((x) => x.loai === "tat_ca_gv")) return "nhận tất cả giáo viên";
+  const lop = dk.filter((x) => x.loai === "lop").map((x) => x.lop);
+  const gv = dk.filter((x) => x.loai === "gv").length;
+  const ph = [];
+  if (lop.length) ph.push(`${lop.length} lớp`);
+  if (gv) ph.push(`${gv} giáo viên`);
+  return ph.length ? "nhận " + ph.join(" · ") : "";
+}
+
+/**
+ * Một dòng người nhận trong bảng chọn tay.
+ * NHÓM ZALO không có số điện thoại và không cần kết bạn — luôn tích được.
+ * Nhóm chưa đặt nhận gì thì sửa NGAY TRÊN DÒNG bằng ô chọn, khỏi phải đi tìm chỗ khác.
+ */
 function veDongNguoi(g) {
   const h = xepHang(g);
   const chonDuoc = h.ma !== "thieu_sdt" && h.ma !== "khong_zalo" && h.ma !== "nhom_trong";
+  const phu = g.la_nhom
+    ? `${esc(g.ghi_chu || "Nhóm Zalo")}${chuNhanNhom(g) ? " · " + esc(chuNhanNhom(g)) : ""}`
+    : `${esc(g.ma_gv || "")}${g.to_chuyen_mon ? " · " + esc(g.to_chuyen_mon) : ""}${g.dien_thoai ? " · " + esc(g.dien_thoai) : " · chưa có số"}`;
+
+  if (h.ma === "nhom_trong") {
+    return `<div class="ng-o h-nhom-trong" data-tim="${esc(g.ho_ten.toLowerCase())}" data-hang="nhom_trong">
+      <span class="ng-chu">
+        <b>${esc(g.ho_ten)}</b>
+        <span class="ng-phu">${esc(g.ghi_chu || "Nhóm Zalo")} · chưa đặt nhận gì</span>
+      </span>
+      <select class="dat-nhan" data-nhom="${g.id}" title="Chọn nhóm này nhận thời khoá biểu nào">
+        <option value="">Chọn nhận gì…</option>
+        <option value="tat_ca_lop">Tất cả các lớp</option>
+        <option value="tat_ca_gv">Tất cả giáo viên</option>
+      </select>
+    </div>`;
+  }
+
   return `<label class="ng-o ${chonDuoc ? "" : "tat"} h-${h.ma}"
       data-tim="${esc((g.ho_ten + " " + (g.ma_gv || "") + " " + (g.dien_thoai || "") + " " + (g.to_chuyen_mon || "")).toLowerCase())}"
       data-hang="${h.ma}">
@@ -115,9 +150,7 @@ function veDongNguoi(g) {
       ${chonDuoc ? "checked" : "disabled"}>
     <span class="ng-chu">
       <b>${esc(g.ho_ten)}</b>
-      <span class="ng-phu">${g.la_nhom
-        ? esc(g.ghi_chu || "Nhóm Zalo")
-        : `${esc(g.ma_gv || "")}${g.to_chuyen_mon ? " · " + esc(g.to_chuyen_mon) : ""}${g.dien_thoai ? " · " + esc(g.dien_thoai) : " · chưa có số"}`}</span>
+      <span class="ng-phu">${phu}</span>
     </span>
     ${h.nhan}
   </label>`;
@@ -153,8 +186,8 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
       <button type="button" class="nut nho chinh" id="do-ngay">Dò Zalo ngay</button>
     </div>` : ""}
     ${dem.nhom_trong ? `<div class="bao xau"><b>${so(dem.nhom_trong)} nhóm Zalo chưa đặt nhận thời khoá biểu nào.</b>
-      <span class="sua">Gửi cũng không ra tin nào. Vào <b>Dữ liệu › Giáo viên › Người nhận ngoài danh sách</b>,
-      sửa nhóm đó và chọn nhận tất cả lớp hoặc tất cả giáo viên.</span></div>` : ""}
+      <span class="sua">Gửi cũng không ra tin nào. Ở tab <b>Gửi cho ai</b> bên dưới, dòng nhóm đó
+      có sẵn ô <b>Chọn nhận gì…</b> — chọn tất cả các lớp hoặc tất cả giáo viên là xong.</span></div>` : ""}
     ${dem.chua_ban ? `<div class="bao canh"><b>${so(dem.chua_ban)} người chưa kết bạn Zalo.</b>
       <span class="sua">Tin rơi vào mục “Tin nhắn từ người lạ”, nhiều người không mở. Nên kết bạn trước.</span></div>` : ""}
     ${NHAC_NGAN}
@@ -230,6 +263,7 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
     </div>`;
 
   let doLai = false;
+  let datLaiNhom = false;
   const chon = await moHop({
     tieuDe: "Gửi thời khoá biểu — tuỳ chọn", rong: "rat-rong", noiDung,
     nut: [{ ten: "Huỷ", giaTri: null }, { ten: "Xem trước", kieu: "chinh", giaTri: "xem" }],
@@ -269,6 +303,16 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
 
       hop.querySelector("#do-ngay")?.addEventListener("click", () => { doLai = true; xong("do"); });
 
+      // Đặt "nhận gì" ngay trên dòng nhóm, lưu xong mở lại hộp để tính lại từ đầu.
+      dsO.addEventListener("change", async (e) => {
+        const o = e.target.closest(".dat-nhan");
+        if (!o || !o.value) return;
+        o.disabled = true;
+        const r = await window.api.gv.datNhanNhanh(Number(o.dataset.nhom), o.value);
+        if (r.ok) { datLaiNhom = true; xong("dat_nhan"); }
+        else { o.disabled = false; baoKetQua(r); }
+      });
+
       hop.querySelector("#tab-gui").addEventListener("click", (e) => {
         const b = e.target.closest("[data-tg]");
         if (!b) return;
@@ -299,6 +343,7 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
   });
 
   if (chon === "do") return { doLai: true };
+  if (chon === "dat_nhan") return { moLai: true };
   return chon === "xem" ? tc : null;
 }
 
@@ -381,6 +426,12 @@ export async function moGui(tkbId) {
 
   const tc = await hopTuyChon(tcCu, dsGv, dsNhom);
   if (!tc) return;
+
+  // Vừa đặt "nhóm nhận gì" xong: mở lại hộp để tính lại danh sách.
+  if (tc.moLai) {
+    baoOk("Đã đặt nhóm nhận thời khoá biểu. Giờ tích được rồi.");
+    return moGui(tkbId);
+  }
 
   // Người dùng bấm "Dò Zalo ngay" ngay trong hộp: dò xong quay lại hộp với số liệu mới.
   if (tc.doLai) {

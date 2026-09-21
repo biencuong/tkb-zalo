@@ -169,22 +169,45 @@ export function dsNguoiNhan() {
   return ds;
 }
 
+/**
+ * Đặt nhanh "nhận thời khoá biểu nào" cho một người nhận ngoài / nhóm Zalo.
+ * loai: tat_ca_lop | tat_ca_gv. Ghi đè đăng ký cũ.
+ */
+export function datNhanNhanh(id, loai) {
+  if (!["tat_ca_lop", "tat_ca_gv"].includes(loai)) return { ok: false, loi: ["Lựa chọn nhận không hợp lệ."] };
+  const n = mot("SELECT id, ho_ten FROM nguoi_nhan WHERE id=?", id);
+  if (!n) return { ok: false, loi: ["Không tìm thấy người nhận này."] };
+  return giaoDich(() => {
+    chay("DELETE FROM nguoi_nhan_dk WHERE nguoi_nhan_id=?", id);
+    chay("INSERT INTO nguoi_nhan_dk(nguoi_nhan_id,loai,lop,giao_vien_id) VALUES(?,?,'',NULL)", id, loai);
+    ghiNhatKy("dat_nhan_nguoi_ngoai", { doi_tuong: n.ho_ten, mo_ta: loai });
+    return { ok: true, id, loai };
+  });
+}
+
 export function luuNguoiNhan(n) {
   const ho_ten = chuanHoaKhoangTrang(n.ho_ten);
   if (!ho_ten) return { ok: false, loi: ["Thiếu họ tên người nhận."] };
-  const sdt = chuanSdt(n.dien_thoai);
-  const uid = String(n.zalo_uid || "").replace(/\D/g, "");
-  if (!sdt && !uid) return { ok: false, loi: ["Cần số điện thoại Zalo (hoặc Zalo UID) để gửi tin."] };
+  // Sửa người đã có mà giao diện không gửi kèm mã Zalo thì GIỮ mã cũ. Trước đây câu lệnh
+  // cập nhật ghi đè zalo_uid bằng chuỗi rỗng — với nhóm Zalo là mất luôn mã nhóm.
+  const cu0 = n.id ? mot("SELECT * FROM nguoi_nhan WHERE id=?", n.id) : null;
+  const laNhom = Boolean(cu0?.la_nhom) || Boolean(n.la_nhom);
+  const sdt = laNhom ? "" : chuanSdt(n.dien_thoai);
+  const uidMoi = String(n.zalo_uid || "").replace(/\D/g, "");
+  const uid = uidMoi || String(cu0?.zalo_uid || "");
+  // Nhóm Zalo không có số điện thoại, gửi bằng mã nhóm.
+  if (!laNhom && !sdt && !uid) return { ok: false, loi: ["Cần số điện thoại Zalo (hoặc Zalo UID) để gửi tin."] };
+  if (laNhom && !uid) return { ok: false, loi: ["Nhóm này chưa có mã nhóm Zalo. Chọn lại nhóm ở màn Kết nối Zalo."] };
   if (sdt && !/^0\d{9}$/.test(sdt)) return { ok: false, loi: [`Số điện thoại "${n.dien_thoai}" không hợp lệ.`] };
   return giaoDich(() => {
     let id = n.id;
     if (id) {
-      const cu = mot("SELECT * FROM nguoi_nhan WHERE id=?", id);
-      const doiSdt = cu && cu.dien_thoai !== sdt;
+      const cu = cu0;
+      const doiSdt = !laNhom && cu && cu.dien_thoai !== sdt;
       chay(
         `UPDATE nguoi_nhan SET ho_ten=?,chuc_danh=?,dien_thoai=?,zalo_uid=?,ghi_chu=?,hoat_dong=?
          ${doiSdt ? ", zalo_trang_thai='chua_do', zalo_ten='', la_ban=-1" : ""} WHERE id=?`,
-        ho_ten, chuanHoaKhoangTrang(n.chuc_danh), sdt, doiSdt ? uid : uid,
+        ho_ten, chuanHoaKhoangTrang(n.chuc_danh), sdt, doiSdt ? "" : uid,
         chuanHoaKhoangTrang(n.ghi_chu), n.hoat_dong === 0 ? 0 : 1, id
       );
     } else {
@@ -238,8 +261,10 @@ export function canDoUid({ chiThieu = true } = {}) {
   const gv = nhieu(
     `SELECT id, ho_ten, dien_thoai, zalo_uid FROM giao_vien WHERE hoat_dong=1 AND dien_thoai<>'' ${dk}`
   ).map((x) => ({ ...x, nguoi_loai: "gv" }));
+  // Nhóm Zalo không có số điện thoại — dò theo số là vô nghĩa, bỏ qua hẳn.
   const ng = nhieu(
-    `SELECT id, ho_ten, dien_thoai, zalo_uid FROM nguoi_nhan WHERE hoat_dong=1 AND dien_thoai<>'' ${dk}`
+    `SELECT id, ho_ten, dien_thoai, zalo_uid FROM nguoi_nhan
+     WHERE hoat_dong=1 AND dien_thoai<>'' AND ifnull(la_nhom,0)=0 ${dk}`
   ).map((x) => ({ ...x, nguoi_loai: "ngoai" }));
   return [...gv, ...ng];
 }

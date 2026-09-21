@@ -166,7 +166,7 @@ export async function ve(khung, thamSo = {}) {
     </div>
     <div class="hang-nut">
       ${chipZalo()}
-      <button class="nut nho" id="tao-anh">Tạo ảnh</button>
+      <button class="nut nho" id="tao-anh" title="Tạo ảnh và file Word (A4, A5) còn thiếu">Tạo ảnh + Word</button>
       <button class="nut nho" id="mo-thu-muc">Mở thư mục</button>
       <button class="nut nho xau" id="xoa-nhieu-tkb" title="Xoá thời khoá biểu: từng số, từng đợt hoặc toàn bộ">${ICON_XOA} Xoá…</button>
       <button class="nut nho" id="len-csdl" title="Đưa thời khoá biểu lên cơ sở dữ liệu ngành giáo dục">
@@ -198,7 +198,7 @@ export async function ve(khung, thamSo = {}) {
   </div>` : ""}
   ${coAnh < tongMuc ? `<div class="bao canh" style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
     <span><b>Mới có ${coAnh}/${tongMuc} ảnh.</b> Thiếu ảnh thì không gửi được.</span>
-    <button class="nut nho chinh" id="tao-anh">Tạo ảnh ngay</button></div>` : ""}
+    <button class="nut nho chinh" id="tao-anh">Tạo ảnh + Word ngay</button></div>` : ""}
 
   <div class="tab">
     <button class="chon" data-tab="lop">Lớp (${ct.lop.length})</button>
@@ -210,7 +210,7 @@ export async function ve(khung, thamSo = {}) {
     <div class="the">
       <div class="the-dau"><h2>Các lớp</h2>
         <span class="hang-nut">
-          <button class="nut nho" id="tao-anh-2">Tạo lại toàn bộ ảnh</button>
+          <button class="nut nho" id="tao-anh-2">Tạo lại toàn bộ ảnh và Word</button>
         </span></div>
       <div class="bang-cuon"><table class="b">
         <thead><tr><th>Lớp</th><th class="so">Tiết/tuần</th><th>Giáo viên chủ nhiệm</th><th>Nguồn</th><th>Tệp</th><th></th></tr></thead>
@@ -287,7 +287,7 @@ export async function ve(khung, thamSo = {}) {
     let kq;
     try { kq = await window.api.anh.chuanBi(dangXem, { ve_lai: true }); }
     finally { boNghe(); cho.dong(); await cho.doi; }
-    if (kq.ok) baoOk(`Đã tạo ${kq.tao_moi} ảnh.`);
+    if (kq.ok) baoOk(`Đã tạo ${kq.tao_moi} ảnh` + (kq.word?.tao_moi ? ` và ${kq.word.tao_moi} file Word.` : "."));
     else baoXau("<b>Tạo ảnh có lỗi.</b><br>" + esc((kq.loi || []).slice(0, 3).join("<br>")));
     ve(khung, thamSo);
   };

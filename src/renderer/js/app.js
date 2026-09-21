@@ -101,7 +101,13 @@ function veChipBan({ banMoi = "" } = {}) {
 /** Chuyển trang. thamSo.tab để mở đúng tab. */
 export async function di(ma, thamSo = null) {
   const m = timMuc(ma) || MUC[0];
-  const b = m.buoc != null ? trangThaiApp.tienDo?.buoc?.[m.buoc] : null;
+  let b = m.buoc != null ? trangThaiApp.tienDo?.buoc?.[m.buoc] : null;
+  // Trạng thái khoá có thể đã CŨ (vừa điền số điện thoại, vừa dò Zalo, vừa chọn nhóm…).
+  // Tính lại một lần rồi mới từ chối — đừng chặn người dùng bằng số liệu cũ.
+  if (b?.khoa) {
+    await capNhatTienDo();
+    b = trangThaiApp.tienDo?.buoc?.[m.buoc] || null;
+  }
   if (b?.khoa) {
     bao(`<b>Chưa mở được “${esc(m.ten)}”.</b><br>Còn thiếu: ${esc((b.thieu || []).join(", "))}.`, "canh", 7);
     return;

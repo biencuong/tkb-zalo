@@ -337,3 +337,34 @@ Lịch sử gửi luôn giữ (khoá ngoại `SET NULL`). Xoá giáo viên thì 
 
 Bản trước bắt dò được Zalo của ít nhất 1 **giáo viên** mới mở — nhóm Zalo không được tính và người đã có
 số điện thoại vẫn bị khoá, trong khi hộp gửi tự dò được. Kiểm trong `scripts/thu-chay.mjs`.
+
+## Tự tạo file Word đúng mẫu Smart Scheduler
+
+`src/main/tao-word.js`. Khuôn là **một bảng cắt từ chính Word Smart Scheduler xuất ra** (4 khuôn:
+`src/main/mau-word/{gv,lop}-{a4,a5}.docx`), mọi chữ thay bằng ô giữ chỗ — giữ nguyên khung, phông,
+độ rộng cột, ô gộp. Dựng lại khuôn: `node scripts/tao-khuon-word.mjs "<thư mục có 4 tệp Word mẫu>"`;
+kịch bản tự kiểm khuôn không còn chữ nào của dữ liệu gốc (khuôn nằm trong kho mã công khai).
+
+| Ô giữ chỗ | Giá trị |
+|---|---|
+| `{{TRUONG}}` `{{DONG_NAM_HOC}}` `{{DONG_HOC_KY}}` | tên trường · "Năm học 2025 - 2026" · "Học kỳ 2" |
+| `{{DONG_SO}}` `{{TIEU_DE}}` `{{DONG_NGAY}}` | "Số 1" · "Giáo viên <mã>" / "Lớp 6A1" · "(Thực hiện từ ngày 18 tháng 08 năm 2025)" |
+| `{{S_<thứ>_<tiết>}}` `{{C_<thứ>_<tiết>}}` | "Môn - Lớp" (giáo viên) · "Môn - Mã GV" (lớp); 6 thứ × 5 tiết × 2 buổi |
+
+- Tạo **cả A4 và A5**, tên `…_A4.docx` / `…_A5.docx` trong `<thư mục TKB>/word/{gv,lop}/`.
+- Cột `docx_a4`, `docx_a5` (tkb_gv, tkb_lop); `docx_path` = khổ ưu tiên (Cài đặt → khổ giấy mặc định).
+- Tệp cắt từ Word Smart Scheduler (nếu người dùng thả) **được giữ** cho khổ của nó; chỉ tự tạo khổ còn thiếu.
+- Chạy ngay sau tạo ảnh (`anh:chuan-bi`), nên nạp xong là có Word. Chạy lại không tạo trùng.
+- Tiết ngoài khuôn (tiết > 5 hoặc Chủ nhật) không in được → báo `canh_bao`.
+- Đã so bằng mắt (Word → PDF): bản tự tạo và bản gốc Smart Scheduler **giống hệt**.
+
+## Gửi Word khổ A4 / A5 / cả hai
+
+Hộp gửi, tab *Gửi cái gì* → **Khổ file Word**. `kho_word` trong tuỳ chọn gửi; `wordCua()` trong
+`kho-gui.js` chọn tệp theo khổ, thiếu khổ đó thì lùi về khổ còn lại. **Cả hai** → `viec_gui.docx_path_2`,
+hàng đợi thêm bước `gui_file_2` (ghi bước ngay sau tệp thứ nhất → tắt app giữa chừng không gửi lặp).
+
+## Thanh bên không được dùng trạng thái cũ để chặn
+
+`di()` trong `app.js`: bộ nhớ nói bước bị khoá thì **tính lại tiến độ một lần** rồi mới từ chối.
+Lưu số điện thoại trên bảng và dò Zalo xong cũng gọi `capNhatTienDo()` để biểu tượng khoá tắt ngay.

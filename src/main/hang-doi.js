@@ -196,7 +196,7 @@ export async function chay_(dotId) {
         } else if (v.buoc === "gui_anh" && !v.anh_path) {
           // Không có ảnh: lời nhắn đi kèm tệp, hoặc gửi riêng nếu cũng không có tệp
           if (v.docx_path && v.caption) {
-            await zalo.guiChu(v.uid, v.caption);
+            await zalo.guiChu(v.uid, v.caption, { laNhom: v.la_nhom === 1 });
             await nghi(zalo.ngau(nhip2TinMin, nhip2TinMax));
           }
           capNhatViec(v.id, { buoc: v.docx_path ? "gui_file" : "xong" });
@@ -206,7 +206,15 @@ export async function chay_(dotId) {
         if (v.buoc === "gui_file" && v.docx_path) {
           const r = await zalo.guiTep(v.uid, v.docx_path, { laNhom: v.la_nhom === 1 });
           msgFile = r.msg_id || "";
-          capNhatViec(v.id, { buoc: "xong", msg_id_file: msgFile });
+          // Chọn gửi cả A4 và A5 thì còn tệp thứ hai — ghi bước ngay để tắt app giữa chừng không gửi lặp.
+          const tiep = v.docx_path_2 ? "gui_file_2" : "xong";
+          capNhatViec(v.id, { buoc: tiep, msg_id_file: msgFile });
+          v.buoc = tiep;
+          if (v.docx_path_2) await nghi(zalo.ngau(nhip2TinMin, nhip2TinMax));
+        }
+        if (v.buoc === "gui_file_2" && v.docx_path_2) {
+          await zalo.guiTep(v.uid, v.docx_path_2, { laNhom: v.la_nhom === 1 });
+          capNhatViec(v.id, { buoc: "xong" });
         }
 
         capNhatViec(v.id, { trang_thai: "xong", gui_luc: new Date().toLocaleString("sv-SE").replace("T", " "), loi_cuoi: "", ma_loi: null });

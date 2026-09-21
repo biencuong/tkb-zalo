@@ -284,3 +284,41 @@ bản cũ của hướng dẫn ghi "Hệ thống → In ấn" cho tệp Word, tr
 Hộp *Chuyển đổi dữ liệu sang Excel* có các ô: Bảng phân công giảng dạy, TKB lớp học, TKB giáo viên, TKB phòng học,
 Hiển thị TKB sáng / chiều / sáng & chiều, TKB nhóm… Phần mềm cần **PCGD + TKB lớp học + TKB giáo viên**;
 thiếu TKB giáo viên thì không suy được mã viết tắt khi tạo giáo viên từ bảng phân công.
+
+---
+
+## [21/9/2026] Chặn người dùng bằng trạng thái đã cũ
+
+**Hiện tượng:** đã có 2 giáo viên có số điện thoại và đã dò ra Zalo, bấm **Gửi** vẫn báo
+"Còn thiếu: chưa ai có số điện thoại, chưa dò được Zalo của ai".
+
+**Nguyên nhân:** tiến độ ba bước được tính một lần, lưu trong bộ nhớ giao diện. Sửa số điện thoại trên
+bảng và bấm Dò Zalo không tính lại, nên nút Gửi vẫn dựa vào số liệu lúc chưa ai có số. (Máy người dùng lúc
+đó còn chạy 0.1.12 với điều kiện cũ — bản 0.1.13 đã phát hành nhưng **chưa cài**.)
+
+**Sửa:** hàm điều hướng tính lại trước khi từ chối; các thao tác đổi dữ liệu gọi cập nhật.
+**Luật:** mọi chỗ **chặn** người dùng phải kiểm lại bằng số liệu tươi — chặn nhầm tệ hơn cho qua rồi báo.
+**Kèm:** phát hành xong phải **cài lên máy người dùng ngay**, nếu không họ vẫn gặp lỗi đã sửa.
+
+## [21/9/2026] Câu chữ hứa nhiều hơn phần mềm làm được
+
+Tin giới thiệu, README và Trợ giúp viết "ảnh xem ngay **và file Word để in**" ngay cạnh "chỉ cần **một tệp
+Excel**". Người dùng hiểu (đúng theo câu chữ) là một tệp Excel cho ra cả Word, thả vào thì không thấy Word.
+Lúc đó phần mềm chỉ **cắt** Word của Smart Scheduler, không tự tạo. Đã làm cho câu chữ thành sự thật: tự tạo
+Word đúng mẫu từ dữ liệu Excel. **Luật:** hai ý đặt cạnh nhau trong một câu quảng bá sẽ được đọc là một —
+kiểm từng lời hứa bằng cách chạy thử đúng như người dùng sẽ làm.
+
+---
+
+## [21/9/2026] Bước kiểm gói "đạt" mà không kiểm gì bản mới
+
+`scripts/kiem-goi.mjs` mặc định soi `dist/win-unpacked` trong dự án. Từ khi chuyển sang đóng gói ra
+`%TEMP%\tkbzalo-dist` (tránh EPERM), thư mục `dist/` là **bản 0.1.9 cũ** — mọi lần "ĐẠT" từ 0.1.10 tới 0.1.13
+đều kiểm nhầm bản cũ. Lộ ra khi thêm khuôn Word: bộ kiểm báo thiếu khuôn lớp, trong khi gói mới có đủ.
+
+Cùng lúc lộ thêm: dòng kiểm `import("zca-js")` trần — Node tìm lên thư mục cha, chạy cạnh mã nguồn thì vớ
+`node_modules` của dự án, nên "đạt" dù gói có thiếu cũng không biết.
+
+**Sửa:** mặc định soi `%TEMP%\tkbzalo-dist`, **so phiên bản trong gói với `package.json`** (khác là báo lỗi),
+nạp zca-js bằng đường dẫn trong `app.asar`. **Luật:** bộ kiểm nào cũng phải tự chứng minh nó đang kiểm đúng
+đối tượng (in ra đối tượng + phiên bản), nếu không một chữ "ĐẠT" chẳng nói lên gì.

@@ -270,6 +270,12 @@ export async function nhapTkb(p) {
   }
   chay("UPDATE tkb SET thu_muc=?, nguon_docx_gv=?, nguon_docx_lop=?, kho_giay=? WHERE id=?",
     thuMuc, p.docxGv || "", p.docxLop || "", ketQuaCat?.kho || "", ketQua.tkbId);
+  // Tệp cắt từ Word Smart Scheduler: ghi vào đúng cột khổ giấy để lúc gửi chọn A4 / A5.
+  if (ketQuaCat) {
+    const cot = String(ketQuaCat.kho || "").toUpperCase() === "A5" ? "docx_a5" : "docx_a4";
+    chay(`UPDATE tkb_gv SET ${cot}=docx_path WHERE tkb_id=? AND docx_path<>''`, ketQua.tkbId);
+    chay(`UPDATE tkb_lop SET ${cot}=docx_path WHERE tkb_id=? AND docx_path<>''`, ketQua.tkbId);
+  }
 
   return {
     ok: true, tkb_id: ketQua.tkbId, phien_ban: ketQua.phienBan, gv_tao_moi: gvTaoMoi, gv_bo_qua: gvBoQua,

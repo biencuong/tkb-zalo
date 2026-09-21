@@ -254,7 +254,25 @@ const COT_THEM = [
   ["viec_gui", "ly_do_bo_qua", "TEXT NOT NULL DEFAULT ''"],
   ["tkb", "so_tuan", "REAL"],
   ["tkb_gv", "co_docx", "INTEGER NOT NULL DEFAULT 0"],
+  // Word theo khổ giấy — gửi được A4, A5 hoặc cả hai.
+  ["tkb_gv", "docx_a4", "TEXT NOT NULL DEFAULT ''"],
+  ["tkb_gv", "docx_a5", "TEXT NOT NULL DEFAULT ''"],
+  ["tkb_lop", "docx_a4", "TEXT NOT NULL DEFAULT ''"],
+  ["tkb_lop", "docx_a5", "TEXT NOT NULL DEFAULT ''"],
+  ["viec_gui", "docx_path_2", "TEXT NOT NULL DEFAULT ''"],
 ];
+
+/** Tệp Word cũ chỉ ghi ở docx_path — chia vào đúng cột khổ giấy theo tkb.kho_giay. Chạy mỗi lần mở. */
+function chiaWordTheoKho() {
+  try {
+    for (const b of ["tkb_gv", "tkb_lop"]) {
+      db.prepare(`UPDATE ${b} SET docx_a5=docx_path WHERE docx_path<>'' AND docx_a4='' AND docx_a5=''
+        AND tkb_id IN (SELECT id FROM tkb WHERE upper(ifnull(kho_giay,''))='A5')`).run();
+      db.prepare(`UPDATE ${b} SET docx_a4=docx_path WHERE docx_path<>'' AND docx_a4='' AND docx_a5=''
+        AND tkb_id IN (SELECT id FROM tkb WHERE upper(ifnull(kho_giay,''))<>'A5')`).run();
+    }
+  } catch { /* bảng chưa có cột thì thôi */ }
+}
 
 function vaCotThieu() {
   for (const [bang, cot, kieu] of COT_THEM) {
@@ -298,6 +316,7 @@ function taoLuocDo() {
   db.exec(LUOC_DO);
   vaCotThieu();
   goKhoaGuiTrung();
+  chiaWordTheoKho();
   // Nhóm Zalo không nằm trong danh sách bạn bè nên hay bị đánh dấu "chưa kết bạn" rồi bị chặn.
   // Mình vốn ở trong nhóm nên luôn gửi được — chạy mỗi lần mở cho chắc.
   try { db.prepare("UPDATE nguoi_nhan SET la_ban=1 WHERE ifnull(la_nhom,0)=1 AND la_ban<>1").run(); }

@@ -12,6 +12,9 @@ import { fileURLToPath } from "node:url";
 import { moDb, dongDb, mot } from "../src/main/db.js";
 import { dsGiaoVien, xemTruocDsGv, xoaTatCaGiaoVien } from "../src/main/kho-gv.js";
 import { nhapTkb, dsTkb, xoaNhieuTkb } from "../src/main/kho-tkb.js";
+import { taoWordTuDuLieu } from "../src/main/tao-word.js";
+import { chuanBiDotGui } from "../src/main/kho-gui.js";
+import JSZip from "jszip";
 
 const MAU = path.join(path.dirname(fileURLToPath(import.meta.url)), "mau");
 const DS = path.join(MAU, "ds gv.xlsx");
@@ -44,6 +47,43 @@ test("chỉ một tệp Excel: tạo đủ 40 giáo viên, kể cả chủ nhi�
   // Mọi lớp có chủ nhiệm trong tệp đều gắn được với người
   const lopCoCn = mot("SELECT COUNT(*) n FROM tkb_lop WHERE tkb_id=? AND giao_vien_id IS NOT NULL", r.tkb_id).n;
   assert.ok(lopCoCn >= 6, `chỉ ${lopCoCn} lớp gắn được chủ nhiệm`);
+});
+
+test("tự tạo Word đúng mẫu Smart Scheduler, cả A4 và A5, không đè tệp đã cắt", async () => {
+  const tkbId = dsTkb()[0].id;
+  const thuMuc = path.join(kho, "tkb-word");
+  const r = await taoWordTuDuLieu(tkbId, { thuMuc });
+  assert.equal(r.ok, true, (r.loi || []).join("; "));
+  const soGv = mot("SELECT COUNT(*) n FROM tkb_gv WHERE tkb_id=? AND giao_vien_id IS NOT NULL AND so_tiet_dem>0", tkbId).n;
+  const soLop = mot("SELECT COUNT(*) n FROM tkb_lop WHERE tkb_id=?", tkbId).n;
+  // Giáo viên đã có Word A4 cắt từ Smart Scheduler → chỉ tạo thêm A5; lớp chưa có → tạo cả hai khổ.
+  assert.equal(r.tao_moi, soGv + soLop * 2);
+
+  const l = mot("SELECT docx_a4, docx_a5 FROM tkb_lop WHERE tkb_id=? AND lop='6A1'", tkbId);
+  const doc = async (f) => (await JSZip.loadAsync(fs.readFileSync(f))).file("word/document.xml").async("string");
+  const a4 = await doc(l.docx_a4), a5 = await doc(l.docx_a5);
+  const chu = [...a4.matchAll(/<w:t[^>]*>([^<]*)<\/w:t>/g)].map((x) => x[1]);
+  for (const c of ["Lớp 6A1", "THỜI KHOÁ BIỂU", "Số 1", "Toán - P.Ha", "(Thực hiện từ ngày 18 tháng 08 năm 2025)", "Buổi sáng"]) {
+    assert.ok(chu.includes(c), `thiếu "${c}"`);
+  }
+  assert.ok(!a4.includes("{{") && !a5.includes("{{"), "còn ô giữ chỗ chưa điền");
+  assert.match(a4, /<w:pgSz[^>]*w:w="16840"/, "A4 ngang");
+  assert.match(a5, /<w:pgSz[^>]*w:w="11900"/, "A5 ngang");
+  assert.ok(l.docx_a4.endsWith("_A4.docx") && l.docx_a5.endsWith("_A5.docx"), "tên tệp có đuôi khổ");
+
+  const g = mot("SELECT docx_a4, docx_path FROM tkb_gv WHERE tkb_id=? AND so_tiet_dem>0 LIMIT 1", tkbId);
+  assert.ok(!/[\\/]word[\\/]/.test(g.docx_a4), "tệp A4 cắt từ Smart Scheduler phải được giữ nguyên");
+
+  const r2 = await taoWordTuDuLieu(tkbId, { thuMuc });
+  assert.equal(r2.tao_moi, 0, "chạy lại không tạo trùng");
+});
+
+test("gửi chọn khổ Word: A5, hoặc cả hai thì có tệp thứ hai", () => {
+  const tkbId = dsTkb()[0].id;
+  const lopA5 = chuanBiDotGui(tkbId, { kho_word: "a5" }).muc.find((m) => m.loai === "lop");
+  assert.ok(lopA5 && lopA5.docx_path.endsWith("_A5.docx") && !lopA5.docx_path_2);
+  const lopCa = chuanBiDotGui(tkbId, { kho_word: "ca_hai" }).muc.find((m) => m.loai === "lop");
+  assert.ok(lopCa.docx_path.endsWith("_A4.docx") && lopCa.docx_path_2.endsWith("_A5.docx"));
 });
 
 test("xem thử danh sách giáo viên: không ghi gì, báo đúng ai được cập nhật", async () => {

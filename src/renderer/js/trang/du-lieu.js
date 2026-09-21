@@ -136,9 +136,9 @@ function htmlXemTruocTkb(xt, { docxGv, docxLop, soGvHienCo = 0, seNapGv = false,
     ${(xt.canh_bao || []).map((c) => `<div class="bao canh">${esc(c)}</div>`).join("")}
     ${khoiKhop}
     ${!docxGv && !docxLop ? `<div class="bao tin">
-      <b>Không có tệp Word — vẫn dùng được bình thường.</b>
-      <span class="sua">Ảnh thời khoá biểu dựng từ chính tệp Excel này. Mỗi giáo viên nhận <b>ảnh xem ngay</b>;
-      muốn họ có thêm file Word để in thì lần sau thả kèm tệp Word.</span>
+      <b>Không cần tệp Word.</b>
+      <span class="sua">Từ chính tệp Excel này, phần mềm tạo <b>ảnh xem ngay</b> và <b>file Word để in</b>
+      đúng mẫu Smart Scheduler, cả khổ A4 và A5.</span>
     </div>` : ""}
     ${tt.so_tkb == null || !tt.ngay_ap_dung || !tt.nam_hoc ? `<hr class="tach">
       <div class="luoi c3">
@@ -193,7 +193,10 @@ async function thucHienNapTkb({ xlsx, docxGv, docxLop, donSauKhiXong = [], chePh
       ${r.gv_bo_qua?.length ? `<div class="bao canh"><b>${so(r.gv_bo_qua.length)} người chưa tạo được:</b>
         <span class="sua">${esc(r.gv_bo_qua.slice(0, 5).map((x) => x.ho_ten + " (" + x.ly_do + ")").join("; "))}</span></div>` : ""}
       <div class="bao ${ra?.ok ? "ok" : "canh"}">Tạo ảnh: ${so(ra?.tao_moi || 0)} ảnh.
-        ${(ra?.loi || []).slice(0, 2).map((x) => `<span class="sua">${esc(x)}</span>`).join("")}</div>`,
+        ${(ra?.loi || []).slice(0, 2).map((x) => `<span class="sua">${esc(x)}</span>`).join("")}</div>
+      ${ra?.word ? `<div class="bao ${ra.word.ok ? "ok" : "canh"}">File Word: ${so(ra.word.tao_moi || 0)} tệp
+        (A4 và A5, đúng mẫu Smart Scheduler).
+        ${[...(ra.word.loi || []), ...(ra.word.canh_bao || [])].slice(0, 2).map((x) => `<span class="sua">${esc(x)}</span>`).join("")}</div>` : ""}`,
     nut: [{ ten: "Đóng", giaTri: null }, { ten: "Mở thời khoá biểu", kieu: "chinh", giaTri: "tkb" }],
   });
   if (c === "tkb") di("du-lieu", { tkbId: r.tkb_id, neo: "khu-tkb" });
@@ -423,9 +426,9 @@ const veBaBuoc = () => `
         <span>Điền thẳng trên bảng Giáo viên sau khi nạp. Hoặc thả kèm tệp danh sách giáo viên có cột
           số điện thoại (mục Dữ liệu giáo viên → <b>Excel | Copy file dữ liệu mẫu</b>).</span></div>
       <div><span class="bb-so">3</span>
-        <b>Tệp Word — không bắt buộc</b>
-        <span>Mục <b>In ấn → In TKB cá nhân</b> → <b>In TKB giáo viên</b> và <b>In TKB lớp học</b>
-          (Chọn tất cả, khổ A4 hoặc A5) → Chấp nhận. Có thì giáo viên nhận thêm file Word để in.</span></div>
+        <b>Tệp Word — không cần</b>
+        <span>Phần mềm tự tạo file Word đúng mẫu Smart Scheduler, cả A4 và A5, từ tệp Excel.
+          Chỉ thả Word của Smart Scheduler (In ấn → In TKB cá nhân) khi đã sửa tay trên đó.</span></div>
     </div>
     <p class="nho mo" style="margin:.6rem 0 0">Thả các tệp vào vùng bên dưới <b>một lượt</b> — phần mềm cho
       <b>xem thử</b> trước, bấm <b>Nạp dữ liệu</b> mới ghi vào.</p>

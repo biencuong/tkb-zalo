@@ -5,6 +5,29 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.14 — Tự tạo file Word đúng mẫu, gửi A4 / A5 / cả hai
+
+### Một tệp Excel là có cả ảnh và Word
+
+- Nạp tệp Excel xong, phần mềm **tự tạo file Word** cho từng giáo viên và từng lớp, **đúng mẫu Word của
+  Smart Scheduler** — cùng khung, phông, cách ghi "Môn - Lớp". Đã so với bản gốc: giống hệt.
+- Tạo sẵn **cả khổ A4 và A5**. Không còn phải xuất Word từ Smart Scheduler.
+- Nếu có thả Word của Smart Scheduler (ví dụ đã sửa tay), phần mềm dùng tệp đó cho khổ tương ứng.
+- Nút **Tạo ảnh + Word** ở khu Thời khoá biểu tạo lại khi cần.
+
+### Gửi chọn khổ Word
+
+- Hộp gửi, tab *Gửi cái gì* → **Khổ file Word: A4 · A5 · Cả hai**. Chọn cả hai thì người nhận được hai tệp
+  (tên có đuôi `_A4`, `_A5`). Lựa chọn được nhớ cho lần sau.
+
+### Sửa lỗi
+
+- **Đã có số điện thoại mà bấm Gửi vẫn báo "chưa ai có số điện thoại"** — thanh bên dùng trạng thái cũ.
+  Nay bấm là tính lại; sửa số hay dò Zalo xong thanh bên cập nhật ngay.
+- Gửi vào nhóm Zalo khi không có ảnh: lời nhắn nay vào đúng nhóm.
+
+---
+
 ## 0.1.13 — Có 1 số điện thoại hoặc 1 nhóm Zalo là mở được Gửi
 
 - **Bước Gửi mở** khi có thời khoá biểu và **ít nhất 1 người nhận được tin**: 1 số điện thoại (giáo viên

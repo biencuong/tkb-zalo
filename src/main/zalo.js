@@ -334,9 +334,9 @@ export async function guiTep(uid, duongDanTep, { laNhom = false } = {}) {
 }
 
 /** Gửi tin văn bản thuần (Zalo không hiểu Markdown). */
-export async function guiChu(uid, noiDung) {
+export async function guiChu(uid, noiDung, { laNhom = false } = {}) {
   if (!daKetNoi()) throw new Error("Chưa kết nối Zalo.");
-  const r = await api.sendMessage({ msg: String(noiDung ?? "") }, String(uid), ThreadType.User);
+  const r = await api.sendMessage({ msg: String(noiDung ?? "") }, String(uid), laNhom ? ThreadType.Group : ThreadType.User);
   return { ok: true, msg_id: r?.message?.msgId ? String(r.message.msgId) : "" };
 }
 

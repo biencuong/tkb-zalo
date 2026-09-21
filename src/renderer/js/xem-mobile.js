@@ -41,14 +41,15 @@ function veDienThoai(d) {
               <div class="dt-gio">${esc(gioBayGio())}</div>
             </div>` : chu ? `<div class="dt-bong"><div class="dt-chu">${esc(chu)}</div>
               <div class="dt-gio">${esc(gioBayGio())}</div></div>` : ""}
-          ${d.co_docx ? `<div class="dt-bong">
+          ${d.co_docx ? [[d.docx_ten, d.docx_co], [d.docx_ten_2, d.docx_co_2]].filter(([t]) => t).map(([t, n]) => `
+            <div class="dt-bong">
               <div class="dt-tep">
                 <span class="dt-tep-bd">W</span>
-                <span class="dt-tep-chu"><b>${esc(d.docx_ten)}</b><span>${esc(coTep(d.docx_co))} · Word</span></span>
+                <span class="dt-tep-chu"><b>${esc(t)}</b><span>${esc(coTep(n))} · Word</span></span>
                 <span class="dt-tep-tai">↓</span>
               </div>
               <div class="dt-gio">${esc(gioBayGio())}</div>
-            </div>` : ""}
+            </div>`).join("") : ""}
           ${!d.co_anh && !d.co_docx && !chu
             ? '<div class="dt-nhac">Không có gì để gửi cho mục này.</div>' : ""}
         </div>

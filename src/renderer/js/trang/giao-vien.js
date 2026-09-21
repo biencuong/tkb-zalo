@@ -383,7 +383,10 @@ export async function ve(khung, tuyChon = {}) {
     el.classList.add("da-luu");
     setTimeout(() => el.classList.remove("da-luu"), 1400);
     // Đổi số điện thoại thì Zalo cũ không còn đúng nữa, phải dò lại.
-    if (khoa === "dien_thoai") baoOk("Đã lưu số mới. Bấm “Dò Zalo” để tìm lại Zalo của người này.");
+    if (khoa === "dien_thoai") {
+      baoOk("Đã lưu số mới. Bấm “Dò Zalo” để tìm lại Zalo của người này.");
+      (await import("../app.js")).capNhatTienDo();   // có số rồi là mở được bước Gửi
+    }
     return true;
   };
 
@@ -525,6 +528,7 @@ export async function ve(khung, tuyChon = {}) {
           baoXau(`<b>Không còn thấy ${kq.nhom_mat.length} nhóm:</b><br>${esc(kq.nhom_mat.join(", "))}`
             + "<br>Có thể bạn đã rời nhóm. Gửi vào đó sẽ lỗi.");
         }
+        (await import("../app.js")).capNhatTienDo();
         ve(khung, tuyChon);
       } else baoKetQua(kq);
       return;

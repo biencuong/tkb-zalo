@@ -16,6 +16,7 @@ import { phienBan } from "./phien-ban.js";
 import * as zalo from "./zalo.js";
 import * as hangDoi from "./hang-doi.js";
 import * as anh from "./anh-tkb.js";
+import * as taoWord from "./tao-word.js";
 import * as capNhat from "./cap-nhat.js";
 import * as tm from "./thu-muc.js";
 
@@ -269,7 +270,18 @@ export function dangKyTatCa() {
       gom: p.gom, veLai: p.ve_lai,
       onTienDo: (x) => day("anh:tien-do", x),
     });
-    return { ok: r.ok, ...r };
+    // Word theo mẫu Smart Scheduler, cả A4 và A5, tạo thẳng từ dữ liệu Excel.
+    // Tệp cắt từ Word Smart Scheduler (nếu người dùng có thả) được giữ nguyên.
+    let word;
+    try {
+      word = await taoWord.taoWordTuDuLieu(tkbId, {
+        thuMuc: t?.thu_muc || duongDan.goc_tai_lieu,
+        khoUuTien: db.layCaiDat("kho_giay_mac_dinh") || "A4",
+        veLai: p.ve_lai,
+        onTienDo: (x) => day("anh:tien-do", { ...x, ten: "Word · " + x.ten }),
+      });
+    } catch (e) { word = { ok: false, tao_moi: 0, loi: [String(e?.message || e)] }; }
+    return { ok: r.ok, ...r, word };
   });
   dangKy("anh:xem-truoc", (tkbId, p) => anh.xemTruocAnh(tkbId, {
     ...p, html: duongDan.ve_tkb_html, thuMucTam: app.getPath("temp"),
@@ -291,14 +303,16 @@ export function dangKyTatCa() {
       anhData = a?.anh || null;
     } catch { /* chưa có ảnh thì hiện rõ là chưa có */ }
     const tenTep = (p2) => (p2 ? path.basename(p2) : "");
-    let coTep = 0;
+    let coTep = 0, coTep2 = 0;
     try { coTep = m.docx_path ? fs.statSync(m.docx_path).size : 0; } catch { /* */ }
+    try { coTep2 = m.docx_path_2 ? fs.statSync(m.docx_path_2).size : 0; } catch { /* */ }
     return {
       ok: true,
       nguoi_ten: m.nguoi_ten, sdt: m.sdt, la_ban: m.la_ban,
       caption: m.caption || "",
       anh: anhData, co_anh: Boolean(m.anh_path), anh_ten: tenTep(m.anh_path),
       co_docx: Boolean(m.docx_path), docx_ten: tenTep(m.docx_path), docx_co: coTep,
+      docx_ten_2: tenTep(m.docx_path_2), docx_co_2: coTep2,
       loai: m.loai, ma: m.ma, so_tiet: m.so_tiet,
     };
   });

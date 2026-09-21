@@ -263,7 +263,12 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom, dsNgoai = []) {
           <label class="tich"><input type="checkbox" id="t-anh" ${tc.gui_anh !== false ? "checked" : ""}>
             <span><b>Ảnh</b> — xem ngay trên điện thoại</span></label>
           <label class="tich"><input type="checkbox" id="t-docx" ${tc.gui_docx !== false ? "checked" : ""}>
-            <span><b>Tệp Word</b> — tải về in<span class="g">Không có tệp Word thì mục này tự bỏ qua.</span></span></label>
+            <span><b>Tệp Word</b> — tải về in<span class="g">Đúng mẫu Word của Smart Scheduler, phần mềm tự tạo từ tệp Excel.</span></span></label>
+          <div class="o-nhap" style="max-width:240px"><label>Khổ file Word</label>
+            <select id="t-kho-word">
+              ${[["a4", "A4"], ["a5", "A5"], ["ca_hai", "Cả hai — A4 và A5"]].map(([v, t]) =>
+                `<option value="${v}" ${(tc.kho_word || String(cd.kho_giay_mac_dinh || "A4").toLowerCase()) === v ? "selected" : ""}>${t}</option>`).join("")}
+            </select></div>
           <div class="o-nhap" style="max-width:240px"><label>Ảnh gồm buổi nào</label>
             <select id="t-gom">
               <option value="ca_ngay" ${tc.anh_gom !== "sang" && tc.anh_gom !== "chieu" ? "selected" : ""}>Cả ngày</option>
@@ -379,6 +384,7 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom, dsNgoai = []) {
           gui_tkb_gv: g("#t-gv").checked, gui_tkb_lop_gvcn: g("#t-lop").checked,
           gui_nguoi_ngoai: g("#t-ngoai").checked || coNgoai,
           gui_anh: g("#t-anh").checked, gui_docx: g("#t-docx").checked, anh_gom: g("#t-gom").value,
+          kho_word: g("#t-kho-word")?.value || "a4",
           bo_qua_trung: g("#t-botrung").checked, chi_thay_doi: g("#t-thaydoi").checked,
           chi_gvcn: false,
           // Chọn hết thì để trống cho nhẹ, chọn một phần mới lọc theo danh sách

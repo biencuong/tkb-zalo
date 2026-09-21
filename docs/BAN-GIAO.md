@@ -1,6 +1,6 @@
 # Bàn giao — TKB Zalo
 
-Cập nhật: 21/9/2026 · Bản 0.1.13 · Đã phát hành trên GitHub và cài chạy thật trên máy `bienc`
+Cập nhật: 21/9/2026 · Bản 0.1.14 · Đã phát hành trên GitHub và cài chạy thật trên máy `bienc`
 
 ## 1. Trạng thái
 
@@ -105,12 +105,15 @@ mà trình nghe chưa bật bao giờ — sửa bằng `api.listener.start({retr
 | 0.1.11 | Sửa lỗi listener chồng; lời nhắn riêng cho nhóm; chỉnh "ai nhận gì" ngay trong hộp gửi; biểu mẫu in chuẩn; nút chờ "Lên CSDL ngành" |
 | 0.1.12 | **Chỉ cần một tệp Excel**: bỏ khoá "phải nạp giáo viên trước", tạo đủ 40/40 giáo viên kể cả chủ nhiệm không dạy; một hộp **Xem thử và nạp dữ liệu**; **Xoá thời khoá biểu** từng số / từng đợt / toàn bộ; **xoá toàn bộ giáo viên**; hướng dẫn viết lại theo luồng đơn giản |
 | 0.1.13 | Bước **Gửi** mở khi có thời khoá biểu và ít nhất 1 số điện thoại hoặc 1 nhóm Zalo; chưa kết nối Zalo không khoá (bấm Gửi là hiện QR); Kết nối Zalo không bao giờ khoá |
+| 0.1.14 | **Tự tạo file Word** đúng mẫu Smart Scheduler (A4 + A5) từ dữ liệu Excel; gửi chọn khổ **A4 / A5 / cả hai**; sửa thanh bên chặn Gửi bằng trạng thái cũ; lời nhắn không ảnh gửi đúng vào nhóm |
 
 **Phát hành:** kho công khai `github.com/biencuong/tkb-zalo`. Quy trình mỗi bản: tăng `version` →
 viết khối đầu `GHI-CHU-PHAT-HANH.md` → `npm test` → `npx electron-builder --win nsis
 -c.directories.output=<thư mục ngoài dự án>` → `gh release create vX.Y.Z <exe> --notes-file <ghi chú>`.
 Ghi chú **phải có dòng** `**SHA-256:** \`<64 ký tự hex>\`` thì bộ tự cập nhật mới kiểm được tệp tải về.
 Bộ cài ~100 MB nên **chỉ đính kèm bản phát hành, không commit vào kho**.
+
+**Giữ 3 bản phát hành mới nhất** (người dùng yêu cầu 21/9/2026): sau `gh release create` chạy `bash scripts/don-ban-cu.sh` — xoá bản phát hành + tệp cài cũ, **giữ git tag**. Phát hành xong **cài ngay lên máy người dùng**.
 
 **Việc còn lại:**
 1. Chưa thử gửi cho **nhiều người một lượt**.

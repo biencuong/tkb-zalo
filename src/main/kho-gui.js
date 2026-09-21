@@ -12,6 +12,7 @@ export const TUY_CHON_MAC_DINH = {
   gui_nguoi_ngoai: false,    // người ngoài danh sách theo đăng ký
   gui_anh: true,
   gui_docx: true,
+  kho_word: "",       // "a4" | "a5" | "ca_hai"; trống = theo Cài đặt → khổ giấy mặc định
   chi_thay_doi: false,       // chỉ gửi người có thay đổi so với lần gửi trước
   // Mặc định KHÔNG chặn gửi lại. Gửi lại là việc bình thường: giáo viên xoá mất tin,
   // đổi máy, hoặc đơn giản là nhà trường muốn nhắc lại. Phần mềm vẫn NHẬN RA và ghi rõ
@@ -45,6 +46,17 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
   // Nhóm Zalo đọc chung nên lời nhắn khác hẳn: xem CAI_DAT_MAC_DINH.mau_tin_nhom_*
   const mauNhomLop = tuyChonVao.mau_tin_nhom_lop || layCaiDat("mau_tin_nhom_lop") || mauLop;
   const mauNhomGv = tuyChonVao.mau_tin_nhom_gv || layCaiDat("mau_tin_nhom_gv") || mauGv;
+  const khoWord = String(tc.kho_word || layCaiDat("kho_giay_mac_dinh") || "a4").toLowerCase();
+  /** Tệp Word gửi đi theo khổ đã chọn; thiếu khổ đó thì lùi về khổ còn lại. */
+  const wordCua = (x) => {
+    if (!tc.gui_docx) return { co_docx: false, docx_path: "", docx_path_2: "" };
+    const a4 = x.docx_a4 || "", a5 = x.docx_a5 || "", cu = x.docx_path || "";
+    let p1, p2 = "";
+    if (khoWord === "ca_hai") { p1 = a4 || a5 || cu; p2 = a4 && a5 ? a5 : ""; }
+    else if (khoWord === "a5") p1 = a5 || a4 || cu;
+    else p1 = a4 || a5 || cu;
+    return { co_docx: Boolean(p1), docx_path: p1 || "", docx_path_2: p2 };
+  };
   const bienChung = { truong: tenTruong, so_tkb: t.so_tkb, ngay: ngayVn(t.ngay_ap_dung), nam_hoc: t.nam_hoc, hoc_ky: t.hoc_ky ?? "" };
 
   const chon = tc.chi_chon ? new Set(tc.chi_chon.map((x) => `${x.nguoi_loai}:${x.nguoi_id}`)) : null;
@@ -92,8 +104,8 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
         nguoi_loai: "gv", nguoi_id: g.giao_vien_id, nguoi_ten: g.ho_ten,
         sdt: g.dien_thoai, uid: g.zalo_uid, la_ban: g.la_ban,
         van_tay: g.van_tay,
-        co_anh: tc.gui_anh && Boolean(g.anh_path), co_docx: tc.gui_docx && Boolean(g.docx_path),
-        anh_path: tc.gui_anh ? g.anh_path : "", docx_path: tc.gui_docx ? g.docx_path : "",
+        co_anh: tc.gui_anh && Boolean(g.anh_path), ...wordCua(g),
+        anh_path: tc.gui_anh ? g.anh_path : "",
         so_tiet: g.so_tiet_dem, lop_cn: g.lop_cn,
         caption: dungTin(mauGv, { ...bienChung, ten: g.ho_ten, gv: g.ho_ten, lop: g.lop_cn, so_tiet: g.so_tiet_dem }),
       });
@@ -114,8 +126,8 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
         nguoi_loai: "gv", nguoi_id: l.giao_vien_id, nguoi_ten: l.ho_ten,
         sdt: l.dien_thoai, uid: l.zalo_uid, la_ban: l.la_ban,
         van_tay: l.van_tay,
-        co_anh: tc.gui_anh && Boolean(l.anh_path), co_docx: tc.gui_docx && Boolean(l.docx_path),
-        anh_path: tc.gui_anh ? l.anh_path : "", docx_path: tc.gui_docx ? l.docx_path : "",
+        co_anh: tc.gui_anh && Boolean(l.anh_path), ...wordCua(l),
+        anh_path: tc.gui_anh ? l.anh_path : "",
         so_tiet: l.so_tiet, lop_cn: l.lop,
         caption: dungTin(mauLop, { ...bienChung, ten: l.ho_ten, gv: l.ho_ten, lop: l.lop, so_tiet: l.so_tiet }),
       });
@@ -146,8 +158,8 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
           loai: "lop", ma: l.lop, nguoi_loai: "ngoai", nguoi_id: n.id, nguoi_ten: n.ho_ten,
           sdt: n.dien_thoai, uid: n.zalo_uid, la_ban: n.la_nhom ? 1 : n.la_ban, la_nhom: n.la_nhom,
           van_tay: l.van_tay,
-          co_anh: tc.gui_anh && Boolean(l.anh_path), co_docx: tc.gui_docx && Boolean(l.docx_path),
-          anh_path: tc.gui_anh ? l.anh_path : "", docx_path: tc.gui_docx ? l.docx_path : "",
+          co_anh: tc.gui_anh && Boolean(l.anh_path), ...wordCua(l),
+          anh_path: tc.gui_anh ? l.anh_path : "",
           so_tiet: l.so_tiet, lop_cn: l.lop,
           caption: dungTin(n.la_nhom ? mauNhomLop : mauLop,
             { ...bienChung, ten: n.ho_ten, nhom: n.ho_ten, lop: l.lop, so_tiet: l.so_tiet }),
@@ -163,8 +175,8 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
           loai: "gv", ma: g.ma_trong_tkb, nguoi_loai: "ngoai", nguoi_id: n.id, nguoi_ten: n.ho_ten,
           sdt: n.dien_thoai, uid: n.zalo_uid, la_ban: n.la_nhom ? 1 : n.la_ban, la_nhom: n.la_nhom,
           van_tay: g.van_tay,
-          co_anh: tc.gui_anh && Boolean(g.anh_path), co_docx: tc.gui_docx && Boolean(g.docx_path),
-          anh_path: tc.gui_anh ? g.anh_path : "", docx_path: tc.gui_docx ? g.docx_path : "",
+          co_anh: tc.gui_anh && Boolean(g.anh_path), ...wordCua(g),
+          anh_path: tc.gui_anh ? g.anh_path : "",
           so_tiet: g.so_tiet_dem, lop_cn: g.lop_cn,
           caption: dungTin(n.la_nhom ? mauNhomGv : mauGv, {
             ...bienChung, nhom: n.ho_ten, gv: g.ho_ten,
@@ -187,7 +199,7 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
     thieu_uid: muc.filter((m) => m.bo_qua === "khong_co_uid").length,
     chua_la_ban: seGui.filter((m) => m.la_ban === 0).length,
     thieu_tep: muc.filter((m) => m.bo_qua === "khong_co_tep").length,
-    so_tin: seGui.reduce((s, m) => s + (m.co_anh ? 1 : 0) + (m.co_docx ? 1 : 0), 0),
+    so_tin: seGui.reduce((s, m) => s + (m.co_anh ? 1 : 0) + (m.co_docx ? 1 : 0) + (m.docx_path_2 ? 1 : 0), 0),
     so_nguoi: new Set(seGui.map((m) => `${m.nguoi_loai}:${m.nguoi_id}`)).size,
   };
 
@@ -224,12 +236,12 @@ export function taoDotGui(tkbId, tuyChon, muc, { ten = "", zaloUid = "", zaloTen
       if (m.bo_qua) boQua++; else n++;
       chay(
         `INSERT INTO viec_gui(dot_id,tkb_id,loai,ma,nguoi_loai,nguoi_id,nguoi_ten,sdt,uid,la_ban,la_nhom,caption,
-         anh_path,anh_w,anh_h,docx_path,van_tay,trung,buoc,trang_thai,ly_do_bo_qua)
-         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+         anh_path,anh_w,anh_h,docx_path,docx_path_2,van_tay,trung,buoc,trang_thai,ly_do_bo_qua)
+         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
         dotId, tkbId, m.loai, m.ma, m.nguoi_loai, m.nguoi_id, m.nguoi_ten, m.sdt || "", m.uid || "",
         m.la_ban == null ? -1 : m.la_ban, m.la_nhom ? 1 : 0, m.caption || "",
         m.co_anh ? m.anh_path : "", m.anh_w || null, m.anh_h || null,
-        m.co_docx ? m.docx_path : "", m.van_tay || "", m.trung ? 1 : 0,
+        m.co_docx ? m.docx_path : "", m.co_docx ? (m.docx_path_2 || "") : "", m.van_tay || "", m.trung ? 1 : 0,
         m.co_anh ? "gui_anh" : "gui_file", trangThai, m.ly_do || ""
       );
     }
@@ -254,7 +266,8 @@ export function ghiLichSu(viec, ketQua, thongTin = {}) {
     viec.loai, viec.ma, viec.nguoi_loai, viec.nguoi_id, viec.nguoi_ten, viec.sdt, viec.uid,
     viec.la_ban == null ? -1 : viec.la_ban,
     viec.anh_path ? 1 : 0, viec.docx_path ? 1 : 0, rutGon(viec.caption),
-    viec.anh_path ? path.basename(viec.anh_path) : "", viec.docx_path ? path.basename(viec.docx_path) : "",
+    viec.anh_path ? path.basename(viec.anh_path) : "",
+    [viec.docx_path, viec.docx_path_2].filter(Boolean).map((f) => path.basename(f)).join(" · "),
     viec.van_tay, ketQua, thongTin.ma_loi ?? null, rutGon(thongTin.loi || "", 300),
     thongTin.msg_id_anh || "", thongTin.msg_id_file || "", thongTin.zalo_uid_gui || ""
   );

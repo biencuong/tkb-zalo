@@ -108,6 +108,7 @@ Cập nhật **không mất** dữ liệu. Gỡ app cũng không xoá thư mục
 - **Tạo danh sách giáo viên** từ bảng phân công và tự nhận ra mã viết tắt của từng người (`P.Ha`, `Thuy Ha`…) — kể cả chủ nhiệm không dạy tiết nào.
 - **Ghép từng tiết** vào đúng giáo viên, đúng lớp.
 - **Vẽ ảnh thời khoá biểu** cho từng giáo viên và từng lớp, xem ngay trên điện thoại.
+- **Tạo file Word để in** cho từng giáo viên và từng lớp, **đúng mẫu Word của Smart Scheduler**, cả khổ **A4** và **A5**.
 
 Việc duy nhất phải làm thêm: **điền số điện thoại** giáo viên, vì tệp Excel không có số. Chỉ làm một lần, những lần sau phần mềm nhớ.
 
@@ -116,7 +117,7 @@ Việc duy nhất phải làm thêm: **điền số điện thoại** giáo viê
 | Tệp | Lấy ở đâu trên Smart Scheduler | Được thêm gì |
 |---|---|---|
 | **Danh sách giáo viên** có số điện thoại | Mục **Dữ liệu giáo viên**, chọn **Excel | Copy file dữ liệu mẫu**. Mở ra điền danh sách và số điện thoại rồi lưu. | Khỏi gõ số điện thoại từng người. |
-| **Hai tệp Word** | Mục **In ấn → In TKB cá nhân**: vào **In TKB giáo viên**, tích **Chọn tất cả**, chọn khổ **A4** hoặc **A5**, bấm **Chấp nhận**. Làm tương tự với **In TKB lớp học**. Mỗi lần ra một tệp Word. | Giáo viên nhận thêm **file Word để in**. |
+| **Tệp Word** — thường **không cần** | Mục **In ấn → In TKB cá nhân**: **In TKB giáo viên** / **In TKB lớp học**, tích **Chọn tất cả**, chọn khổ, bấm **Chấp nhận**. | Chỉ khi bạn đã **sửa tay** trên Word của Smart Scheduler và muốn gửi đúng bản đó. Phần mềm dùng tệp này thay cho bản tự tạo cùng khổ. |
 
 
 > **Có thêm tệp thì thả cùng lượt với tệp Excel tổng.** Thả cùng lượt thì tệp Word mới biết nó thuộc thời khoá biểu số mấy.
@@ -238,7 +239,13 @@ Nạp xong, thời khoá biểu hiện ở tab **Thời khoá biểu** của tra
 
 ### Ảnh
 
-Mỗi giáo viên và mỗi lớp một ảnh, chữ to, xem rõ trên điện thoại. Bấm **Xem** hoặc **Trên ĐT** ở từng dòng để soi trước. Sửa chủ nhiệm xong thì bấm **Tạo ảnh** để vẽ lại.
+Mỗi giáo viên và mỗi lớp một ảnh, chữ to, xem rõ trên điện thoại. Bấm **Xem** hoặc **Trên ĐT** ở từng dòng để soi trước. Sửa chủ nhiệm xong thì bấm **Tạo ảnh + Word** để tạo lại.
+
+### File Word
+
+Nạp xong là phần mềm **tự tạo file Word** cho từng giáo viên và từng lớp, **đúng mẫu Word của Smart Scheduler** (cùng khung, phông, cách ghi “Môn - Lớp”), cả khổ **A4** và **A5**. Tệp nằm trong thư mục `wordgv` và `wordlop`, tên có đuôi `_A4` / `_A5`.
+
+Nếu bạn có thả tệp Word của Smart Scheduler, phần mềm dùng tệp đó cho khổ tương ứng và chỉ tự tạo khổ còn lại.
 
 ### Xoá thời khoá biểu
 
@@ -364,7 +371,7 @@ Còn người **chưa dò Zalo** thì hộp hiện nút **Dò Zalo ngay** — d�
 |   |   |
 |---|---|
 | **Gửi gì** | TKB cá nhân · TKB lớp cho chủ nhiệm · người ngoài danh sách. Tích bao nhiêu cũng được. |
-| **Dạng tệp** | Ảnh · Word · cả hai. Ảnh chọn được cả ngày, chỉ sáng, hoặc chỉ chiều. |
+| **Dạng tệp** | Ảnh · Word · cả hai. Ảnh chọn được cả ngày, chỉ sáng, hoặc chỉ chiều. **Khổ file Word:** A4, A5, hoặc **cả hai** (người nhận được hai tệp). Lựa chọn được nhớ cho lần sau; mặc định theo **Cài đặt → Khổ giấy mặc định**. |
 | **Tránh trùng** | Bỏ qua người đã nhận y nguyên · chỉ gửi người có thay đổi (mục 10). |
 | **Người nhận** | Tất cả · chỉ chủ nhiệm · chọn tay từng người. |
 | **Lời nhắn** | Sửa ngay trong hộp. |

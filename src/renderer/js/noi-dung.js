@@ -132,6 +132,8 @@ Tự kiểm tra bất cứ lúc nào: bấm số hiệu ở cuối thanh bên, h
       (<span class="mono">P.Ha</span>, <span class="mono">Thuy Ha</span>…) — kể cả chủ nhiệm không dạy tiết nào.</li>
   <li><b>Ghép từng tiết</b> vào đúng giáo viên, đúng lớp.</li>
   <li><b>Vẽ ảnh thời khoá biểu</b> cho từng giáo viên và từng lớp, xem ngay trên điện thoại.</li>
+  <li><b>Tạo file Word để in</b> cho từng giáo viên và từng lớp, <b>đúng mẫu Word của Smart Scheduler</b>,
+      cả khổ <b>A4</b> và <b>A5</b>.</li>
 </ul>
 <p>Việc duy nhất phải làm thêm: <b>điền số điện thoại</b> giáo viên, vì tệp Excel không có số.
 Chỉ làm một lần, những lần sau phần mềm nhớ.</p>
@@ -142,11 +144,11 @@ Chỉ làm một lần, những lần sau phần mềm nhớ.</p>
       <td>Mục <b>Dữ liệu giáo viên</b>, chọn <b>Excel | Copy file dữ liệu mẫu</b>.
           Mở ra điền danh sách và số điện thoại rồi lưu.</td>
       <td>Khỏi gõ số điện thoại từng người.</td></tr>
-  <tr><td><b>Hai tệp Word</b></td>
-      <td>Mục <b>In ấn → In TKB cá nhân</b>: vào <b>In TKB giáo viên</b>, tích <b>Chọn tất cả</b>,
-          chọn khổ <b>A4</b> hoặc <b>A5</b>, bấm <b>Chấp nhận</b>. Làm tương tự với <b>In TKB lớp học</b>.
-          Mỗi lần ra một tệp Word.</td>
-      <td>Giáo viên nhận thêm <b>file Word để in</b>.</td></tr>
+  <tr><td><b>Tệp Word</b> — thường <b>không cần</b></td>
+      <td>Mục <b>In ấn → In TKB cá nhân</b>: <b>In TKB giáo viên</b> / <b>In TKB lớp học</b>, tích
+          <b>Chọn tất cả</b>, chọn khổ, bấm <b>Chấp nhận</b>.</td>
+      <td>Chỉ khi bạn đã <b>sửa tay</b> trên Word của Smart Scheduler và muốn gửi đúng bản đó.
+          Phần mềm dùng tệp này thay cho bản tự tạo cùng khổ.</td></tr>
 </tbody></table>
 <div class="bao tin"><b>Có thêm tệp thì thả cùng lượt với tệp Excel tổng.</b>
   <span class="sua">Thả cùng lượt thì tệp Word mới biết nó thuộc thời khoá biểu số mấy.</span></div>
@@ -259,7 +261,14 @@ Nút <b>⋯</b> mở hộp đầy đủ khi cần sửa nhiều trường một 
 
 <h3>Ảnh</h3>
 <p>Mỗi giáo viên và mỗi lớp một ảnh, chữ to, xem rõ trên điện thoại. Bấm <b>Xem</b> hoặc <b>Trên ĐT</b>
-ở từng dòng để soi trước. Sửa chủ nhiệm xong thì bấm <b>Tạo ảnh</b> để vẽ lại.</p>
+ở từng dòng để soi trước. Sửa chủ nhiệm xong thì bấm <b>Tạo ảnh + Word</b> để tạo lại.</p>
+
+<h3>File Word</h3>
+<p>Nạp xong là phần mềm <b>tự tạo file Word</b> cho từng giáo viên và từng lớp, <b>đúng mẫu Word của
+Smart Scheduler</b> (cùng khung, phông, cách ghi “Môn - Lớp”), cả khổ <b>A4</b> và <b>A5</b>.
+Tệp nằm trong thư mục <span class="mono">word\gv</span> và <span class="mono">word\lop</span>,
+tên có đuôi <span class="mono">_A4</span> / <span class="mono">_A5</span>.</p>
+<p>Nếu bạn có thả tệp Word của Smart Scheduler, phần mềm dùng tệp đó cho khổ tương ứng và chỉ tự tạo khổ còn lại.</p>
 
 <h3>Xoá thời khoá biểu</h3>
 <p>Bấm <b>Xoá…</b> ở đầu khu Thời khoá biểu. Trong hộp xoá, chọn một trong ba cách:</p>
@@ -377,7 +386,9 @@ Bên dưới chia ba tab:</p>
 với số liệu mới, khỏi phải thoát ra làm rồi vào lại.</p>
 <table class="b"><tbody>
   <tr><td style="width:26%"><b>Gửi gì</b></td><td>TKB cá nhân · TKB lớp cho chủ nhiệm · người ngoài danh sách. Tích bao nhiêu cũng được.</td></tr>
-  <tr><td><b>Dạng tệp</b></td><td>Ảnh · Word · cả hai. Ảnh chọn được cả ngày, chỉ sáng, hoặc chỉ chiều.</td></tr>
+  <tr><td><b>Dạng tệp</b></td><td>Ảnh · Word · cả hai. Ảnh chọn được cả ngày, chỉ sáng, hoặc chỉ chiều.
+      <b>Khổ file Word:</b> A4, A5, hoặc <b>cả hai</b> (người nhận được hai tệp). Lựa chọn được nhớ cho lần sau;
+      mặc định theo <b>Cài đặt → Khổ giấy mặc định</b>.</td></tr>
   <tr><td><b>Tránh trùng</b></td><td>Bỏ qua người đã nhận y nguyên · chỉ gửi người có thay đổi (mục 10).</td></tr>
   <tr><td><b>Người nhận</b></td><td>Tất cả · chỉ chủ nhiệm · chọn tay từng người.</td></tr>
   <tr><td><b>Lời nhắn</b></td><td>Sửa ngay trong hộp.</td></tr>

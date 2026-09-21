@@ -5,6 +5,18 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.13 — Có 1 số điện thoại hoặc 1 nhóm Zalo là mở được Gửi
+
+- **Bước Gửi mở** khi có thời khoá biểu và **ít nhất 1 người nhận được tin**: 1 số điện thoại (giáo viên
+  hoặc người ngoài danh sách) **hoặc 1 nhóm Zalo**. Trước đây phải dò ra Zalo của ít nhất một giáo viên,
+  nên có số rồi mà vẫn khoá, và gửi riêng vào nhóm cũng bị khoá.
+- **Chưa kết nối Zalo không khoá Gửi nữa**: bấm Gửi là hộp quét mã QR tự hiện, quét xong đi tiếp.
+  Zalo của giáo viên cũng tự dò ngay trong hộp gửi.
+- **Kết nối Zalo không bao giờ khoá** — chọn nhóm Zalo phải làm ở chính màn này.
+- Rê chuột vào bước còn khoá thấy đúng thứ còn thiếu.
+
+---
+
 ## 0.1.12 — Chỉ cần một tệp Excel, xem thử rồi mới nạp, xoá thời khoá biểu và giáo viên
 
 ### Chỉ cần một tệp Excel

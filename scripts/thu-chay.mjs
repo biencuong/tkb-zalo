@@ -201,6 +201,10 @@ app.whenReady().then(async () => {
     kiem(!(thieu.includes("chưa kết nối Zalo") && td.zalo?.status === "da_ket_noi"),
       `bước Gửi nêu đúng thứ còn thiếu (${thieu || "không thiếu gì"})`);
     kiem(!b3.khoa || (b3.thieu || []).length > 0, "bước bị khoá luôn nói rõ vì sao");
+    // Chỉ khoá vì thứ phần mềm không tự làm được. Dữ liệu mẫu có thời khoá biểu và 1 số điện thoại,
+    // chưa kết nối Zalo → Gửi vẫn phải MỞ (bấm là hộp QR tự hiện), Kết nối Zalo không bao giờ khoá.
+    kiem(!b3.khoa, `có thời khoá biểu + ít nhất 1 số điện thoại thì mở bước Gửi (${td.zalo?.status || "?"})`);
+    kiem(!td?.buoc?.[1]?.khoa, "bước Kết nối Zalo không bao giờ khoá");
 
     // Đèn nhịp góc phải: xám đứng yên khi chưa nối, xanh đập khi đã nối.
     const den = await cua.webContents.executeJavaScript(`(async () => {

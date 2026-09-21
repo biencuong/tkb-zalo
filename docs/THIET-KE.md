@@ -324,3 +324,16 @@ người dùng điền trên bảng. Nạp kèm tệp danh sách giáo viên th�
 
 Lịch sử gửi luôn giữ (khoá ngoại `SET NULL`). Xoá giáo viên thì thời khoá biểu mất liên kết
 (`tkb_gv.giao_vien_id`, `tiet.giao_vien_id` về NULL) — nạp lại tệp thời khoá biểu để ghép lại.
+
+## Khi nào bước Gửi mở
+
+`app:tien-do` chỉ khoá vì thứ phần mềm **không tự làm được**:
+
+| Bước | Khoá khi | Không khoá vì |
+|---|---|---|
+| Dữ liệu | không bao giờ | — |
+| Kết nối Zalo | không bao giờ (chọn nhóm Zalo phải làm ở chính màn này) | chưa có giáo viên |
+| Gửi | chưa có thời khoá biểu, **hoặc** chưa có ai để gửi (0 số điện thoại giáo viên, 0 số người ngoài, 0 nhóm Zalo có mã nhóm) | chưa kết nối Zalo (bấm Gửi là `canZalo` mở hộp QR), chưa dò Zalo (hộp gửi tự dò), chưa đủ ảnh |
+
+Bản trước bắt dò được Zalo của ít nhất 1 **giáo viên** mới mở — nhóm Zalo không được tính và người đã có
+số điện thoại vẫn bị khoá, trong khi hộp gửi tự dò được. Kiểm trong `scripts/thu-chay.mjs`.

@@ -42,7 +42,7 @@ Lần sau có thời khoá biểu mới: xuất tệp mới, thả vào, nạp, 
 
 ### Màn hình có gì
 
-Thanh bên trái là **ba bước theo đúng thứ tự**: Dữ liệu → Kết nối Zalo → Gửi. Bước sau bị khoá cho tới khi bước trước xong, rê chuột vào là thấy còn thiếu gì.
+Thanh bên trái là **ba bước theo đúng thứ tự**: Dữ liệu → Kết nối Zalo → Gửi. **Gửi** chỉ khoá khi chưa có thời khoá biểu hoặc chưa có ai để gửi — cần ít nhất **1 số điện thoại** hoặc **1 nhóm Zalo**. Chưa kết nối Zalo vẫn bấm Gửi được: hộp quét mã QR tự hiện, quét xong đi tiếp. Rê chuột vào bước bị khoá là thấy còn thiếu gì.
 
 - **Dữ liệu** gom cả ba việc vào một trang: nhập tệp, danh sách giáo viên, thời khoá biểu. Thanh nhảy nhanh ở đầu trang đưa tới đúng khu.
 - Nút **«** ở góc trên thanh bên (hoặc **Ctrl + B**) thu gọn thanh bên còn icon kèm chữ viết tắt, để màn hình rộng hơn. Bấm lại để mở ra.

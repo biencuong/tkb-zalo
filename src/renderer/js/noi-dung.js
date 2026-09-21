@@ -55,7 +55,9 @@ Giáo viên chủ nhiệm nhận thêm thời khoá biểu lớp mình.</p>
 <p>Lần sau có thời khoá biểu mới: xuất tệp mới, thả vào, nạp, bấm <b>Gửi</b>.</p>
 <h3>Màn hình có gì</h3>
 <p>Thanh bên trái là <b>ba bước theo đúng thứ tự</b>: Dữ liệu → Kết nối Zalo → Gửi.
-Bước sau bị khoá cho tới khi bước trước xong, rê chuột vào là thấy còn thiếu gì.</p>
+<b>Gửi</b> chỉ khoá khi chưa có thời khoá biểu hoặc chưa có ai để gửi — cần ít nhất
+<b>1 số điện thoại</b> hoặc <b>1 nhóm Zalo</b>. Chưa kết nối Zalo vẫn bấm Gửi được: hộp quét mã QR tự hiện,
+quét xong đi tiếp. Rê chuột vào bước bị khoá là thấy còn thiếu gì.</p>
 <ul>
   <li><b>Dữ liệu</b> gom cả ba việc vào một trang: nhập tệp, danh sách giáo viên, thời khoá biểu.
       Thanh nhảy nhanh ở đầu trang đưa tới đúng khu.</li>

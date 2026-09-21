@@ -104,33 +104,42 @@ export function dangKyTatCa() {
     }
     const daKetNoi = zalo.trangThai.status === "da_ket_noi";
 
+    // Người nhận được tin: số điện thoại (giáo viên hoặc người ngoài) hoặc nhóm Zalo đã có mã nhóm.
+    const soSdtNgoai = db.mot(
+      "SELECT COUNT(*) n FROM nguoi_nhan WHERE hoat_dong=1 AND ifnull(la_nhom,0)=0 AND dien_thoai<>''").n;
+    const soNhom = db.mot(
+      "SELECT COUNT(*) n FROM nguoi_nhan WHERE hoat_dong=1 AND ifnull(la_nhom,0)=1 AND zalo_uid<>''").n;
+    const soNguoiNhan = soSdt + soSdtNgoai + soNhom;
+    const CHUA_CO_NGUOI = "chưa có ai để gửi — cần ít nhất 1 số điện thoại hoặc 1 nhóm Zalo";
+
     const b1 = { ma: "du-lieu", ten: "Dữ liệu", xong: false, thieu: [], viec: "" };
-    if (!soGv) b1.thieu.push("chưa có danh sách giáo viên");
-    if (!soSdt) b1.thieu.push("chưa ai có số điện thoại");
-    if (!soTkb) b1.thieu.push("chưa nhập thời khoá biểu");
-    else if (coAnh < canTep) b1.thieu.push(`mới có ${coAnh}/${canTep} ảnh`);
+    if (!soTkb) b1.thieu.push("chưa nạp thời khoá biểu");
+    if (!soNguoiNhan) b1.thieu.push(CHUA_CO_NGUOI);
+    if (soTkb && coAnh < canTep) b1.thieu.push(`mới có ${coAnh}/${canTep} ảnh`);
     b1.xong = b1.thieu.length === 0;
-    b1.viec = !soGv ? "Nhập danh sách giáo viên"
-      : !soSdt ? "Bổ sung số điện thoại"
-      : !soTkb ? "Nhập thời khoá biểu"
+    b1.viec = !soTkb ? "Nạp tệp Excel từ Smart Scheduler"
+      : !soNguoiNhan ? "Điền số điện thoại hoặc chọn nhóm Zalo"
       : coAnh < canTep ? "Tạo ảnh thời khoá biểu" : "Đã đủ dữ liệu";
 
-    const b2 = { ma: "zalo", ten: "Kết nối Zalo", xong: false, thieu: [], viec: "", khoa: !soGv };
+    // Không khoá: chọn nhóm Zalo phải kết nối trước, và kết nối lúc nào cũng được.
+    const b2 = { ma: "zalo", ten: "Kết nối Zalo", xong: false, thieu: [], viec: "", khoa: false };
     if (!daKetNoi) b2.thieu.push("chưa quét mã QR");
-    if (!soUid) b2.thieu.push("chưa dò được Zalo của ai");
-    b2.xong = daKetNoi && soUid > 0;
-    b2.viec = !daKetNoi ? "Quét mã QR" : !soUid ? "Dò Zalo theo số điện thoại" : "Đã sẵn sàng";
-    if (b2.khoa) b2.thieu = ["cần có danh sách giáo viên trước"];
+    b2.xong = daKetNoi;
+    b2.viec = !daKetNoi ? "Quét mã QR"
+      : soUid || soNhom ? "Đã sẵn sàng" : "Đã kết nối — bấm Gửi, phần mềm tự dò Zalo";
 
-    const b3 = { ma: "gui", ten: "Gửi", xong: false, thieu: [], viec: "", khoa: !(b1.xong && b2.xong) };
+    // Chỉ khoá vì thứ phần mềm không tự làm được: chưa có thời khoá biểu, chưa có ai để gửi.
+    // Chưa kết nối Zalo → bấm Gửi là hộp QR tự hiện; chưa dò Zalo → hộp gửi tự dò.
+    const b3 = { ma: "gui", ten: "Gửi", xong: false, thieu: [], viec: "", khoa: !(soTkb && soNguoiNhan) };
     const daGui = db.mot("SELECT COUNT(*) n FROM lich_su_gui WHERE ket_qua='xong'").n;
     b3.xong = daGui > 0;
-    b3.viec = b3.khoa ? "Hoàn tất hai bước trên" : daGui ? "Đã gửi " + daGui + " lượt" : "Gửi thời khoá biểu";
-    // Nêu ĐÚNG thứ còn thiếu, đừng nói gộp. Trước đây hễ bước 2 chưa xong là báo
-    // "chưa kết nối Zalo", nên người đã quét QR xong vẫn thấy câu đó và không hiểu vì sao.
+    b3.viec = b3.khoa ? "Cần thời khoá biểu và người nhận"
+      : daGui ? "Đã gửi " + daGui + " lượt"
+      : !daKetNoi ? "Bấm là hiện mã QR Zalo" : "Gửi thời khoá biểu";
+    // Nêu ĐÚNG thứ còn thiếu, đừng nói gộp.
     if (b3.khoa) {
-      b3.thieu.push(...b1.thieu, ...b2.thieu);
-      if (!b3.thieu.length) b3.thieu.push("hoàn tất hai bước trên");
+      if (!soTkb) b3.thieu.push("chưa nạp thời khoá biểu");
+      if (!soNguoiNhan) b3.thieu.push(CHUA_CO_NGUOI);
     }
 
     return {

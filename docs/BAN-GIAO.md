@@ -1,6 +1,6 @@
 # Bàn giao — TKB Zalo
 
-Cập nhật: 20/9/2026 · Bản 0.1.0 · Đã đóng gói và chạy thử trên máy `bienc`
+Cập nhật: 21/9/2026 · Bản 0.1.11 · Đã phát hành trên GitHub và cài chạy thật trên máy `bienc`
 
 ## 1. Trạng thái
 
@@ -88,6 +88,39 @@ npm run dist                          # đóng gói + tự kiểm gói
 | Bản cài | `%LOCALAPPDATA%\Programs\TKBZalo\` |
 
 Gỡ phần mềm **không xoá** dữ liệu trong hai thư mục đầu.
+
+## 5b. Làm thêm trong ngày 21/9/2026 (bản 0.1.4 → 0.1.11)
+
+**Đã gửi thật thành công** (tài khoản "Trần Lụa" → một giáo viên): ảnh và tệp Word đều tới nơi.
+Lỗi đắt nhất: tệp Word treo vô hạn không báo gì vì `zca-js` chờ sự kiện WebSocket `file_done`
+mà trình nghe chưa bật bao giờ — sửa bằng `api.listener.start({retryOnClose:true})` + hạn chờ 120 giây.
+
+| Bản | Nội dung |
+|---|---|
+| 0.1.4 | Sửa lỗi không gửi được tệp Word; bật trình nghe để biết tin đã tới / đã xem |
+| 0.1.5–0.1.6 | Ảnh thời khoá biểu vẽ lại chuẩn màn hình điện thoại; tối thiểu chỉ cần MỘT tệp Excel |
+| 0.1.7 | Gửi trùng chỉ cảnh báo, không chặn (có migration mở khoá một lần) |
+| 0.1.8–0.1.9 | Gửi vào **nhóm Zalo**: chọn nhóm từ danh sách, dùng mã nhóm, không cần số điện thoại |
+| 0.1.10 | Hộp chọn "nhận thời khoá biểu nào" tách hai cột lớp \| giáo viên |
+| 0.1.11 | Sửa lỗi listener chồng; lời nhắn riêng cho nhóm; chỉnh "ai nhận gì" ngay trong hộp gửi; biểu mẫu in chuẩn; nút chờ "Lên CSDL ngành" |
+
+**Phát hành:** kho công khai `github.com/biencuong/tkb-zalo`. Quy trình mỗi bản: tăng `version` →
+viết khối đầu `GHI-CHU-PHAT-HANH.md` → `npm test` → `npx electron-builder --win nsis
+-c.directories.output=<thư mục ngoài dự án>` → `gh release create vX.Y.Z <exe> --notes-file <ghi chú>`.
+Ghi chú **phải có dòng** `**SHA-256:** \`<64 ký tự hex>\`` thì bộ tự cập nhật mới kiểm được tệp tải về.
+Bộ cài ~100 MB nên **chỉ đính kèm bản phát hành, không commit vào kho**.
+
+**Việc còn lại:**
+1. Chưa thử gửi cho **nhiều người một lượt**.
+2. Tin gửi vào **nhóm Zalo** đã sinh đúng việc gửi kèm mã nhóm, nhưng chưa xác nhận tin nằm trong
+   nhóm thật.
+3. Bộ cài **chưa ký số** → SmartScreen cảnh báo lần đầu.
+4. **Lên CSDL ngành** mới có nút chờ. Muốn làm tiếp phải có tệp mẫu nhập tải từ tài khoản CSDL của
+   trường — không có API công khai (xem `KINH-NGHIEM.md` 21/9).
+5. Sau đợt gửi thật đầu tiên: xem `lich_su_gui.ma_loi` để lập bảng mã lỗi Zalo.
+
+**Tài liệu giới thiệu:** `docs/TIN-GIOI-THIEU-ZALO.txt` — ba bản tin dán thẳng vào Zalo kèm link
+tải `https://github.com/biencuong/tkb-zalo/releases/latest`.
 
 ## 6. Cảnh báo giữ nguyên, đừng bỏ
 

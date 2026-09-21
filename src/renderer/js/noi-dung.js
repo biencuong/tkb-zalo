@@ -59,8 +59,31 @@ Bước sau bị khoá cho tới khi bước trước xong, rê chuột vào là
       Thanh nhảy nhanh ở đầu trang đưa tới đúng khu.</li>
   <li>Nút <b>«</b> ở góc trên thanh bên (hoặc <b>Ctrl + B</b>) thu gọn thanh bên còn icon kèm chữ viết tắt,
       để màn hình rộng hơn. Bấm lại để mở ra.</li>
-  <li>Cuối thanh bên là nút <b>Nối Zalo</b> và <b>số hiệu phiên bản</b> — bấm số hiệu là kiểm tra cập nhật.</li>
+  <li>Cuối thanh bên là <b>số hiệu phiên bản</b> — bấm vào là kiểm tra cập nhật.
+      Trạng thái Zalo xem ở <b>đèn góc trên bên phải</b>, bấm đèn là mở luôn màn kết nối.</li>
 </ul>
+<h3>Vì sao có phần mềm này</h3>
+<p>Phát thời khoá biểu cho giáo viên, cách chính thống là <b>gửi email</b> hoặc <b>Zalo OA của trường</b>.
+Hai cách đó đều dùng được, nhưng <b>dựng lên khá phức tạp</b>:</p>
+<ul>
+  <li><b>Email:</b> phải có địa chỉ đúng của từng người, trộn thư, đính kèm đúng tệp của từng người.
+      Nhiều thầy/cô không mở hộp thư hằng ngày nên tin đến mà không ai đọc.</li>
+  <li><b>Zalo OA:</b> phải đăng ký tài khoản chính thức, xác minh, chờ duyệt, giáo viên phải
+      quan tâm OA thì mới nhận được; gửi tin theo mẫu, có loại tin phải trả phí.</li>
+</ul>
+<p>Phần mềm này <b>đi đường đơn giản</b>: dùng chính tài khoản Zalo cá nhân sẵn có, quét mã QR một lần
+là gửi được ngay — không đăng ký, không chờ duyệt, không tốn phí. Đổi lại, phải gửi chừng mực để
+tài khoản không bị hạn chế (xem mục <b>Điều khoản và rủi ro</b>), nên khuyến cáo dùng
+<b>một tài khoản Zalo phụ</b>.</p>
+<p>Ngoài việc gửi, phần mềm làm thêm mấy việc mà gửi tay không làm được:</p>
+<ul>
+  <li><b>Tự cắt</b> tệp Word của cả trường thành tệp riêng từng giáo viên, từng lớp.</li>
+  <li><b>Tự vẽ ảnh thời khoá biểu</b> gọn cho màn hình điện thoại — mở là đọc được, khỏi tải tệp.</li>
+  <li><b>Gửi vào nhóm Zalo</b> của tổ chuyên môn hay của trường.</li>
+  <li><b>Thống kê số tiết</b> theo giáo viên, lớp, môn, buổi; xuất Excel và in biểu mẫu báo cáo.</li>
+  <li><b>Lịch sử gửi</b> có trạng thái tin đã tới nơi hay chưa, ai chưa nhận được và vì sao.</li>
+</ul>
+
 <p class="nho mo">App miễn phí, không liên kết với Zalo hay phần mềm xếp TKB nào.</p>`,
   },
   {

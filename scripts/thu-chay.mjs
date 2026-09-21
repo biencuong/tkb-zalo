@@ -152,7 +152,7 @@ app.whenReady().then(async () => {
 
     const soChip = await cua.webContents.executeJavaScript(
       `document.querySelectorAll("[data-chip-zalo], #nhip-zalo").length`, true);
-    kiem(soChip >= 2, `có chỗ kết nối Zalo nhanh (${soChip} chỗ: đèn góc phải + chân thanh bên)`);
+    kiem(soChip >= 1, `có chỗ kết nối Zalo nhanh (${soChip} chỗ: đèn góc phải màn chính)`);
 
     const rongThuong = await cua.webContents.executeJavaScript(
       `import("./js/app.js").then(m => { m.datMini(true, false); return document.getElementById("ben").offsetWidth; })`, true);
@@ -164,7 +164,7 @@ app.whenReady().then(async () => {
       const vt = [...document.querySelectorAll(".mnu-vt")].map((e) => e.textContent.trim());
       const trao = [...document.querySelectorAll(".mnu-vt")].every((e) => e.scrollWidth <= e.clientWidth + 1);
       return { an_nhan_dai: an(".mnu-chu") && an("#hieu .chu"),
-               hien_viet_tat: hien(".mnu-vt") && hien(".chip-zalo .cz-chu") && hien(".chip-ban .cb-chu"),
+               hien_viet_tat: hien(".mnu-vt") && hien(".chip-ban .cb-chu"),
                du_cho: trao, chu: vt.join("|") };
     })()`, true);
     kiem(goiTat.an_nhan_dai, "thu gọn thì giấu nhãn dài");

@@ -45,7 +45,24 @@ Thanh bên trái là **ba bước theo đúng thứ tự**: Dữ liệu → Kế
 
 - **Dữ liệu** gom cả ba việc vào một trang: nhập tệp, danh sách giáo viên, thời khoá biểu. Thanh nhảy nhanh ở đầu trang đưa tới đúng khu.
 - Nút **«** ở góc trên thanh bên (hoặc **Ctrl + B**) thu gọn thanh bên còn icon kèm chữ viết tắt, để màn hình rộng hơn. Bấm lại để mở ra.
-- Cuối thanh bên là nút **Nối Zalo** và **số hiệu phiên bản** — bấm số hiệu là kiểm tra cập nhật.
+- Cuối thanh bên là **số hiệu phiên bản** — bấm vào là kiểm tra cập nhật. Trạng thái Zalo xem ở **đèn góc trên bên phải**, bấm đèn là mở luôn màn kết nối.
+
+### Vì sao có phần mềm này
+
+Phát thời khoá biểu cho giáo viên, cách chính thống là **gửi email** hoặc **Zalo OA của trường**. Hai cách đó đều dùng được, nhưng **dựng lên khá phức tạp**:
+
+- **Email:** phải có địa chỉ đúng của từng người, trộn thư, đính kèm đúng tệp của từng người. Nhiều thầy/cô không mở hộp thư hằng ngày nên tin đến mà không ai đọc.
+- **Zalo OA:** phải đăng ký tài khoản chính thức, xác minh, chờ duyệt, giáo viên phải quan tâm OA thì mới nhận được; gửi tin theo mẫu, có loại tin phải trả phí.
+
+Phần mềm này **đi đường đơn giản**: dùng chính tài khoản Zalo cá nhân sẵn có, quét mã QR một lần là gửi được ngay — không đăng ký, không chờ duyệt, không tốn phí. Đổi lại, phải gửi chừng mực để tài khoản không bị hạn chế (xem mục **Điều khoản và rủi ro**), nên khuyến cáo dùng **một tài khoản Zalo phụ**.
+
+Ngoài việc gửi, phần mềm làm thêm mấy việc mà gửi tay không làm được:
+
+- **Tự cắt** tệp Word của cả trường thành tệp riêng từng giáo viên, từng lớp.
+- **Tự vẽ ảnh thời khoá biểu** gọn cho màn hình điện thoại — mở là đọc được, khỏi tải tệp.
+- **Gửi vào nhóm Zalo** của tổ chuyên môn hay của trường.
+- **Thống kê số tiết** theo giáo viên, lớp, môn, buổi; xuất Excel và in biểu mẫu báo cáo.
+- **Lịch sử gửi** có trạng thái tin đã tới nơi hay chưa, ai chưa nhận được và vì sao.
 
 App miễn phí, không liên kết với Zalo hay phần mềm xếp TKB nào.
 

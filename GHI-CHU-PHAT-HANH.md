@@ -5,6 +5,50 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.11 — Hết thông báo lỗi lặp, lời nhắn cho nhóm, biểu mẫu in chuẩn
+
+### Sửa lỗi
+
+- **Hết cảnh báo lỗi lặp lại nhiều lần.** Bấm một nút mà hiện bốn năm thông báo
+  *“Cannot read properties of undefined”* giống hệt nhau, có khi hiện cả khi đã sang màn khác.
+  Nguyên nhân: mỗi lần vẽ lại một trang, phần mềm lại gắn thêm một bộ bắt sự kiện lên cùng một
+  khung, bộ cũ vẫn giữ dữ liệu cũ. Nay mỗi khung và mỗi hộp thoại chỉ còn đúng một bộ.
+- **Sửa lỗi khi gõ vào ô tìm** trong hộp gửi (*Cannot read properties of undefined (reading 'trim')*).
+- **Đợt gửi chạy lâu mà đóng hộp giữa chừng** không còn báo lỗi nữa.
+- Thông báo lỗi nay kèm **chỗ xảy ra** (tệp và dòng), và lỗi giống nhau trong 5 giây chỉ hiện một lần —
+  chụp màn hình là đủ để báo lỗi.
+
+### Lời nhắn gửi vào nhóm
+
+- Gửi vào nhóm Zalo nay dùng **lời nhắn riêng**: cả nhóm cùng đọc nên không xưng “gửi thầy/cô
+  &lt;tên nhóm&gt;” và không nói “lớp thầy/cô chủ nhiệm” nữa.
+- Sửa được ở **Cài đặt › Lời nhắn gửi vào nhóm Zalo** và ngay trong hộp gửi, tab *Lời nhắn*.
+  Thêm hai biến thay được: `{nhom}` (tên nhóm) và `{gv}` (tên giáo viên của thời khoá biểu).
+
+### Chỉnh “ai nhận gì” ngay trong hộp gửi
+
+- Tab **Gửi cái gì** có khối liệt kê mọi **nhóm Zalo** và **người ngoài danh sách**, mỗi dòng một ô
+  chọn *Tất cả các lớp / Tất cả giáo viên* và nút *Chọn riêng…*. Đổi là lưu ngay, danh sách gửi
+  tự tính lại — khỏi sang mục Dữ liệu.
+
+### Biểu mẫu báo cáo in ra
+
+- **In** và **Lưu PDF** ở Thống kê nay ra đúng biểu mẫu báo cáo: tên trường bên trái, quốc hiệu –
+  tiêu ngữ bên phải, tên biểu in hoa ở giữa, **bảng kẻ khung đầy đủ** có cột TT và dòng tổng cộng,
+  tiêu đề bảng lặp lại ở mỗi trang, cuối biểu có chỗ ký *Người lập biểu* / *Hiệu trưởng* kèm ngày tháng.
+  Phông Times New Roman, khổ A4.
+
+### Khác
+
+- Hai ô **Tất cả các lớp** / **Tất cả giáo viên** xếp thành hai thẻ bằng nhau, thẳng hàng.
+- Bỏ nút **Nối Zalo** ở chân thanh bên cho gọn — trạng thái Zalo vẫn xem ở đèn góc trên bên phải.
+- Thêm nút **Lên CSDL ngành** (đánh dấu *sắp có*) cạnh *Gửi qua Zalo*. Bấm vào nói rõ hiện trạng:
+  cơ sở dữ liệu ngành chỉ mở kết nối cho phần mềm quản lý nhà trường đã được Bộ thẩm định, nên cách
+  khả thi là xuất tệp đúng mẫu để tự tải lên.
+- Phần **Trợ giúp › App làm gì** thêm mục *Vì sao có phần mềm này*: so với gửi email và Zalo OA.
+
+---
+
 ## 0.1.10 — Chọn lớp, chọn giáo viên thành hai cột
 
 Hộp **Sửa người nhận** (Dữ liệu › Giáo viên › Người nhận ngoài danh sách) trước đây xếp

@@ -47,7 +47,11 @@ let dongHopHienTai = null;
 export function moHop({ tieuDe, noiDung, nut = [], rong = "", khiMo = null, khongDongNgoai = false }) {
   return new Promise((giai) => {
     const pm = document.getElementById("phu-man");
-    const hop = document.getElementById("hop");
+    // Hộp thoại dùng chung một phần tử. Thay nó bằng bản sao RỖNG để mọi sự kiện mà hộp
+    // trước đã gắn chết theo — nếu không, listener chồng nhau và hộp sau chạy cả việc của hộp trước.
+    const hopCu = document.getElementById("hop");
+    const hop = hopCu.cloneNode(false);
+    hopCu.replaceWith(hop);
     hop.className = "hop " + rong;
     hop.innerHTML =
       `<div class="hop-dau"><h2>${esc(tieuDe)}</h2><button class="x" data-dong="1" title="Đóng">✕</button></div>` +
@@ -181,6 +185,22 @@ export function dsTich(ten, muc, daChon = [], { cao = "" } = {}) {
   </div>`;
 }
 
+/**
+ * Gắn sự kiện cho KHUNG TRANG (`#noi-dung`) — luôn gỡ cái đã gắn trước đó.
+ *
+ * Khung này dùng chung cho mọi trang và được vẽ lại nhiều lần trong cùng một trang.
+ * Gắn thẳng addEventListener thì listener chồng nhau: một cú bấm chạy nhiều lần, những lần
+ * cũ vẫn giữ mảng dữ liệu của lần vẽ trước nên tra không ra dòng → lỗi "undefined".
+ * Listener gắn vào PHẦN TỬ CON thì không cần hàm này (con bị thay mới mỗi lần vẽ).
+ */
+export function ganKhung(khung, loai, fn) {
+  if (!khung) return;
+  if (!khung.__nghe) khung.__nghe = {};
+  if (khung.__nghe[loai]) khung.removeEventListener(loai, khung.__nghe[loai]);
+  khung.__nghe[loai] = fn;
+  khung.addEventListener(loai, fn);
+}
+
 export const layTich = (goc, ten) => $$(`input[name="${ten}"]:checked`, goc).map((x) => x.value);
 
 /**
@@ -207,6 +227,8 @@ export function dsTichCoThanh(ten, nhan, muc, daChon = [], { cao = "", tim = fal
 /** Gắn hành vi cho mọi ô chọn nhiều bên trong một khung (hộp thoại hoặc trang). */
 export function ganDsTich(khung) {
   if (!khung) return;
+  if (khung.__dsTich) return;   // đã gắn rồi thì thôi, tránh chồng listener
+  khung.__dsTich = true;
   const demLai = (ten) => {
     const e = khung.querySelector(`[data-dem="${ten}"]`);
     if (!e) return;
@@ -230,8 +252,8 @@ export function ganDsTich(khung) {
     if (x) demLai(x.name);
   });
   khung.addEventListener("input", (e) => {
-    const o = e.target.closest?.("[data-tim]");
-    if (!o) return;
+    const o = e.target.closest?.("input[data-tim]");
+    if (!o || typeof o.value !== "string") return;   // chỉ ô nhập mới lọc được
     const v = o.value.trim().toLowerCase();
     const boDau = (t) => String(t).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/gi, "d").toLowerCase();
     const k = boDau(v);

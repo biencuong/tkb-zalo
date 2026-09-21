@@ -206,7 +206,30 @@ async function batDau() {
   await kiemDongYRuiRo();
 }
 
-window.addEventListener("error", (e) => baoXau("Lỗi giao diện: " + esc(e.message)));
-window.addEventListener("unhandledrejection", (e) => baoXau("Lỗi: " + esc(e.reason?.message || e.reason)));
+/**
+ * Lỗi lập trình lọt ra ngoài: báo kèm CHỖ XẢY RA (tệp:dòng) để người dùng chụp màn hình là đủ
+ * dữ kiện sửa. Lỗi giống hệt nhau trong 5 giây chỉ hiện MỘT lần, khỏi ngập kín màn hình.
+ */
+const loiVuaBao = new Map();
+
+function baoLoiLapTrinh(chu, noi) {
+  const khoa = chu + "|" + noi;
+  const gio = Date.now();
+  if (gio - (loiVuaBao.get(khoa) || 0) < 5000) return;
+  loiVuaBao.set(khoa, gio);
+  baoXau("<b>Lỗi trong phần mềm.</b><br>" + esc(chu)
+    + (noi ? "<br><span class=\"mono nho mo\">" + esc(noi) + "</span>" : "")
+    + "<br><span class=\"nho\">Việc đang làm có thể chưa xong."
+    + " Chụp lại thông báo này để báo lỗi.</span>");
+}
+
+/** Rút gọn stack còn đúng dòng đầu tiên trong mã của mình. */
+const goNoi = (st) => String(st || "").split("\n").slice(1, 2).join("").trim()
+  .replace(/^at\s+/, "").replace(/.*\/js\//, "js/").slice(0, 120);
+
+window.addEventListener("error", (e) => baoLoiLapTrinh(e.message,
+  e.filename ? String(e.filename).replace(/.*\/js\//, "js/") + ":" + e.lineno : goNoi(e.error?.stack)));
+window.addEventListener("unhandledrejection", (e) => baoLoiLapTrinh(
+  String(e.reason?.message || e.reason), goNoi(e.reason?.stack)));
 
 batDau();

@@ -42,6 +42,9 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
   const tenTruong = layCaiDat("ten_truong") || t.ten_truong || "Nhà trường";
   const mauGv = tuyChonVao.mau_tin_gv || layCaiDat("mau_tin_gv");
   const mauLop = tuyChonVao.mau_tin_lop || layCaiDat("mau_tin_lop");
+  // Nhóm Zalo đọc chung nên lời nhắn khác hẳn: xem CAI_DAT_MAC_DINH.mau_tin_nhom_*
+  const mauNhomLop = tuyChonVao.mau_tin_nhom_lop || layCaiDat("mau_tin_nhom_lop") || mauLop;
+  const mauNhomGv = tuyChonVao.mau_tin_nhom_gv || layCaiDat("mau_tin_nhom_gv") || mauGv;
   const bienChung = { truong: tenTruong, so_tkb: t.so_tkb, ngay: ngayVn(t.ngay_ap_dung), nam_hoc: t.nam_hoc, hoc_ky: t.hoc_ky ?? "" };
 
   const chon = tc.chi_chon ? new Set(tc.chi_chon.map((x) => `${x.nguoi_loai}:${x.nguoi_id}`)) : null;
@@ -92,7 +95,7 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
         co_anh: tc.gui_anh && Boolean(g.anh_path), co_docx: tc.gui_docx && Boolean(g.docx_path),
         anh_path: tc.gui_anh ? g.anh_path : "", docx_path: tc.gui_docx ? g.docx_path : "",
         so_tiet: g.so_tiet_dem, lop_cn: g.lop_cn,
-        caption: dungTin(mauGv, { ...bienChung, ten: g.ho_ten, lop: g.lop_cn, so_tiet: g.so_tiet_dem }),
+        caption: dungTin(mauGv, { ...bienChung, ten: g.ho_ten, gv: g.ho_ten, lop: g.lop_cn, so_tiet: g.so_tiet_dem }),
       });
     }
   }
@@ -114,7 +117,7 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
         co_anh: tc.gui_anh && Boolean(l.anh_path), co_docx: tc.gui_docx && Boolean(l.docx_path),
         anh_path: tc.gui_anh ? l.anh_path : "", docx_path: tc.gui_docx ? l.docx_path : "",
         so_tiet: l.so_tiet, lop_cn: l.lop,
-        caption: dungTin(mauLop, { ...bienChung, ten: l.ho_ten, lop: l.lop, so_tiet: l.so_tiet }),
+        caption: dungTin(mauLop, { ...bienChung, ten: l.ho_ten, gv: l.ho_ten, lop: l.lop, so_tiet: l.so_tiet }),
       });
     }
     if (thieu.length) {
@@ -146,7 +149,8 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
           co_anh: tc.gui_anh && Boolean(l.anh_path), co_docx: tc.gui_docx && Boolean(l.docx_path),
           anh_path: tc.gui_anh ? l.anh_path : "", docx_path: tc.gui_docx ? l.docx_path : "",
           so_tiet: l.so_tiet, lop_cn: l.lop,
-          caption: dungTin(mauLop, { ...bienChung, ten: n.ho_ten, lop: l.lop, so_tiet: l.so_tiet }),
+          caption: dungTin(n.la_nhom ? mauNhomLop : mauLop,
+            { ...bienChung, ten: n.ho_ten, nhom: n.ho_ten, lop: l.lop, so_tiet: l.so_tiet }),
         });
       }
       for (const gid of gvs) {
@@ -162,7 +166,11 @@ export function chuanBiDotGui(tkbId, tuyChonVao = {}) {
           co_anh: tc.gui_anh && Boolean(g.anh_path), co_docx: tc.gui_docx && Boolean(g.docx_path),
           anh_path: tc.gui_anh ? g.anh_path : "", docx_path: tc.gui_docx ? g.docx_path : "",
           so_tiet: g.so_tiet_dem, lop_cn: g.lop_cn,
-          caption: dungTin(mauGv, { ...bienChung, ten: `${n.ho_ten} (TKB của ${g.ho_ten})`, lop: g.lop_cn, so_tiet: g.so_tiet_dem }),
+          caption: dungTin(n.la_nhom ? mauNhomGv : mauGv, {
+            ...bienChung, nhom: n.ho_ten, gv: g.ho_ten,
+            ten: n.la_nhom ? n.ho_ten : `${n.ho_ten} (TKB của ${g.ho_ten})`,
+            lop: g.lop_cn, so_tiet: g.so_tiet_dem,
+          }),
         });
       }
     }

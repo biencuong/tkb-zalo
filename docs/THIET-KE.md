@@ -252,3 +252,44 @@ người dùng **phải bấm “Tôi đồng ý”** mới cài tiếp được
   kiểm trang Dữ liệu gom đủ ba khu, thanh bên thu gọn/mở rộng và chữ viết tắt không bị cắt,
   chân thanh bên hiện đúng số hiệu; mọi lỗi và cảnh báo trong giao diện đều bị bắt.
 - Lỗi phát sinh trong giao diện lúc chạy thật cũng được ghi vào `loi.log` ở thư mục dữ liệu người dùng.
+
+
+---
+
+## Lời nhắn: gửi riêng và gửi vào nhóm là hai ngữ cảnh khác nhau
+
+Bốn mẫu tin trong `cai_dat`, sửa được ở **Cài đặt** và sửa riêng cho từng đợt ở tab **Lời nhắn**
+của hộp gửi:
+
+| Khoá | Dùng khi | Giọng |
+|---|---|---|
+| `mau_tin_gv` | gửi riêng thời khoá biểu cá nhân | xưng tên người nhận |
+| `mau_tin_lop` | gửi riêng thời khoá biểu lớp cho chủ nhiệm | "lớp thầy/cô chủ nhiệm" |
+| `mau_tin_nhom_lop` | gửi thời khoá biểu lớp **vào nhóm** | không xưng tên ai, không nói "chủ nhiệm" |
+| `mau_tin_nhom_gv` | gửi thời khoá biểu cá nhân **vào nhóm** | nêu rõ *của thầy/cô {gv}* |
+
+Biến thay được: `{truong} {ten} {gv} {nhom} {so_tkb} {ngay} {nam_hoc} {hoc_ky} {lop} {so_tiet}`.
+`kho-gui.js` chọn mẫu theo `n.la_nhom`, mẫu nhóm thiếu thì lùi về mẫu gửi riêng.
+
+## Ai nhận gì — chỉnh ngay trong hộp gửi
+
+Hộp gửi, tab **Gửi cái gì** có khối liệt kê mọi nhóm Zalo và người ngoài danh sách kèm ô chọn
+*Tất cả các lớp / Tất cả giáo viên* và nút *Chọn riêng…*. Đổi là lưu ngay
+(`gv:dat-nhan-nhanh`), hộp tự đóng rồi mở lại để tính lại danh sách gửi.
+Lý do: cảnh báo "nhóm chưa đặt nhận gì" mà bắt sang màn khác sửa thì người dùng không tìm ra —
+xem mục 17b của `NGHIEP-VU-THIET-KE-APP.md`.
+
+## Biểu mẫu báo cáo in ra
+
+`htmlIn()` trong `trang/thong-ke.js` dựng bản in theo lối trình bày văn bản hành chính:
+tên trường bên trái có gạch chân, quốc hiệu – tiêu ngữ bên phải, tên biểu in hoa ở giữa,
+phụ đề nghiêng, khung điều kiện lọc, bảng kẻ khung đủ có cột **TT**, dòng tổng cộng,
+và chỗ ký *Người lập biểu* / *Hiệu trưởng* kèm dòng ngày tháng. Phông Times New Roman 13pt,
+khổ A4 lề 18/14/16 mm, `thead{display:table-header-group}` để tiêu đề bảng lặp mỗi trang.
+Cùng một HTML dùng cho cả **In** và **Lưu PDF**.
+
+## Nút chờ "Lên CSDL ngành"
+
+Đặt cạnh *Gửi qua Zalo* trong khu Thời khoá biểu vì cùng là việc **phát hành thời khoá biểu đi
+nơi khác**. Có nhãn *sắp có*; bấm vào mở hộp nói thẳng vì sao chưa làm được và cần gì để làm tiếp
+(xem `KINH-NGHIEM.md`). Không làm nút giả bấm vào không có gì.

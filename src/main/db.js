@@ -316,6 +316,13 @@ export const CAI_DAT_MAC_DINH = {
   mau_tin_lop:
     "{truong} gửi thầy/cô {ten} THỜI KHOÁ BIỂU LỚP {lop} (lớp thầy/cô chủ nhiệm), số {so_tkb}, " +
     "thực hiện từ ngày {ngay}.",
+  // Gửi vào NHÓM thì người đọc là cả nhóm — không xưng tên một người, không nói "lớp chủ nhiệm".
+  mau_tin_nhom_lop:
+    "{truong} gửi THỜI KHOÁ BIỂU LỚP {lop}, số {so_tkb}, thực hiện từ ngày {ngay}.\n" +
+    "Ảnh để xem nhanh, tệp đính kèm để tải về in. Đề nghị thầy/cô kiểm tra và phản hồi nếu có sai sót.",
+  mau_tin_nhom_gv:
+    "{truong} gửi THỜI KHOÁ BIỂU của thầy/cô {gv}, số {so_tkb}, thực hiện từ ngày {ngay}.\n" +
+    "Ảnh để xem nhanh, tệp đính kèm để tải về in.",
   nhip_2_tin_min: "3000", nhip_2_tin_max: "6000",
   nhip_2_nguoi_min: "8000", nhip_2_nguoi_max: "15000",
   nghi_moi_n: "10", nghi_min: "60000", nghi_max: "90000",

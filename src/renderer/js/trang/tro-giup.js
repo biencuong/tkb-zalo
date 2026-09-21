@@ -1,5 +1,5 @@
 /** Hướng dẫn sử dụng đầy đủ, đọc ngay trong phần mềm (không cần mạng). */
-import { esc, $, $$ } from "../chung.js";
+import { esc, $, $$, ganKhung,} from "../chung.js";
 import { moHopRuiRo } from "../rui-ro.js";
 import { MUC_TRO_GIUP as MUC } from "../noi-dung.js";
 import { moHopCapNhat } from "../cap-nhat.js";
@@ -55,7 +55,7 @@ export async function ve(khung, thamSo = {}) {
     });
   });
 
-  khung.addEventListener("click", (e) => {
+  ganKhung(khung, "click", (e) => {
     const b = e.target.closest("button");
     if (!b) return;
     if (b.id === "xem-rui-ro") moHopRuiRo({});

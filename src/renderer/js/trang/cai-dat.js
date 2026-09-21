@@ -3,7 +3,7 @@
  * Mỗi dòng một việc: nhãn bên trái, ô nhập nhỏ bên phải.
  * Các tab ẩn vẫn nằm trong DOM nên bấm Lưu là lưu được hết một lượt.
  */
-import { esc, so, gioVn, baoOk, baoKetQua, hoi, moHop, bang } from "../chung.js";
+import { esc, so, gioVn, baoOk, baoKetQua, hoi, moHop, bang, ganKhung,} from "../chung.js";
 import { moHopCapNhat } from "../cap-nhat.js";
 import { moHopRuiRo } from "../rui-ro.js";
 
@@ -113,12 +113,24 @@ export async function ve(khung, thamSo = {}) {
   const tLoiNhan = `
     <div class="the">
       <h2>Lời nhắn mặc định</h2>
-      <p class="nho mo" style="margin:.1rem 0 .5rem">Thay được: <span class="mono">{truong} {ten} {so_tkb} {ngay}
+      <p class="nho mo" style="margin:.1rem 0 .5rem">Thay được: <span class="mono">{truong} {ten} {gv} {so_tkb} {ngay}
         {nam_hoc} {hoc_ky} {lop} {so_tiet}</span>. Mỗi đợt gửi vẫn sửa riêng được ngay trong hộp gửi.</p>
       <div class="o-nhap" style="margin-bottom:.5rem"><label>Kèm thời khoá biểu cá nhân</label>
         <textarea id="c-mau-gv" rows="3">${esc(cd.mau_tin_gv || "")}</textarea></div>
       <div class="o-nhap" style="margin-bottom:0"><label>Kèm thời khoá biểu lớp</label>
         <textarea id="c-mau-lop" rows="3">${esc(cd.mau_tin_lop || "")}</textarea></div>
+    </div>
+
+    <div class="the">
+      <h2>Lời nhắn gửi vào nhóm Zalo</h2>
+      <p class="nho mo" style="margin:.1rem 0 .5rem">Cả nhóm cùng đọc nên lời nhắn khác hẳn gửi riêng:
+        không xưng tên một thầy/cô, không nói “lớp thầy/cô chủ nhiệm”. Thay thêm được
+        <span class="mono">{nhom}</span> (tên nhóm) và <span class="mono">{gv}</span> (tên giáo viên
+        của thời khoá biểu).</p>
+      <div class="o-nhap" style="margin-bottom:.5rem"><label>Kèm thời khoá biểu lớp</label>
+        <textarea id="c-mau-nhom-lop" rows="3">${esc(cd.mau_tin_nhom_lop || "")}</textarea></div>
+      <div class="o-nhap" style="margin-bottom:0"><label>Kèm thời khoá biểu cá nhân</label>
+        <textarea id="c-mau-nhom-gv" rows="3">${esc(cd.mau_tin_nhom_gv || "")}</textarea></div>
     </div>`;
 
   const tHeThong = `
@@ -181,7 +193,7 @@ export async function ve(khung, thamSo = {}) {
     document.getElementById("chinh").scrollTop = 0;
   });
 
-  khung.addEventListener("click", async (e) => {
+  ganKhung(khung, "click", async (e) => {
     const b = e.target.closest("button");
     if (!b) return;
     if (b.dataset.mo) return window.api.app.moThuMuc(b.dataset.mo);
@@ -216,6 +228,7 @@ export async function ve(khung, thamSo = {}) {
         nghi_moi_n: v("#c-nghi-n"), nghi_min: v("#c-nghi-min"), nghi_max: v("#c-nghi-max"),
         lui_khi_loi_ms: v("#c-lui"),
         mau_tin_gv: v("#c-mau-gv"), mau_tin_lop: v("#c-mau-lop"),
+        mau_tin_nhom_lop: v("#c-mau-nhom-lop"), mau_tin_nhom_gv: v("#c-mau-nhom-gv"),
         tu_kiem_cap_nhat: khung.querySelector("#c-tu-kiem").checked ? "1" : "0",
       });
       if (baoKetQua(r, "Đã lưu cài đặt.")) {

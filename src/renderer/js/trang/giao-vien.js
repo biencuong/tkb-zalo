@@ -1,8 +1,7 @@
 /** Danh sách giáo viên: xem đủ thông tin, thêm/sửa/xoá, dò Zalo, người nhận ngoài danh sách. */
 import {
   esc, so, moHop, hoi, baoOk, baoXau, baoCanh, baoKetQua, hopCho, bang, $, $$, coHoac, vungTha, htmlVungTha,
-  ganDsTich,
-} from "../chung.js";
+  ganDsTich, ganKhung,} from "../chung.js";
 import { canZalo } from "../zalo-nhanh.js";
 
 let tab = "gv";
@@ -93,6 +92,22 @@ function moHopGv(gv = null) {
   });
 }
 
+/**
+ * Mở hộp sửa MỘT người nhận / nhóm Zalo từ màn khác (hộp gửi gọi tới), tự nạp danh sách
+ * giáo viên và lớp. Trả về true nếu đã lưu.
+ */
+export async function moSuaNguoiNhan(id) {
+  const [rNn, rGv, rTkb] = await Promise.all([
+    window.api.gv.nguoiNhan(), window.api.gv.ds({}), window.api.tkb.ds(),
+  ]);
+  const n = (rNn.ds || []).find((x) => x.id === Number(id));
+  if (!n) return false;
+  const dsLop = rTkb.ds?.length
+    ? (await window.api.tkb.chiTiet(rTkb.ds[0].id)).tkb.lop.map((l) => l.lop)
+    : [];
+  return moHopNguoiNhan(n, (rGv.ds || []).filter((g) => g.hoat_dong), dsLop);
+}
+
 function moHopNguoiNhan(n, dsGv, dsLop) {
   const d = n || { dang_ky: [] };
   const dk = d.dang_ky || [];
@@ -125,11 +140,11 @@ function moHopNguoiNhan(n, dsGv, dsLop) {
         <div class="o-nhap"><label>Ghi chú</label><input type="text" id="n-ghi" value="${esc(d.ghi_chu || "")}"></div>
       </div>
       <hr class="tach"><h3>Nhận thời khoá biểu nào</h3>
-      <div class="hang-nut" style="margin-bottom:.5rem">
-        <label class="tich" style="margin:0"><input type="checkbox" id="dk-tat-lop" ${coLoai("tat_ca_lop") ? "checked" : ""}>
-          <span>Tất cả các lớp</span></label>
-        <label class="tich" style="margin:0"><input type="checkbox" id="dk-tat-gv" ${coLoai("tat_ca_gv") ? "checked" : ""}>
-          <span>Tất cả giáo viên <span class="g">(rất nhiều tin)</span></span></label>
+      <div class="luoi c2" style="gap:.5rem;margin-bottom:.5rem">
+        <label class="tich the-tich"><input type="checkbox" id="dk-tat-lop" ${coLoai("tat_ca_lop") ? "checked" : ""}>
+          <span>Tất cả các lớp<span class="g">mỗi lớp một tin</span></span></label>
+        <label class="tich the-tich"><input type="checkbox" id="dk-tat-gv" ${coLoai("tat_ca_gv") ? "checked" : ""}>
+          <span>Tất cả giáo viên<span class="g">rất nhiều tin</span></span></label>
       </div>
 
       <p class="nho mo" style="margin:0 0 .4rem">Hoặc chọn từng mục bên dưới. Hai cột để cuộn ít, dễ tìm.</p>
@@ -343,6 +358,7 @@ export async function ve(khung, tuyChon = {}) {
     const moiGt = el.textContent.replace(/\s+/g, " ").trim();
     if (moiGt === (el.dataset.cu || "")) return false;
     const g = ds.find((x) => x.id === id);
+    if (!g) return;
     if (!g) return false;
 
     const ban = { ...g };
@@ -370,11 +386,11 @@ export async function ve(khung, tuyChon = {}) {
   };
 
   // Sửa tại chỗ: rời ô là lưu; Enter để lưu nhanh, Esc để bỏ.
-  khung.addEventListener("focusout", (e) => {
+  ganKhung(khung, "focusout", (e) => {
     const el = e.target.closest?.(".o-sua");
     if (el) luuO(el);
   });
-  khung.addEventListener("keydown", (e) => {
+  ganKhung(khung, "keydown", (e) => {
     const el = e.target.closest?.(".o-sua");
     if (!el) return;
     if (e.key === "Enter") { e.preventDefault(); el.blur(); }
@@ -387,7 +403,7 @@ export async function ve(khung, tuyChon = {}) {
     await napTuTep(dsTep[0], () => ve(khung, tuyChon));
   }, { loc: /\.(xlsx|xlsm)$/i })];
 
-  khung.addEventListener("click", async (e) => {
+  ganKhung(khung, "click", async (e) => {
     const b = e.target.closest("button");
     if (!b) return;
 
@@ -400,6 +416,7 @@ export async function ve(khung, tuyChon = {}) {
     if (b.dataset.sua) { if (await moHopGv(ds.find((x) => x.id === Number(b.dataset.sua)))) ve(khung, tuyChon); return; }
     if (b.dataset.xoa) {
       const g = ds.find((x) => x.id === Number(b.dataset.xoa));
+      if (!g) return baoXau("Không còn thấy giáo viên này. Hãy tải lại trang.");
       let r = await window.api.gv.xoa(g.id, false);
       if (!r.ok && r.canXacNhan) {
         if (!(await hoi("Xoá hẳn giáo viên?", esc(r.loi[0]), { nutOk: "Xoá hẳn", kieu: "xau" }))) return;

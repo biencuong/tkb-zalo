@@ -1,11 +1,51 @@
 /** Thời khoá biểu: danh sách theo số và ngày, chi tiết từng lớp/giáo viên, chọn chủ nhiệm, tạo ảnh. */
-import { esc, so, ngayVn, gioVn, moHop, hoi, baoOk, baoXau, baoKetQua, hopCho, luoiTkb, bang, $$, coHoac } from "../chung.js";
+import { esc, so, ngayVn, gioVn, moHop, hoi, baoOk, baoXau, baoKetQua, hopCho, luoiTkb, bang, $$, coHoac, ganKhung,} from "../chung.js";
 import { di } from "../app.js";
 import { chipZalo } from "../zalo-nhanh.js";
 import { moGui } from "../gui-modal.js";
 import { moXemMobile } from "../xem-mobile.js";
 
 let dangXem = null;
+
+/**
+ * Đưa thời khoá biểu lên Cơ sở dữ liệu ngành giáo dục (csdl.moet.gov.vn) — CHƯA LÀM ĐƯỢC.
+ *
+ * Đã tra ngày 21/9/2026: CSDL ngành chia sẻ dữ liệu qua API dùng token của hệ thống đăng nhập
+ * một lần (SSO), và CHỈ mở cho phần mềm quản lý nhà trường đã được Bộ thẩm định rồi cấp kết nối
+ * trục dữ liệu (K12Online/K12Connect, EnetViet, ONEDU…). Không có API công khai cho phần mềm
+ * cá nhân, và phần mềm đã kết nối còn bị cấm chia sẻ dữ liệu cho bên thứ ba.
+ * → Đường khả thi: XUẤT TỆP đúng mẫu để người dùng tự tải lên bằng tài khoản của trường.
+ *   Muốn làm đúng mẫu thì cần lấy tệp mẫu từ chính tài khoản CSDL của trường (phải đăng nhập).
+ */
+function moHopCsdlNganh() {
+  return moHop({
+    tieuDe: "Đưa thời khoá biểu lên CSDL ngành giáo dục", rong: "rong",
+    noiDung: `
+      <div class="bao tin"><b>Chức năng đang chờ làm.</b>
+        <span class="sua">Nút này để sẵn chỗ. Dưới đây là kết quả tìm hiểu, để biết làm được tới đâu.</span></div>
+
+      <h3>Vì sao chưa tự đẩy thẳng lên được</h3>
+      <ul class="ds-gon">
+        <li>Cơ sở dữ liệu ngành (<span class="mono">truong.csdl.moet.gov.vn</span>) trao đổi dữ liệu
+          qua API có <b>token đăng nhập một lần (SSO)</b>.</li>
+        <li>Kết nối đó chỉ cấp cho <b>phần mềm quản lý nhà trường đã được Bộ thẩm định</b>
+          (K12Online, EnetViet, ONEDU…), theo hợp đồng kết nối trục dữ liệu — <b>không có API công khai</b>
+          cho phần mềm cá nhân.</li>
+        <li>Phần mềm đã kết nối còn bị <b>cấm chia sẻ dữ liệu cho bên thứ ba</b>; vi phạm thì bị cắt kết nối.</li>
+      </ul>
+
+      <h3>Cách làm được, khi bạn muốn</h3>
+      <ol class="ds-gon">
+        <li><b>Xuất tệp đúng mẫu nhập của CSDL ngành</b> (giống cách nhập danh sách học sinh từ Excel),
+          rồi bạn tự tải lên bằng tài khoản của trường. Hợp lệ, không cần xin phép ai.</li>
+        <li>Để làm đúng mẫu, cần <b>tệp mẫu tải từ chính tài khoản CSDL của trường</b> — tôi không đăng nhập
+          được nên phải nhờ bạn tải về rồi đưa vào đây.</li>
+      </ol>
+
+      <p class="nho mo">Có tệp mẫu thì phần này làm nhanh: đọc mẫu, ánh xạ cột, xuất ra tệp tải lên được.</p>`,
+    nut: [{ ten: "Đã rõ", kieu: "chinh", giaTri: true }],
+  });
+}
 
 export async function ve(khung, thamSo = {}) {
   const gon = Boolean(thamSo.gon);
@@ -45,6 +85,8 @@ export async function ve(khung, thamSo = {}) {
       ${chipZalo()}
       <button class="nut nho" id="tao-anh">Tạo ảnh</button>
       <button class="nut nho" id="mo-thu-muc">Mở thư mục</button>
+      <button class="nut nho" id="len-csdl" title="Đưa thời khoá biểu lên cơ sở dữ liệu ngành giáo dục">
+        Lên CSDL ngành <span class="nhan n-xam">sắp có</span></button>
       <button class="nut chinh" id="di-gui">Gửi qua Zalo</button>
     </div>
   </div>
@@ -166,7 +208,7 @@ export async function ve(khung, thamSo = {}) {
     ve(khung, thamSo);
   };
 
-  khung.addEventListener("click", async (e) => {
+  ganKhung(khung, "click", async (e) => {
     const b = e.target.closest("button");
     if (!b) return;
     if (b.id === "ve-moi-nhat") { dangXem = idMoiNhat; return ve(khung, { ...thamSo, tkbId: idMoiNhat }); }
@@ -175,6 +217,7 @@ export async function ve(khung, thamSo = {}) {
       const [loai, ...r] = b.dataset.dt.split(":");
       return moXemMobile(dangXem, { loai, ma: r.join(":") });
     }
+    if (b.id === "len-csdl") return moHopCsdlNganh();
     if (b.id === "mo-thu-muc") return window.api.app.moThuMuc(ct.thu_muc);
     if (b.id === "tao-anh" || b.id === "tao-anh-2") return taoAnh();
 

@@ -104,6 +104,26 @@ function xepHang(g) {
   return { ma: "san_sang", nhan: '<span class="nhan n-ok">Sẵn sàng</span>', thu: 0 };
 }
 
+/** Một dòng chỉnh "nhận gì" cho nhóm Zalo hoặc người ngoài danh sách, ngay trong hộp gửi. */
+function veHangNhanGi(n) {
+  const dk = n.dang_ky || [];
+  const tat = dk.some((x) => x.loai === "tat_ca_lop") ? "tat_ca_lop"
+    : dk.some((x) => x.loai === "tat_ca_gv") ? "tat_ca_gv" : "";
+  const rieng = !tat && dk.length;
+  const tom = chuNhanNhom(n) || "chưa đặt nhận gì";
+  return `<div class="hang-nhan${dk.length ? "" : " thieu"}">
+    <span class="hang-nhan-ten"><b>${esc(n.ho_ten)}</b>
+      ${n.la_nhom ? '<span class="nhan n-ok">nhóm</span>' : '<span class="nhan n-xam">ngoài DS</span>'}
+      <span class="nho mo">${esc(tom)}</span></span>
+    <select class="dat-nhan" data-nhom="${n.id}" title="Chọn nhận thời khoá biểu nào">
+      <option value="" ${tat ? "" : "selected"}>${rieng ? "Đang chọn riêng…" : "Chưa đặt…"}</option>
+      <option value="tat_ca_lop" ${tat === "tat_ca_lop" ? "selected" : ""}>Tất cả các lớp</option>
+      <option value="tat_ca_gv" ${tat === "tat_ca_gv" ? "selected" : ""}>Tất cả giáo viên</option>
+    </select>
+    <button type="button" class="lien" data-sua-nn="${n.id}">Chọn riêng…</button>
+  </div>`;
+}
+
 /** Nhóm đang đăng ký nhận gì, viết gọn một dòng. */
 function chuNhanNhom(g) {
   const dk = g.dang_ky || [];
@@ -130,7 +150,7 @@ function veDongNguoi(g) {
     : `${esc(g.ma_gv || "")}${g.to_chuyen_mon ? " · " + esc(g.to_chuyen_mon) : ""}${g.dien_thoai ? " · " + esc(g.dien_thoai) : " · chưa có số"}`;
 
   if (h.ma === "nhom_trong") {
-    return `<div class="ng-o h-nhom-trong" data-tim="${esc(g.ho_ten.toLowerCase())}" data-hang="nhom_trong">
+    return `<div class="ng-o h-nhom-trong" data-loc="${esc(g.ho_ten.toLowerCase())}" data-hang="nhom_trong">
       <span class="ng-chu">
         <b>${esc(g.ho_ten)}</b>
         <span class="ng-phu">${esc(g.ghi_chu || "Nhóm Zalo")} · chưa đặt nhận gì</span>
@@ -144,7 +164,7 @@ function veDongNguoi(g) {
   }
 
   return `<label class="ng-o ${chonDuoc ? "" : "tat"} h-${h.ma}"
-      data-tim="${esc((g.ho_ten + " " + (g.ma_gv || "") + " " + (g.dien_thoai || "") + " " + (g.to_chuyen_mon || "")).toLowerCase())}"
+      data-loc="${esc((g.ho_ten + " " + (g.ma_gv || "") + " " + (g.dien_thoai || "") + " " + (g.to_chuyen_mon || "")).toLowerCase())}"
       data-hang="${h.ma}">
     <input type="checkbox" name="ng" value="${g.la_nhom ? "ngoai" : "gv"}:${g.id}"
       ${chonDuoc ? "checked" : "disabled"}>
@@ -157,7 +177,7 @@ function veDongNguoi(g) {
 }
 
 /** Bước 1: hộp tuỳ chọn. */
-async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
+async function hopTuyChon(tuyChonCu, dsGv, dsNhom, dsNgoai = []) {
   const cd = (await window.api.app.caiDat()).cai_dat;
   const tc = { ...tuyChonCu };
   const nguoi = [...dsNhom.map((n) => ({ ...n, la_nhom: 1 })), ...dsGv]
@@ -229,6 +249,14 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
           <label class="tich"><input type="checkbox" id="t-ngoai" ${tc.gui_nguoi_ngoai || dsNhom.length ? "checked" : ""}>
             <span>Người <b>ngoài danh sách</b> và <b>nhóm Zalo</b> đã đăng ký
               <span class="g">${dsNhom.length ? `Đang có ${dsNhom.length} nhóm.` : "Chưa có nhóm nào."}</span></span></label>
+
+          ${dsNgoai.length ? `<div class="o-nhap" style="margin:.6rem 0 0">
+            <label>Nhóm Zalo và người ngoài danh sách nhận gì</label>
+            <div class="ds-tich" style="max-height:210px">${dsNgoai.map(veHangNhanGi).join("")}</div>
+            <div class="goi-y">Đổi ở đây là lưu ngay, hộp tự tính lại. “Chọn riêng…” để tích từng lớp,
+              từng giáo viên.</div>
+          </div>` : `<p class="nho mo" style="margin:.5rem 0 0">Chưa có nhóm Zalo hay người ngoài danh sách nào.
+            Thêm ở <b>Dữ liệu › Giáo viên › Người nhận ngoài danh sách</b>.</p>`}
         </div>
         <div>
           <h3>Dạng tệp</h3>
@@ -255,11 +283,22 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
     </div>
 
     <div data-khu-tg="loi" hidden>
+      <h3 style="margin:.1rem 0 .5rem">Gửi riêng cho từng người</h3>
       <div class="o-nhap"><label>Lời nhắn kèm thời khoá biểu cá nhân</label>
         <textarea id="t-mau-gv" rows="3">${esc(tc.mau_tin_gv || cd.mau_tin_gv)}</textarea>
-        <div class="goi-y">{truong} {ten} {so_tkb} {ngay} {nam_hoc} {hoc_ky} {lop} {so_tiet}</div></div>
+        <div class="goi-y">{truong} {ten} {gv} {so_tkb} {ngay} {nam_hoc} {hoc_ky} {lop} {so_tiet}</div></div>
       <div class="o-nhap"><label>Lời nhắn kèm thời khoá biểu lớp</label>
         <textarea id="t-mau-lop" rows="3">${esc(tc.mau_tin_lop || cd.mau_tin_lop)}</textarea></div>
+
+      <hr class="tach">
+      <h3 style="margin:.1rem 0 .3rem">Gửi vào nhóm Zalo</h3>
+      <p class="nho mo" style="margin:0 0 .5rem">Cả nhóm cùng đọc nên không xưng tên một thầy/cô,
+        cũng không nói “lớp thầy/cô chủ nhiệm”. Dùng thêm <span class="mono">{nhom}</span> (tên nhóm)
+        và <span class="mono">{gv}</span> (tên giáo viên của thời khoá biểu).</p>
+      <div class="o-nhap"><label>Lời nhắn kèm thời khoá biểu lớp — vào nhóm</label>
+        <textarea id="t-mau-nhom-lop" rows="3">${esc(tc.mau_tin_nhom_lop || cd.mau_tin_nhom_lop || "")}</textarea></div>
+      <div class="o-nhap"><label>Lời nhắn kèm thời khoá biểu cá nhân — vào nhóm</label>
+        <textarea id="t-mau-nhom-gv" rows="3">${esc(tc.mau_tin_nhom_gv || cd.mau_tin_nhom_gv || "")}</textarea></div>
     </div>`;
 
   let doLai = false;
@@ -280,7 +319,7 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
         const v = hop.querySelector("#loc-ng").value.trim().toLowerCase();
         const h = hop.querySelector("#loc-hang").value;
         $$(".ng-o", dsO).forEach((l) => {
-          const hop1 = !v || l.dataset.tim.includes(v);
+          const hop1 = !v || (l.dataset.loc || "").includes(v);
           const hop2 = !h || l.dataset.hang === h;
           l.style.display = hop1 && hop2 ? "" : "none";
         });
@@ -303,14 +342,22 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
 
       hop.querySelector("#do-ngay")?.addEventListener("click", () => { doLai = true; xong("do"); });
 
-      // Đặt "nhận gì" ngay trên dòng nhóm, lưu xong mở lại hộp để tính lại từ đầu.
-      dsO.addEventListener("change", async (e) => {
+      // Đặt "nhận gì" ngay tại chỗ (dòng nhóm ở tab "Gửi cho ai" và khối ở tab "Gửi cái gì"),
+      // lưu xong mở lại hộp để tính lại từ đầu.
+      hop.addEventListener("change", async (e) => {
         const o = e.target.closest(".dat-nhan");
         if (!o || !o.value) return;
         o.disabled = true;
         const r = await window.api.gv.datNhanNhanh(Number(o.dataset.nhom), o.value);
         if (r.ok) { datLaiNhom = true; xong("dat_nhan"); }
         else { o.disabled = false; baoKetQua(r); }
+      });
+
+      // "Chọn riêng…": đóng hộp gửi, mở hộp sửa người nhận, sửa xong quay lại hộp gửi.
+      // (Mở hộp lồng trong hộp thì hộp ngoài không đóng được nữa — chỉ có MỘT hộp mỗi lúc.)
+      hop.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-sua-nn]");
+        if (b) xong("sua:" + b.dataset.suaNn);
       });
 
       hop.querySelector("#tab-gui").addEventListener("click", (e) => {
@@ -337,6 +384,8 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
           // Chọn hết thì để trống cho nhẹ, chọn một phần mới lọc theo danh sách
           chi_chon: daChon.length && daChon.length < tongChonDuoc ? daChon : null,
           mau_tin_gv: g("#t-mau-gv").value, mau_tin_lop: g("#t-mau-lop").value,
+          mau_tin_nhom_lop: g("#t-mau-nhom-lop")?.value || "",
+          mau_tin_nhom_gv: g("#t-mau-nhom-gv")?.value || "",
         });
       }, true);
     },
@@ -344,6 +393,7 @@ async function hopTuyChon(tuyChonCu, dsGv, dsNhom) {
 
   if (chon === "do") return { doLai: true };
   if (chon === "dat_nhan") return { moLai: true };
+  if (typeof chon === "string" && chon.startsWith("sua:")) return { suaNn: chon.slice(4) };
   return chon === "xem" ? tc : null;
 }
 
@@ -385,14 +435,16 @@ function hopChay(dotId, tomTat) {
       });
       hop.addEventListener("tkb:dong", () => boNgheTin?.(), { once: true });
 
+      // Đợt gửi chạy hàng phút; người dùng có thể đã đóng hộp trước khi xong,
+      // lúc đó các nút không còn trong trang nữa — phải chịu được chuyện đó.
+      const datNut = (thu, het, dung) => {
+        const d = (id, v) => { const x = hop.querySelector(id); if (x) x.disabled = v; };
+        d("#g-thu", thu); d("#g-het", het); d("#g-dung", dung);
+      };
       const chay = async (n) => {
-        hop.querySelector("#g-thu").disabled = true;
-        hop.querySelector("#g-het").disabled = true;
-        hop.querySelector("#g-dung").disabled = false;
+        datNut(true, true, false);
         const r = n ? await window.api.gui.thu(dotId, n) : await window.api.gui.chay(dotId);
-        hop.querySelector("#g-thu").disabled = false;
-        hop.querySelector("#g-het").disabled = false;
-        hop.querySelector("#g-dung").disabled = true;
+        datNut(false, false, true);
         if (!r.ok) baoKetQua(r);
         else if (n) baoOk(`Đã gửi thử ${r.gui_thu} người. Kiểm tra Zalo rồi bấm “Bắt đầu gửi tất cả”.`);
         else baoOk(`Xong: gửi ${r.xong}, lỗi ${r.loi}, còn chờ ${r.cho}.`);
@@ -422,14 +474,22 @@ export async function moGui(tkbId) {
   let tcCu = {};
   try { tcCu = JSON.parse(cd.tuy_chon_gui_json || "{}"); } catch { /* */ }
   const dsGv = (await window.api.gv.ds({})).ds.filter((g) => g.hoat_dong);
-  const dsNhom = ((await window.api.gv.nguoiNhan()).ds || []).filter((x) => x.la_nhom && x.hoat_dong !== 0);
+  const dsNgoai = ((await window.api.gv.nguoiNhan()).ds || []).filter((x) => x.hoat_dong !== 0);
+  const dsNhom = dsNgoai.filter((x) => x.la_nhom);
 
-  const tc = await hopTuyChon(tcCu, dsGv, dsNhom);
+  const tc = await hopTuyChon(tcCu, dsGv, dsNhom, dsNgoai);
   if (!tc) return;
+
+  // Bấm "Chọn riêng…": sửa xong thì quay lại hộp gửi với số liệu mới.
+  if (tc.suaNn) {
+    const { moSuaNguoiNhan } = await import("./trang/giao-vien.js");
+    await moSuaNguoiNhan(tc.suaNn);
+    return moGui(tkbId);
+  }
 
   // Vừa đặt "nhóm nhận gì" xong: mở lại hộp để tính lại danh sách.
   if (tc.moLai) {
-    baoOk("Đã đặt nhóm nhận thời khoá biểu. Giờ tích được rồi.");
+    baoOk("Đã lưu. Danh sách gửi đã tính lại.");
     return moGui(tkbId);
   }
 

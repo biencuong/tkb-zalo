@@ -128,6 +128,22 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 .tich{display:flex;align-items:flex-start;gap:.45rem;font-size:.9rem;color:var(--ink);font-weight:400;margin-bottom:.35rem;cursor:pointer}
 .tich input{margin-top:.28rem;flex:0 0 auto;accent-color:var(--accent-nut)}
 .tich .g{display:block;font-size:.78rem;color:var(--muted)}
+/* Ô tích quan trọng, đứng thành hàng: khung bằng nhau, chữ phụ không làm lệch hàng. */
+.the-tich{align-items:center;margin:0;padding:.55rem .7rem;background:var(--chim);border:1px solid var(--line);border-radius:var(--r-nho)}
+.the-tich input{margin-top:0}
+/* Dòng chỉnh 'nhận gì' cho nhóm Zalo / người ngoài, ngay trong hộp gửi. */
+.hang-nhan{display:flex;align-items:center;gap:.5rem;padding:.35rem .1rem;border-bottom:1px solid var(--line)}
+.hang-nhan:last-child{border-bottom:0}
+.hang-nhan-ten{flex:1 1 auto;min-width:0;font-size:.9rem}
+.hang-nhan-ten .nho{display:block}
+.hang-nhan select{width:auto;min-width:150px;padding:.25rem .4rem;font-size:.85rem}
+.hang-nhan.thieu .hang-nhan-ten .nho{color:var(--bad)}
+/* Danh sách gọn trong hộp thoại giải thích. */
+.ds-gon{margin:.2rem 0 .8rem;padding-left:1.1rem}
+.ds-gon li{margin:.25rem 0;font-size:.92rem;line-height:1.5}
+.luoi.c2>.o-loc{display:flex;flex-direction:column}
+.luoi.c2>.o-loc .ds-tich{flex:1 1 auto}
+.the-tich:has(input:checked){border-color:var(--accent)}
 
 .bang-cuon{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
 table.b{width:100%;border-collapse:collapse;font-size:.9rem}

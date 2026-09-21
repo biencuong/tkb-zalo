@@ -1,5 +1,5 @@
 /** Kết nối Zalo bằng quét mã QR. */
-import { esc, so, baoOk, baoXau, baoKetQua, hoi, chuTrangThaiZalo, hopCho } from "../chung.js";
+import { esc, so, baoOk, baoXau, baoKetQua, hoi, chuTrangThaiZalo, hopCho, ganKhung,} from "../chung.js";
 import { moHopRuiRo } from "../rui-ro.js";
 import { di, capNhatTienDo } from "../app.js";
 
@@ -89,7 +89,7 @@ export async function ve(khung) {
     capNhatTienDo();
   });
 
-  khung.addEventListener("click", async (e) => {
+  ganKhung(khung, "click", async (e) => {
     const b = e.target.closest("button");
     if (!b) return;
     if (b.id === "xem-rui-ro") return moHopRuiRo({});

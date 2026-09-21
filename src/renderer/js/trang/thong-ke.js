@@ -1,7 +1,6 @@
 /** Thống kê số tiết: lọc đa chiều, nhiều cách xem, xuất Excel, in theo bộ lọc. */
 import {
-  esc, so, ngayVn, moHop, baoOk, baoXau, baoKetQua, hopCho, dsTich, dsTichCoThanh, ganDsTich, layTich, $, $$,
-} from "../chung.js";
+  esc, so, ngayVn, moHop, baoOk, baoXau, baoKetQua, hopCho, dsTich, dsTichCoThanh, ganDsTich, layTich, $, $$, ganKhung,} from "../chung.js";
 
 let loc = {};
 let cachXem = "gv";
@@ -38,37 +37,110 @@ function veBangKq(kq) {
 }
 
 /** Dựng HTML trang in theo đúng bộ lọc đang xem. */
+/** Cột số thì căn phải. */
+const COT_SO = ["tiet_tuan", "so_tiet_khai", "lech", "tong_tiet", "so_lop", "so_gv", "so_mon"];
+
+/** "Tuyên Quang, ngày 21 tháng 9 năm 2026" — đúng lối ghi của văn bản hành chính. */
+function dongNgayThang(noi = "") {
+  const n = new Date();
+  return `${noi ? esc(noi) + ", n" : "N"}gày ${n.getDate()} tháng ${n.getMonth() + 1} năm ${n.getFullYear()}`;
+}
+
+/**
+ * Biểu mẫu báo cáo để in hoặc lưu PDF.
+ * Theo lối trình bày quen thuộc của văn bản hành chính: khối đầu hai bên, tên biểu ở giữa,
+ * bảng kẻ khung đầy đủ, và chỗ ký ở cuối.
+ */
 function htmlIn(d) {
   const cot = d.cot;
+  const laSo = (k) => COT_SO.includes(k);
+  const o = (r, c) => (r[c.khoa] == null || r[c.khoa] === "" ? "" : esc(String(r[c.khoa])));
   return `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>${esc(d.tieu_de)}</title>
   <style>
-    @page{size:A4;margin:14mm 12mm}
-    body{font-family:"Segoe UI",Arial,sans-serif;font-size:10.5pt;color:#000;margin:0}
-    h1{font-size:15pt;margin:0 0 2mm;text-align:center;text-transform:uppercase}
-    .truong{text-align:center;font-size:11pt;font-weight:600;margin:0 0 1mm}
-    .loc{font-size:9pt;color:#333;margin:0 0 3mm;border:1px solid #bbb;padding:2mm 3mm;border-radius:2mm}
-    .loc b{color:#000}
-    table{width:100%;border-collapse:collapse;font-size:9.5pt}
-    th,td{border:1px solid #999;padding:1.4mm 2mm}
-    th{background:#eee;text-align:left}
+    @page{size:A4;margin:18mm 14mm 16mm}
+    body{font-family:"Times New Roman",serif;font-size:13pt;color:#000;margin:0;line-height:1.35}
+
+    .dau{display:flex;justify-content:space-between;gap:8mm;margin-bottom:6mm}
+    .dau .ben{text-align:center;flex:1}
+    .dau .co-quan{font-weight:700;text-transform:uppercase;font-size:12pt}
+    .dau .quoc-hieu{font-weight:700;text-transform:uppercase;font-size:12pt}
+    .dau .tieu-ngu{font-weight:700;font-size:13pt}
+    .gach{display:block;width:60%;margin:1mm auto 0;border-bottom:1px solid #000}
+    .gach.dai{width:80%}
+
+    h1{font-size:14pt;margin:0;text-align:center;text-transform:uppercase;font-weight:700}
+    .phu-de{text-align:center;font-size:12pt;font-style:italic;margin:1mm 0 4mm}
+
+    .loc{font-size:11pt;margin:0 0 3mm;border:1px solid #000;padding:2mm 3mm}
+    .loc div{display:inline-block;margin-right:6mm}
+    .loc b{font-weight:700}
+
+    table{width:100%;border-collapse:collapse;font-size:11.5pt}
+    thead{display:table-header-group}
+    tr{page-break-inside:avoid}
+    th,td{border:1px solid #000;padding:1.3mm 2mm;vertical-align:top}
+    th{background:#e8e8e8;text-align:center;font-weight:700}
     td.so,th.so{text-align:right}
-    tr.lech td{background:#fbe6e2}
-    tfoot td{font-weight:700;background:#f4f4f4}
-    .chan{margin-top:3mm;font-size:8.5pt;color:#555;display:flex;justify-content:space-between}
+    td.tt,th.tt{text-align:center;width:12mm}
+    tr.lech td{background:#f2f2f2}
+    tfoot td{font-weight:700;background:#e8e8e8}
+    tfoot{display:table-footer-group}
+
+    .ky{display:flex;justify-content:space-between;gap:10mm;margin-top:8mm;page-break-inside:avoid}
+    .ky .o-ky{flex:1;text-align:center;font-size:12pt}
+    .ky .chuc{font-weight:700;text-transform:uppercase}
+    .ky .ngay{font-style:italic;margin-bottom:1mm}
+    .ky .cho-ten{margin-top:18mm}
+    .chan-in{margin-top:4mm;font-size:9pt;color:#444;text-align:right}
   </style></head><body>
-    ${d.ten_truong ? `<p class="truong">${esc(d.ten_truong)}</p>` : ""}
-    <h1>Thống kê số tiết — ${esc(d.tieu_de)}</h1>
-    <div class="loc">${d.mo_ta_loc.map(([k, v]) => `<div><b>${esc(k)}:</b> ${esc(v)}</div>`).join("")}</div>
+    <div class="dau">
+      <div class="ben">
+        <div class="co-quan">${esc(d.ten_truong || "Nhà trường")}</div>
+        <span class="gach"></span>
+      </div>
+      <div class="ben">
+        <div class="quoc-hieu">Cộng hoà xã hội chủ nghĩa Việt Nam</div>
+        <div class="tieu-ngu">Độc lập - Tự do - Hạnh phúc</div>
+        <span class="gach dai"></span>
+      </div>
+    </div>
+
+    <h1>Thống kê số tiết</h1>
+    <p class="phu-de">${esc(d.tieu_de)}</p>
+
+    ${d.mo_ta_loc?.length
+      ? `<div class="loc">${d.mo_ta_loc.map(([k, v]) => `<div><b>${esc(k)}:</b> ${esc(v)}</div>`).join("")}</div>`
+      : ""}
+
     <table>
-      <thead><tr>${cot.map((c) => `<th class="${["tiet_tuan", "so_tiet_khai", "lech", "tong_tiet"].includes(c.khoa) ? "so" : ""}">${esc(c.ten)}</th>`).join("")}</tr></thead>
-      <tbody>${d.dong.map((r) => `<tr class="${r.lech != null && r.lech !== 0 ? "lech" : ""}">
-        ${cot.map((c) => `<td class="${["tiet_tuan", "so_tiet_khai", "lech", "tong_tiet"].includes(c.khoa) ? "so" : ""}">${r[c.khoa] == null || r[c.khoa] === "" ? "" : esc(String(r[c.khoa]))}</td>`).join("")}</tr>`).join("")}</tbody>
-      <tfoot><tr>${cot.map((c, i) => `<td class="${["tiet_tuan", "so_tiet_khai", "lech", "tong_tiet"].includes(c.khoa) ? "so" : ""}">${
-        i === 0 ? "TỔNG CỘNG" : c.khoa === "tiet_tuan" ? d.tong.tiet_tuan : c.khoa === "tong_tiet" ? d.tong.tong_tiet : ""}</td>`).join("")}</tr></tfoot>
+      <thead><tr><th class="tt">TT</th>${cot.map((c) =>
+        `<th class="${laSo(c.khoa) ? "so" : ""}">${esc(c.ten)}</th>`).join("")}</tr></thead>
+      <tbody>${d.dong.map((r, i) => `<tr class="${r.lech != null && r.lech !== 0 ? "lech" : ""}">
+        <td class="tt">${i + 1}</td>${cot.map((c) =>
+          `<td class="${laSo(c.khoa) ? "so" : ""}">${o(r, c)}</td>`).join("")}</tr>`).join("")}</tbody>
+      <tfoot><tr><td class="tt"></td>${cot.map((c, i) => `<td class="${laSo(c.khoa) ? "so" : ""}">${
+        i === 0 ? "TỔNG CỘNG"
+          : c.khoa === "tiet_tuan" ? d.tong.tiet_tuan
+          : c.khoa === "tong_tiet" ? d.tong.tong_tiet : ""}</td>`).join("")}</tr></tfoot>
     </table>
-    <div class="chan"><span>In lúc ${esc(d.in_luc)}</span><span>Phần mềm TKB Zalo</span></div>
+
+    <div class="ky">
+      <div class="o-ky">
+        <div class="chuc">Người lập biểu</div>
+        <div class="cho-ten"></div>
+      </div>
+      <div class="o-ky">
+        <div class="ngay">${dongNgayThang()}</div>
+        <div class="chuc">Hiệu trưởng</div>
+        <div class="cho-ten"></div>
+      </div>
+    </div>
+    <div class="chan-in">In lúc ${esc(d.in_luc)} · TKB Zalo</div>
   </body></html>`;
 }
+
+/** Dùng cho kịch bản kiểm thử: dựng bản in từ dữ liệu có sẵn. */
+export const __htmlInThu = htmlIn;
 
 /** Bộ lọc có khác mặc định không (mặc định = một thời khoá biểu mới nhất). */
 function daLocRieng(l) {
@@ -241,7 +313,7 @@ export async function ve(khung) {
     ve(khung);
   });
 
-  khung.addEventListener("click", async (e) => {
+  ganKhung(khung, "click", async (e) => {
     const b = e.target.closest("button");
     if (!b) return;
     if (b.id === "mo-loc") {

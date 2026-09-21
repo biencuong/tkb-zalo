@@ -185,3 +185,65 @@ vẫn còn.
 **Cách xử lý nhanh:** đóng gói vào thư mục khác rồi đổi tên:
 `npx electron-builder --win nsis -c.directories.output=_dist` → kiểm gói → `mv _dist dist`.
 Thư mục `.tmp` kẹt thì chuyển sang thư mục tạm để Windows tự dọn.
+
+
+---
+
+## [21/9/2026] Phần tử DÙNG LẠI + addEventListener = lỗi "undefined" khó hiểu
+
+**Hiện tượng người dùng thấy:** bấm một nút, hiện **năm thông báo lỗi giống hệt nhau**
+`Cannot read properties of undefined (reading 'nguoi_ten')`; lỗi còn hiện cả khi đã sang màn khác.
+
+**Nguyên nhân:** app dùng lại hai phần tử cố định và chỉ thay `innerHTML`:
+`#noi-dung` (khung của mọi trang) và `#hop` (mọi hộp thoại). Listener gắn vào PHẦN TỬ CON thì
+chết theo `innerHTML`, nhưng listener gắn vào **chính hai phần tử đó thì còn nguyên**. Mỗi lần vẽ
+lại là chồng thêm một cái, mỗi cái vẫn giữ mảng dữ liệu của lần vẽ cũ → cú bấm chạy N lần, N−1 lần
+cũ tra `ds.find(...)` không ra → `undefined`. Số thông báo lặp chính là số lần đã vẽ lại.
+
+**Ba cách sửa đã dùng:**
+1. `moHop()` thay `#hop` bằng `hopCu.cloneNode(false)` + `replaceWith` — hộp mới sạch listener.
+2. Khung trang: hàm `ganKhung(khung, loai, fn)` luôn `removeEventListener` cái cũ trước khi gắn
+   (lưu cái đang gắn trong `khung.__nghe[loai]`).
+3. Mọi `ds.find(...)` đều kiểm `if (!x) return baoXau(...)` — có phòng hờ thì lỗi không còn im lặng.
+
+**Dấu hiệu nhận ra sớm:** thông báo lỗi **lặp lại đúng số lần**, tăng dần theo số lần vào ra trang.
+Đó gần như luôn là listener chồng, không phải lỗi dữ liệu.
+
+**Bẫy cùng họ, cùng phiên:** `Cannot read properties of undefined (reading 'trim')` trong hàm lọc
+dùng chung — nó bắt `e.target.closest("[data-tim]")`, mà một màn khác lại đặt `data-tim` lên
+`<label>` dòng danh sách (không có `.value`). Hai nơi trùng tên thuộc tính. Sửa: thu hẹp bộ chọn
+thành `input[data-tim]`, kiểm `typeof o.value === "string"`, và đổi tên thuộc tính bên kia thành
+`data-loc`. **Thuộc tính `data-*` dùng chung toàn app thì phải coi như tên biến toàn cục.**
+
+**Bẫy thứ ba:** đợt gửi chạy hàng phút, xong mới `hop.querySelector("#g-thu").disabled = false` —
+người dùng đã đóng hộp thì `querySelector` trả `null`. Việc chạy lâu thì **mọi thao tác DOM sau khi
+chờ đều phải chịu được chuyện phần tử đã biến mất.**
+
+---
+
+## [21/9/2026] Chỉ có MỘT hộp thoại mỗi lúc — đừng mở hộp lồng hộp
+
+`moHop()` giữ một biến `dongHopHienTai` để biết hộp nào đang mở. Mở hộp B khi hộp A còn mở thì B
+chiếm biến đó, và lời gọi đóng của A bị bỏ qua (`if (dongHopHienTai !== xong) return`) → promise của
+A **treo vĩnh viễn**, luồng đang chờ A không bao giờ chạy tiếp.
+
+**Cách làm đúng** (đã dùng cho "Xem trên điện thoại" và "Chọn riêng…"): hộp A tự đóng với một mã
+trả về (`"sua:12"`), hàm gọi đọc mã đó, mở hộp B, xong thì **mở lại A** với dữ liệu mới. Người dùng
+thấy y như hộp lồng, mà không kẹt.
+
+---
+
+## [21/9/2026] CSDL ngành giáo dục: không có cửa cho phần mềm cá nhân
+
+Tra ngày 21/9/2026 cho việc "đưa thời khoá biểu lên CSDL ngành":
+
+- CSDL ngành (`truong.csdl.moet.gov.vn`) trao đổi dữ liệu qua API dùng **token SSO**.
+- Kết nối chỉ cấp cho **phần mềm quản lý nhà trường đã được Bộ thẩm định** và ký kết nối trục dữ liệu
+  (K12Online/K12Connect, EnetViet, ONEDU…). **Không có API công khai.**
+- Phần mềm đã kết nối bị **cấm chia sẻ dữ liệu cho bên thứ ba**; vi phạm thì bị cắt kết nối vĩnh viễn.
+- Trang hướng dẫn cũ `huongdan.csdl.moet.gov.vn` nay chuyển hướng về `moet.gov.vn` — không còn tra được.
+
+→ **Đường khả thi duy nhất:** xuất tệp đúng mẫu nhập của CSDL ngành để người dùng tự tải lên bằng
+tài khoản trường (giống cách nhập danh sách học sinh từ Excel). Muốn làm đúng mẫu thì phải có tệp mẫu
+tải từ chính tài khoản đó — không đăng nhập được thì không đoán mò.
+Trong app đã đặt sẵn nút **"Lên CSDL ngành"** kèm nhãn *sắp có*, bấm vào nói đúng hiện trạng này.

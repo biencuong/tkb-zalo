@@ -4,8 +4,7 @@
  *   · Lịch sử  — ai đã nhận gì, lọc bằng thanh chip + hộp thoại như trang Thống kê.
  */
 import {
-  esc, so, gioVn, ngayVn, moHop, nhanKetQuaGui, bang, $$, coHoac, baoXau,
-} from "../chung.js";
+  esc, so, gioVn, ngayVn, moHop, nhanKetQuaGui, bang, $$, coHoac, baoXau, ganKhung,} from "../chung.js";
 import { chipZalo } from "../zalo-nhanh.js";
 import { moGui, moHopLoi } from "../gui-modal.js";
 
@@ -252,7 +251,7 @@ export async function ve(khung, thamSo = {}) {
     khung.querySelector("#tab-tong-hop").hidden = tabLs !== "tong-hop";
   });
 
-  khung.addEventListener("click", async (e) => {
+  ganKhung(khung, "click", async (e) => {
     const b = e.target.closest("button");
     if (!b) return;
 
@@ -276,6 +275,7 @@ export async function ve(khung, thamSo = {}) {
     if (b.id === "bo-loc") { loc = {}; return ve(khung); }
     if (b.dataset.xem) {
       const x = ds.find((y) => y.id === Number(b.dataset.xem));
+      if (!x) return baoXau("Không còn thấy dòng này trong danh sách. Hãy tải lại trang Lịch sử.");
       return moHop({
         tieuDe: "Nội dung đã gửi", rong: "rong",
         noiDung: `<table class="b"><tbody>

@@ -1,5 +1,5 @@
 /** Tổng quan: quy trình 3 bước, chỉ hiện việc cần làm tiếp. */
-import { esc, so, ngayVn, hopCho, baoOk, baoXau } from "../chung.js";
+import { esc, so, ngayVn, hopCho, baoOk, baoXau, ganKhung,} from "../chung.js";
 import { di, capNhatTienDo } from "../app.js";
 
 /** Thanh 3 bước — bấm vào là nhảy tới bước đó. Dùng lại ở các trang khác. */
@@ -67,7 +67,7 @@ export async function ve(khung) {
     <span><b>${s.thieu_cn} lớp chưa có chủ nhiệm</b> — không gửi được thời khoá biểu lớp.</span>
     <button class="nut nho" data-di-tab="tkb">Chọn chủ nhiệm</button></div>` : ""}`;
 
-  khung.addEventListener("click", async (e) => {
+  ganKhung(khung, "click", async (e) => {
     const b = e.target.closest("button");
     if (!b) return;
     if (b.dataset.diBuoc) return di(b.dataset.diBuoc);

@@ -183,7 +183,23 @@ Hai thứ người dùng cần liếc bất cứ lúc nào: **đang nối tài k
 - [ ] Không có trang nào chỉ để "đi qua" — vào là làm được việc.
 - [ ] Mọi việc máy tự làm được đều đã tự làm, và đều có báo cáo đủ trạng thái.
 - [ ] Điều kiện thiếu thì mở ngay chỗ khắc phục tại chỗ.
+- [ ] **Mỗi cảnh báo đều bấm sửa được ngay tại dòng/màn đang báo** — thử từng cái một bằng tay.
+- [ ] Không dòng nào vừa bị khoá vừa không có đường thoát ngay cạnh.
 - [ ] Không có nhãn nào dài quá 3 từ; không có cảnh báo nào thiếu cách sửa.
 - [ ] Thu gọn thanh bên vẫn đọc được tên mục.
 - [ ] Việc không hoàn tác được đều có màn xem trước đúng như thật.
 - [ ] Chạy được kịch bản tự động mở lần lượt mọi trang, không lỗi nào trong bảng điều khiển.
+
+### 17b. Ba câu phải trả lời được cho MỌI cảnh báo
+
+Rút ra từ lỗi thật trong chính dự án này: app báo *"nhóm chưa đặt nhận thời khoá biểu nào → vào
+Dữ liệu › Giáo viên › Người nhận ngoài danh sách mà sửa"*. Người dùng sang đó thì hộp sửa đòi số
+điện thoại mà nhóm không có số, còn dòng đang bị cảnh báo thì khoá không tích được. Ngõ cụt.
+
+1. **Bấm được gì ngay tại đây?** Sửa nhanh thì đặt luôn ô chọn / ô nhập trên chính dòng đang báo.
+   Chỉ đường sang màn khác là phương án cuối, và phải tự mở màn đó kiểm lại là sửa được thật.
+2. **Đã khoá thì đường thoát nằm ở đâu?** Khoá mà không có lối ra là bắt người dùng đoán.
+3. **Sửa xong màn hình tự tính lại chưa?** Cảnh báo phải biến mất ngay, không bắt đóng ra mở lại.
+
+Luật dữ liệu hay đi kèm: **trường khoá mà giao diện không gửi lên thì giữ giá trị cũ**, đừng coi
+`undefined` là lệnh xoá — nếu không, lưu một lần là mất định danh (ở đây là mã nhóm Zalo), hết gửi được.

@@ -77,7 +77,7 @@ Lần đầu Windows có thể cảnh báo SmartScreen vì bộ cài chưa ký s
 
 Số hiệu đánh theo chuẩn **chính.phụ.vá** (ví dụ `1.2.0`): số cuối là sửa lỗi, số giữa là thêm chức năng, số đầu là thay đổi lớn. Bản thử nghiệm có thêm đuôi (`1.2.0-beta.1`) và luôn được coi là cũ hơn bản chính thức cùng số.
 
-Mỗi lần mở, app tự hỏi có bản mới không. Có thì:
+App **tự hỏi** có bản mới không: lúc mở, rồi **cứ mỗi giờ**, và khi bạn quay lại cửa sổ sau một lúc lâu. Để app mở cả ngày vẫn được báo. Có bản mới thì:
 
 - Hiện **thông báo ở góc dưới** kèm nút xem nội dung cập nhật.
 - **Số hiệu ở cuối thanh bên** chuyển màu và có chấm đỏ.

@@ -394,3 +394,10 @@ Hộp *Xem trước đợt gửi* ghi "đã kiểm lại theo số liệu mới 
 `datNhanTatCa(id, {lop, gv})`: hai ô **độc lập**, giữ các lớp / giáo viên chọn riêng. Khối trong hộp gửi:
 hai ô + nút "Chọn lớp, GV cụ thể…" (mở hộp hai cột). Lưu xong mở lại hộp gửi **đúng tab**, giữ tuỳ chọn
 đang chỉnh (`moGui(tkbId, { tab, tcTam })`).
+
+## Tự hỏi bản mới
+
+`cap-nhat.js › kiemNenSauKhoiDong`: hỏi 15 giây sau khi mở, rồi **mỗi giờ** (`setInterval`), và khi cửa sổ
+được bấm vào lại mà đã ≥ 30 phút chưa hỏi (`app.on("browser-window-focus")` → `hoiNeuDaLau`). Hỏi kèm ETag
+(304 khi không đổi). Có bản mới → chấm đỏ trên số phiên bản; thông báo hiện **một lần cho mỗi bản**
+(bản mới hơn nữa ra sau thì báo tiếp). Tắt được ở Cài đặt (`tu_kiem_cap_nhat`).

@@ -1,7 +1,7 @@
 /** Hộp thông báo cập nhật có lịch sử thay đổi (gọn theo kiểu bảng điều khiển S22U). */
 import { moHop, esc, ngayVn, baoOk, baoXau, bao, dongHop } from "./chung.js";
 
-let daNhacPhien = false;
+let daNhacBan = "";   // bản đã hiện thông báo — bản mới hơn nữa ra sau thì báo tiếp
 
 /** Kết quả kiểm tra gần nhất (null nếu đang là bản mới nhất). */
 export let banMoiDaBiet = null;
@@ -131,8 +131,8 @@ export function ganTuDongKiem(khiCoMoi = null) {
   window.api.capNhat.onCoBanMoi((kq) => {
     banMoiDaBiet = kq;
     khiCoMoi?.(kq);
-    if (daNhacPhien) return;
-    daNhacPhien = true;
+    if (daNhacBan === kq.ban_moi) return;   // cùng bản này đã báo rồi: chỉ giữ chấm đỏ, không nhắc lại
+    daNhacBan = kq.ban_moi;
     const t = bao(
       `<b>Đã có TKB Zalo bản ${esc(kq.ban_moi)}.</b>
        <span class="sua">Đang dùng bản ${esc(kq.ban_hien_tai)}.</span>

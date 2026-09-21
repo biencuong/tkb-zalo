@@ -212,12 +212,29 @@ export async function taiVaCai(onTienDo) {
 export function moTrangPhatHanh() { shell.openExternal(`https://github.com/${KHO}/releases`); return { ok: true }; }
 
 /** Kiểm tra nền sau khi app khởi động (im lặng nếu lỗi mạng). */
-export function kiemNenSauKhoiDong(guiChoGiaoDien, tre = 15000) {
+/**
+ * TỰ HỎI BẢN MỚI: 15 giây sau khi mở, rồi MỖI GIỜ, và khi người dùng quay lại cửa sổ mà đã ≥ 30 phút
+ * chưa hỏi. App để mở cả ngày vẫn biết có bản mới (trước đây chỉ hỏi một lần lúc mở).
+ * Hỏi kèm ETag: chưa có gì mới thì máy chủ trả 304, không tốn lượt truy vấn của GitHub.
+ */
+let lanHoiCuoi = 0;
+let guiLen = null;
+async function hoiNgam() {
   if (layCaiDat("tu_kiem_cap_nhat") === "0") return;
-  setTimeout(async () => {
-    try {
-      const kq = await kiemTraBanMoi();
-      if (kq.co_ban_moi && !kq.da_bo_qua) guiChoGiaoDien(kq);
-    } catch { /* không mạng thì thôi */ }
-  }, tre).unref?.();
+  lanHoiCuoi = Date.now();
+  try {
+    const kq = await kiemTraBanMoi({ dungCache: false });
+    if (kq.co_ban_moi && !kq.da_bo_qua) guiLen?.(kq);
+  } catch { /* không mạng thì thôi, lần sau hỏi lại */ }
+}
+
+export function kiemNenSauKhoiDong(guiChoGiaoDien, tre = 15000, chuKy = 60 * 60000) {
+  guiLen = guiChoGiaoDien;
+  setTimeout(hoiNgam, tre).unref?.();
+  setInterval(hoiNgam, chuKy).unref?.();
+}
+
+/** Cửa sổ vừa được bấm vào lại: đã lâu chưa hỏi thì hỏi ngay. */
+export function hoiNeuDaLau(toiThieu = 30 * 60000) {
+  if (guiLen && Date.now() - lanHoiCuoi >= toiThieu) hoiNgam();
 }

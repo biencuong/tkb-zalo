@@ -338,3 +338,11 @@ cho mọi hàm nhận dạng đường dẫn; sinh mã có dấu `\` thì ghi b�
 "Ảnh gồm buổi nào" (cả ngày / sáng / chiều) được lưu nhưng không ai đọc — ảnh luôn vẽ cả ngày. Lộ ra khi
 làm vân tay (buổi phải nằm trong số liệu ảnh). Nay mỗi lần gửi ảnh được đảm bảo đúng buổi đã chọn.
 **Luật:** mỗi tuỳ chọn trên giao diện phải có ít nhất một chỗ đọc nó — `grep` tên khoá trong `src/main`.
+
+---
+
+## [21/9/2026] Chỉ hỏi bản mới lúc mở app là không đủ
+
+Người dùng để app mở cả buổi; ba bản 0.1.13 → 0.1.15 ra sau khi mở nên số phiên bản không hề có chấm đỏ.
+Nay hỏi lại mỗi giờ và khi quay lại cửa sổ. Kiểm bằng cách giả máy bản cũ (chép `src/main` + `package.json`
+đổi version ra thư mục tạm) rồi cho chu kỳ vài giây — thấy báo lặp đúng nhịp.

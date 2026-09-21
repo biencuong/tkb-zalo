@@ -96,7 +96,8 @@ Không cần Word, Python hay Node.</p>
 <p>Số hiệu đánh theo chuẩn <b>chính.phụ.vá</b> (ví dụ <span class="mono">1.2.0</span>): số cuối là sửa lỗi,
 số giữa là thêm chức năng, số đầu là thay đổi lớn. Bản thử nghiệm có thêm đuôi
 (<span class="mono">1.2.0-beta.1</span>) và luôn được coi là cũ hơn bản chính thức cùng số.</p>
-<p>Mỗi lần mở, app tự hỏi có bản mới không. Có thì:</p>
+<p>App <b>tự hỏi</b> có bản mới không: lúc mở, rồi <b>cứ mỗi giờ</b>, và khi bạn quay lại cửa sổ sau
+một lúc lâu. Để app mở cả ngày vẫn được báo. Có bản mới thì:</p>
 <ul>
   <li>Hiện <b>thông báo ở góc dưới</b> kèm nút xem nội dung cập nhật.</li>
   <li><b>Số hiệu ở cuối thanh bên</b> chuyển màu và có chấm đỏ.</li>

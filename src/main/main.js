@@ -158,6 +158,8 @@ app.whenReady().then(() => {
 
   // Kiểm tra bản mới sau khi app đã chạy ổn định
   capNhat.kiemNenSauKhoiDong((kq) => { try { cua?.webContents.send("cap-nhat:co-ban-moi", kq); } catch { /* */ } });
+  // Quay lại cửa sổ sau một lúc lâu: hỏi bản mới ngay (không đợi tới giờ hỏi định kỳ).
+  app.on("browser-window-focus", () => capNhat.hoiNeuDaLau());
 
   app.on("activate", () => { if (BrowserWindow.getAllWindows().length === 0) { taoCuaSo(); datCuaSo(cua); } });
 }).catch((e) => {

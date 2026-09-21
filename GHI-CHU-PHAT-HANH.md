@@ -5,6 +5,15 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.16 — Tự báo có bản mới cả khi app đang mở
+
+- Trước đây app chỉ hỏi có bản mới **một lần lúc mở**. Để app mở cả buổi thì không biết có bản mới ra sau đó.
+- Nay app hỏi lúc mở, rồi **cứ mỗi giờ**, và **khi bạn quay lại cửa sổ** sau một lúc lâu. Có bản mới thì
+  số phiên bản ở cuối thanh bên **đổi màu, có chấm đỏ**, kèm thông báo. Bản mới hơn nữa ra sau thì báo tiếp.
+- Hỏi nhẹ: chưa có gì mới thì máy chủ chỉ trả "không đổi". Tắt được ở **Cài đặt**.
+
+---
+
 ## 0.1.15 — Ảnh và Word tự làm mới, không còn nút bấm; nhóm nhận gì chọn được đủ kiểu
 
 ### Không còn nút "Tạo ảnh + Word"

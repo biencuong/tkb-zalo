@@ -198,10 +198,15 @@ cả hai việc: `package.json` đúng chuẩn, và bảng so sánh mười cặ
 
 ## 6. Luồng nghiệp vụ chính
 
-1. **Nhập danh sách giáo viên** → khoá khớp `ma_gv`, rồi `ho_ten`. Nhập lại là cập nhật, không nhân đôi.
-2. **Nhập thời khoá biểu** → xem trước (kiểm tra đủ chưa, thiếu gì) → cất tệp vào kho theo năm học + số →
-   ghi tiết → cắt Word. Trùng số thì cảnh báo, chọn cập nhật thì snapshot bản cũ vào `tkb_phien_ban`.
-3. **Tạo ảnh** cho từng giáo viên và từng lớp.
+1. **Thả tệp** (kéo thả hoặc *＋ Thêm tệp dữ liệu*) → `tm:nhan-tep` phân loại theo nội dung, đặt tên chuẩn,
+   chống trùng bằng SHA-256.
+2. **Hộp "Xem thử và nạp dữ liệu"** (`hopXemThuVaNap`) đọc thử mọi thứ nạp được mà CHƯA ghi gì:
+   danh sách giáo viên (`gv:xem-truoc-excel` → thêm / cập nhật / có số điện thoại) và từng thời khoá biểu
+   (`tkb:xem-truoc`). Bấm **Nạp dữ liệu** thì nạp đúng thứ tự: giáo viên trước, thời khoá biểu sau.
+3. **Nạp thời khoá biểu** → cất tệp vào kho theo năm học + số → ghi tiết → cắt Word → **tự tạo ảnh**.
+   Trùng số thì cập nhật và snapshot bản cũ vào `tkb_phien_ban`.
+   Chưa có danh sách giáo viên thì `taoGvThieu` tạo từ bảng phân công (xem mục dưới) — **không** bắt buộc
+   nạp danh sách giáo viên trước.
 4. **Kết nối Zalo** (QR) → **dò UID** theo số điện thoại → đối chiếu bạn bè.
 5. **Gửi**: hộp tuỳ chọn → dựng danh sách + phát hiện trùng → xem trước → tạo đợt → gửi thử → gửi cả đợt →
    **danh sách lỗi** (`gomLoiDot`) nêu từng giáo viên không nhận được, số điện thoại, lý do và cách sửa;
@@ -293,3 +298,29 @@ Cùng một HTML dùng cho cả **In** và **Lưu PDF**.
 Đặt cạnh *Gửi qua Zalo* trong khu Thời khoá biểu vì cùng là việc **phát hành thời khoá biểu đi
 nơi khác**. Có nhãn *sắp có*; bấm vào mở hộp nói thẳng vì sao chưa làm được và cần gì để làm tiếp
 (xem `KINH-NGHIEM.md`). Không làm nút giả bấm vào không có gì.
+
+---
+
+## Chỉ một tệp Excel: tạo giáo viên từ bảng phân công
+
+Tệp Excel xuất từ Smart Scheduler có sẵn cả hai phía cần ghép: sheet **PCGD** có họ tên đầy đủ, các sheet
+**TKB** dùng mã viết tắt. `taoGvThieu` trong `nhapTkb` tạo giáo viên cho mọi dòng PCGD chưa có:
+
+1. Mã suy từ phân công (`suyMaTuPhanCong`): so chữ ký *môn | lớp* của từng người với tiết thực dạy,
+   chỉ nhận cặp khớp **duy nhất cả hai chiều**.
+2. Chủ nhiệm **không dạy tiết nào** thì không có chữ ký — lấy mã trong tiêu đề cột lớp (`6A1 (D.Nhàn)`),
+   ghép qua cột CN của PCGD.
+
+Tệp mẫu: **40/40** người, 0 tiết thiếu giáo viên (`test/mot-tep.test.js`). Còn thiếu mỗi số điện thoại,
+người dùng điền trên bảng. Nạp kèm tệp danh sách giáo viên thì danh sách là chuẩn, không tự tạo thêm
+(tránh nhân đôi khi tên hai nguồn viết khác nhau).
+
+## Xoá
+
+| Việc | Ở đâu | Làm gì |
+|---|---|---|
+| Xoá thời khoá biểu | Nút **Xoá…** đầu khu Thời khoá biểu | Một hộp: tích từng số / cả đợt (năm học · học kỳ) / chọn tất cả. `tkb:xoa-nhieu` xoá trong một giao dịch; tuỳ chọn xoá thư mục ảnh + Word — chỉ khi thư mục nằm trong kho và không bản nào khác dùng chung. |
+| Xoá toàn bộ giáo viên | Biểu tượng thùng rác cuối thanh tiêu đề bảng Giáo viên | Phải tích "Tôi hiểu" mới bấm được. `gv:xoa-tat-ca` rồi xoá dấu `ds_gv_da_nap` để nạp lại được đúng tệp cũ. |
+
+Lịch sử gửi luôn giữ (khoá ngoại `SET NULL`). Xoá giáo viên thì thời khoá biểu mất liên kết
+(`tkb_gv.giao_vien_id`, `tiet.giao_vien_id` về NULL) — nạp lại tệp thời khoá biểu để ghép lại.

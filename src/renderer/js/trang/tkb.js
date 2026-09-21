@@ -1,6 +1,6 @@
 /** Thời khoá biểu: danh sách theo số và ngày, chi tiết từng lớp/giáo viên, chọn chủ nhiệm, tạo ảnh. */
-import { esc, so, ngayVn, gioVn, moHop, hoi, baoOk, baoXau, baoKetQua, hopCho, luoiTkb, bang, $$, coHoac, ganKhung,} from "../chung.js";
-import { di } from "../app.js";
+import { esc, so, ngayVn, gioVn, moHop, hoi, baoOk, baoXau, baoKetQua, hopCho, luoiTkb, bang, $$, coHoac, ganKhung, ICON_XOA,} from "../chung.js";
+import { di, capNhatTienDo } from "../app.js";
 import { chipZalo } from "../zalo-nhanh.js";
 import { moGui } from "../gui-modal.js";
 import { moXemMobile } from "../xem-mobile.js";
@@ -47,6 +47,89 @@ function moHopCsdlNganh() {
   });
 }
 
+/**
+ * XOÁ THỜI KHOÁ BIỂU — một hộp cho cả ba cách: tích từng số, tích cả một đợt
+ * (năm học · học kỳ), hoặc "Chọn tất cả". Lịch sử gửi giữ nguyên.
+ * Trả về true nếu đã xoá.
+ */
+async function hopXoaTkb(ds, chonSan = []) {
+  if (!ds.length) return false;
+  const dot = new Map();
+  for (const t of ds) {
+    const k = `${t.nam_hoc || "chưa rõ năm học"}${t.hoc_ky ? " · học kỳ " + t.hoc_ky : ""}`;
+    if (!dot.has(k)) dot.set(k, []);
+    dot.get(k).push(t);
+  }
+  const idMoiNhat = ds[0].id;
+  let chon = [];
+  let xoaTep = true;
+  const kq = await moHop({
+    tieuDe: "Xoá thời khoá biểu", rong: "rong",
+    noiDung: `
+      <p class="nho mo" style="margin:0 0 .6rem">Tích <b>từng số</b>, tích <b>cả một đợt</b>, hoặc
+        <b>chọn tất cả</b>. Lịch sử gửi vẫn giữ; tệp gốc đã nạp vẫn còn trong thư mục dữ liệu, cần thì nạp lại.</p>
+      <label class="tich the-tich" style="margin-bottom:.6rem"><input type="checkbox" id="xt-het">
+        <span><b>Chọn tất cả</b><span class="g">${so(ds.length)} thời khoá biểu</span></span></label>
+      <div class="ds-dot-xoa">
+      ${[...dot.entries()].map(([ten, dsT], i) => `
+        <div class="dot-xoa">
+          <label class="tich dot-dau"><input type="checkbox" data-dot="${i}">
+            <span><b>Đợt ${esc(ten)}</b><span class="g">${so(dsT.length)} số — tích để chọn cả đợt</span></span></label>
+          ${dsT.map((t) => `<label class="tich dot-muc"><input type="checkbox" name="xt" value="${t.id}" data-thuoc="${i}"
+              ${chonSan.includes(t.id) ? "checked" : ""}>
+            <span>Số <b>${t.so_tkb}</b> · từ ${esc(ngayVn(t.ngay_ap_dung)) || "?"}
+              ${t.id === idMoiNhat ? '<span class="nhan n-ok">mới nhất</span>' : ""}
+              <span class="g">${so(t.so_lop)} lớp · ${so(t.so_gv)} giáo viên${t.da_gui ? ` · đã gửi ${so(t.da_gui)} lượt` : ""}</span></span></label>`).join("")}
+        </div>`).join("")}
+      </div>
+      <label class="tich" style="margin-top:.7rem"><input type="checkbox" id="xt-tep" checked>
+        <span>Xoá luôn ảnh và tệp Word đã tạo của các bản này
+          <span class="g">Tạo lại được bất cứ lúc nào bằng cách nạp lại tệp gốc.</span></span></label>`,
+    nut: [{ ten: "Huỷ", giaTri: null }, { ten: "Xoá", kieu: "xau", giaTri: "xoa" }],
+    khiMo: (hop) => {
+      const muc = () => $$('input[name="xt"]', hop);
+      const nutXoa = hop.querySelector(".hop-chan .nut.xau");
+      const capNhat = () => {
+        const n = muc().filter((x) => x.checked).length;
+        if (nutXoa) {
+          nutXoa.disabled = !n;
+          nutXoa.textContent = !n ? "Chưa chọn bản nào" : n === ds.length ? "Xoá toàn bộ" : `Xoá ${so(n)} thời khoá biểu`;
+        }
+        hop.querySelector("#xt-het").checked = n === muc().length;
+        $$("[data-dot]", hop).forEach((d) => {
+          const con = muc().filter((x) => x.dataset.thuoc === d.dataset.dot);
+          d.checked = con.every((x) => x.checked);
+          d.indeterminate = !d.checked && con.some((x) => x.checked);
+        });
+      };
+      hop.addEventListener("change", (e) => {
+        const x = e.target;
+        if (x.id === "xt-het") muc().forEach((m) => { m.checked = x.checked; });
+        else if (x.dataset.dot != null) {
+          muc().filter((m) => m.dataset.thuoc === x.dataset.dot).forEach((m) => { m.checked = x.checked; });
+        }
+        capNhat();
+      });
+      capNhat();
+      nutXoa?.addEventListener("click", () => {
+        chon = muc().filter((x) => x.checked).map((x) => Number(x.value));
+        xoaTep = hop.querySelector("#xt-tep").checked;
+      }, true);
+    },
+  });
+  if (kq !== "xoa" || !chon.length) return false;
+
+  const tatCa = chon.length === ds.length;
+  if (!(await hoi(tatCa ? "Xoá TOÀN BỘ thời khoá biểu?" : `Xoá ${so(chon.length)} thời khoá biểu?`,
+    (tatCa ? "Phần mềm sẽ không còn thời khoá biểu nào — phải nạp lại mới gửi được. " : "")
+      + "Không hoàn tác được. Lịch sử gửi vẫn giữ.",
+    { nutOk: "Xoá", kieu: "xau" }))) return false;
+
+  const r = await window.api.tkb.xoaNhieu(chon, { xoaTep });
+  return baoKetQua(r, `Đã xoá ${so(r.so)} thời khoá biểu`
+    + (r.so_thu_muc ? `, dọn ${so(r.so_thu_muc)} thư mục ảnh và Word.` : "."));
+}
+
 export async function ve(khung, thamSo = {}) {
   const gon = Boolean(thamSo.gon);
   const r = await window.api.tkb.ds();
@@ -85,6 +168,7 @@ export async function ve(khung, thamSo = {}) {
       ${chipZalo()}
       <button class="nut nho" id="tao-anh">Tạo ảnh</button>
       <button class="nut nho" id="mo-thu-muc">Mở thư mục</button>
+      <button class="nut nho xau" id="xoa-nhieu-tkb" title="Xoá thời khoá biểu: từng số, từng đợt hoặc toàn bộ">${ICON_XOA} Xoá…</button>
       <button class="nut nho" id="len-csdl" title="Đưa thời khoá biểu lên cơ sở dữ liệu ngành giáo dục">
         Lên CSDL ngành <span class="nhan n-xam">sắp có</span></button>
       <button class="nut chinh" id="di-gui">Gửi qua Zalo</button>
@@ -183,9 +267,9 @@ export async function ve(khung, thamSo = {}) {
         </tbody></table></div>
     </div>
     <div class="the">
-      <div class="the-dau"><h3 style="margin:0">Xoá thời khoá biểu này</h3></div>
-      <p class="nho mo">Lịch sử gửi vẫn giữ.</p>
-      <button class="nut xau" id="xoa-tkb">Xoá thời khoá biểu số ${ct.so_tkb}</button>
+      <div class="the-dau"><h3 style="margin:0">Xoá thời khoá biểu</h3></div>
+      <p class="nho mo">Xoá bản này, cả một đợt hoặc toàn bộ. Lịch sử gửi vẫn giữ.</p>
+      <button class="nut xau" id="xoa-tkb">${ICON_XOA} Xoá thời khoá biểu số ${ct.so_tkb}…</button>
     </div>
   </div>`;
 
@@ -269,11 +353,13 @@ export async function ve(khung, thamSo = {}) {
       return;
     }
 
-    if (b.id === "xoa-tkb") {
-      if (!(await hoi("Xoá thời khoá biểu?",
-        `Xoá <b>số ${ct.so_tkb}</b> (${esc(ct.nam_hoc)}) cùng ${so(ct.lop.length)} lớp. Lịch sử gửi và tệp gốc vẫn giữ.`, { nutOk: "Xoá", kieu: "xau" }))) return;
-      const r2 = await window.api.tkb.xoa(dangXem);
-      if (baoKetQua(r2, "Đã xoá.")) { dangXem = null; ve(khung, thamSo); }
+    if (b.id === "xoa-tkb" || b.id === "xoa-nhieu-tkb") {
+      // Nút trong thẻ "Xoá thời khoá biểu" chọn sẵn bản đang xem; nút trên đầu trang để trống.
+      if (await hopXoaTkb(ds, b.id === "xoa-tkb" ? [dangXem] : [])) {
+        dangXem = null;
+        await capNhatTienDo();
+        ve(khung, thamSo);
+      }
       return;
     }
   });

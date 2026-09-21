@@ -1,62 +1,41 @@
 TIN GIỚI THIỆU TKB ZALO — DÁN THẲNG VÀO ZALO
-Link tải luôn trỏ bản mới nhất: https://github.com/biencuong/tkb-zalo/releases/latest
-(Chọn tệp TKBZalo-Setup-x.y.z.exe. Chỉ chạy trên Windows.)
+Mỗi đoạn là một dòng liền, không ngắt giữa câu, để trên điện thoại tự xuống dòng cho đẹp.
+Link tải luôn trỏ tới bản mới nhất: https://github.com/biencuong/tkb-zalo/releases/latest
 
-═══════════════════════════════════════════════════════════════════
-BẢN 1 — NGẮN, DÁN VÀO NHÓM ZALO TRƯỜNG
-═══════════════════════════════════════════════════════════════════
+==================== BẢN 1 — NGẮN, DÁN VÀO NHÓM ZALO TRƯỜNG ====================
 
 TKB Zalo — gửi thời khoá biểu cho giáo viên bằng Zalo, miễn phí.
 
-Nhập tệp xuất từ phần mềm xếp thời khoá biểu, phần mềm tự cắt cho từng thầy/cô, tự vẽ
-ảnh xem ngay trên điện thoại, rồi gửi bằng chính Zalo của mình. Quét mã QR một lần là
-dùng được, không phải đăng ký gì.
+Mỗi thầy/cô nhận thời khoá biểu của mình qua Zalo: dạng ảnh để xem ngay trên điện thoại và file Word để in. Chỉ cần một tệp Excel xuất từ Smart Scheduler, quét mã QR Zalo một lần là dùng được, không phải đăng ký gì.
 
 Tải về: https://github.com/biencuong/tkb-zalo/releases/latest
 
-═══════════════════════════════════════════════════════════════════
-BẢN 2 — ĐẦY ĐỦ, GỬI CHO BAN GIÁM HIỆU HOẶC TRƯỜNG BẠN
-═══════════════════════════════════════════════════════════════════
+==================== BẢN 2 — ĐẦY ĐỦ, GỬI BAN GIÁM HIỆU HOẶC TRƯỜNG BẠN ====================
 
-TKB Zalo — phát thời khoá biểu tới từng giáo viên, miễn phí
+TKB Zalo — gửi thời khoá biểu tới từng giáo viên, miễn phí
 
-Phát thời khoá biểu cho giáo viên, cách chính thống là gửi email hoặc Zalo OA của
-trường. Cả hai đều dùng được, nhưng dựng lên khá phức tạp: email thì phải có địa chỉ
-đúng của từng người, trộn thư, đính kèm đúng tệp, mà nhiều thầy/cô không mở hộp thư
-hằng ngày; Zalo OA thì phải đăng ký tài khoản chính thức, xác minh, chờ duyệt, giáo
-viên phải quan tâm OA mới nhận được, có loại tin còn mất phí.
+Cách chính thống để gửi thời khoá biểu là qua email hoặc Zalo OA của trường, nhưng cài đặt khá phức tạp, Zalo OA còn phải đăng ký và chờ được duyệt.
 
-Phần mềm này đi đường đơn giản hơn: dùng chính tài khoản Zalo sẵn có, quét mã QR một
-lần là gửi được ngay — không đăng ký, không chờ duyệt, không tốn phí.
+Phần mềm này đi đường đơn giản hơn: dùng chính tài khoản Zalo sẵn có, quét mã QR một lần là gửi được ngay — không đăng ký, không chờ duyệt, không tốn phí.
 
 Làm giúp mấy việc mà gửi tay không làm nổi:
-• Tự cắt tệp Word của cả trường thành tệp riêng từng giáo viên, từng lớp.
-• Tự vẽ ảnh thời khoá biểu gọn cho màn hình điện thoại — mở là đọc được, khỏi tải tệp.
-• Gửi được cả vào nhóm Zalo của tổ chuyên môn hay của trường.
+• Mỗi thầy/cô nhận đúng thời khoá biểu của mình qua Zalo: dạng ảnh xem ngay trên điện thoại và file Word để in; chủ nhiệm nhận thêm thời khoá biểu lớp.
+• Gửi được cả vào nhóm Zalo của tổ chuyên môn, của trường, của nhóm cha mẹ học sinh...
 • Thống kê số tiết theo giáo viên, lớp, môn, buổi; xuất Excel và in biểu mẫu báo cáo.
 • Lịch sử gửi cho biết tin đã tới nơi chưa, ai chưa nhận được và vì sao.
 
-Cách dùng: nhập danh sách giáo viên (một lần) → nhập tệp thời khoá biểu vừa xuất →
-tạo ảnh → quét mã QR Zalo → gửi thử vài người → gửi cả trường.
+Cách dùng: trên Smart Scheduler chọn Hệ thống | Chuyển đổi dữ liệu sang Excel → Chấp nhận, lưu tệp → kéo thả vào TKB Zalo → bấm Nạp dữ liệu → lần đầu điền số điện thoại giáo viên và quét mã QR Zalo → bấm Gửi. Lần sau chỉ cần xuất tệp mới, thả vào, nạp rồi gửi.
 
 Tải về (Windows): https://github.com/biencuong/tkb-zalo/releases/latest
 
-Lưu ý: phần mềm dùng tài khoản Zalo cá nhân nên nên dùng một tài khoản phụ và gửi
-chừng mực; trong phần mềm có sẵn giới hạn an toàn và hướng dẫn chi tiết.
+Lưu ý: phần mềm dùng tài khoản Zalo cá nhân nên nên dùng một tài khoản phụ và gửi chừng mực; trong phần mềm có sẵn giới hạn an toàn và hướng dẫn chi tiết.
 
-═══════════════════════════════════════════════════════════════════
-BẢN 3 — MỘT DÒNG, KÈM LINK
-═══════════════════════════════════════════════════════════════════
+==================== BẢN 3 — MỘT DÒNG KÈM LINK ====================
 
-Phần mềm miễn phí gửi thời khoá biểu cho giáo viên qua Zalo, tự cắt tệp và tự vẽ ảnh
-xem trên điện thoại: https://github.com/biencuong/tkb-zalo/releases/latest
+Phần mềm miễn phí gửi thời khoá biểu cho giáo viên qua Zalo, dạng ảnh xem ngay và file Word để in: https://github.com/biencuong/tkb-zalo/releases/latest
 
-═══════════════════════════════════════════════════════════════════
-GHI CHÚ KHI GỬI
-═══════════════════════════════════════════════════════════════════
+==================== GHI CHÚ KHI GỬI ====================
 
-• Lần đầu chạy tệp cài, Windows có thể hiện bảng xanh "Windows protected your PC" vì
-  bộ cài chưa mua chữ ký số. Bấm "More info" → "Run anyway".
+• Lần đầu chạy tệp cài, Windows có thể hiện bảng xanh "Windows protected your PC" vì bộ cài chưa có chữ ký số. Bấm "More info" rồi "Run anyway".
 • Cài không cần quyền quản trị, không cần cài thêm gì khác.
-• Nếu muốn gửi kèm link trang phát hành (có mô tả từng bản):
-  https://github.com/biencuong/tkb-zalo/releases
+• Trang phát hành có mô tả từng bản: https://github.com/biencuong/tkb-zalo/releases

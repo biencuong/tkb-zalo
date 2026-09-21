@@ -1,7 +1,7 @@
 /** Danh sách giáo viên: xem đủ thông tin, thêm/sửa/xoá, dò Zalo, người nhận ngoài danh sách. */
 import {
   esc, so, moHop, hoi, baoOk, baoXau, baoCanh, baoKetQua, hopCho, bang, $, $$, coHoac, vungTha, htmlVungTha,
-  ganDsTich, ganKhung,} from "../chung.js";
+  ganDsTich, ganKhung, ICON_XOA,} from "../chung.js";
 import { canZalo } from "../zalo-nhanh.js";
 
 let tab = "gv";
@@ -247,6 +247,8 @@ export async function ve(khung, tuyChon = {}) {
       <button class="nut nho" id="nhap-excel">Nhập Excel</button>
       <button class="nut nho" id="do-uid">Dò Zalo</button>
       <button class="nut nho chinh" id="them">Thêm</button>
+      <button class="nut nho xau nut-icon" id="xoa-het-gv" title="Xoá toàn bộ danh sách giáo viên"
+        aria-label="Xoá toàn bộ giáo viên"${ds.length ? "" : " disabled"}>${ICON_XOA}</button>
     </div>
   </div>
 
@@ -413,6 +415,38 @@ export async function ve(khung, tuyChon = {}) {
       return;
     }
     if (b.id === "them") { if (await moHopGv(null)) ve(khung, tuyChon); return; }
+    if (b.id === "xoa-het-gv") {
+      if (!ds.length) return;
+      const coSdt = ds.filter((g) => g.dien_thoai).length;
+      const kq = await moHop({
+        tieuDe: "Xoá toàn bộ giáo viên",
+        noiDung: `<div class="bao xau"><b>Xoá hết ${so(ds.length)} giáo viên khỏi phần mềm.</b>
+            <span class="sua">Mất luôn số điện thoại${coSdt ? ` đã nhập (${so(coSdt)} người có số)` : ""}
+            và kết quả dò Zalo. Không hoàn tác được.</span></div>
+          <ul class="ds-gon">
+            <li><b>Vẫn giữ:</b> lịch sử gửi, nhóm Zalo, người nhận ngoài danh sách.</li>
+            <li>Người ngoài danh sách đang đăng ký nhận thời khoá biểu của <b>từng giáo viên cụ thể</b>
+              sẽ mất phần đăng ký đó.</li>
+            <li>Thời khoá biểu đã nạp mất liên kết với giáo viên — <b>nạp lại tệp thời khoá biểu</b>
+              để phần mềm tạo và ghép lại.</li>
+          </ul>
+          <label class="tich"><input type="checkbox" id="xg-dong-y">
+            <span>Tôi hiểu, xoá hết ${so(ds.length)} giáo viên</span></label>`,
+        nut: [{ ten: "Huỷ", giaTri: null }, { ten: "Xoá toàn bộ", kieu: "xau", giaTri: "xoa", tat: true }],
+        khiMo: (hop) => {
+          const o = hop.querySelector("#xg-dong-y");
+          const n = hop.querySelector(".hop-chan .nut.xau");
+          o.addEventListener("change", () => { n.disabled = !o.checked; });
+        },
+      });
+      if (kq !== "xoa") return;
+      const r = await window.api.gv.xoaTatCa();
+      if (baoKetQua(r, `Đã xoá ${so(r.so)} giáo viên.`)) {
+        await (await import("../app.js")).capNhatTienDo();
+        ve(khung, tuyChon);
+      }
+      return;
+    }
     if (b.dataset.sua) { if (await moHopGv(ds.find((x) => x.id === Number(b.dataset.sua)))) ve(khung, tuyChon); return; }
     if (b.dataset.xoa) {
       const g = ds.find((x) => x.id === Number(b.dataset.xoa));

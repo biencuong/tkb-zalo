@@ -185,6 +185,7 @@ Hai thứ người dùng cần liếc bất cứ lúc nào: **đang nối tài k
 - [ ] Điều kiện thiếu thì mở ngay chỗ khắc phục tại chỗ.
 - [ ] **Mỗi cảnh báo đều bấm sửa được ngay tại dòng/màn đang báo** — thử từng cái một bằng tay.
 - [ ] Không dòng nào vừa bị khoá vừa không có đường thoát ngay cạnh.
+- [ ] Thêm một cách làm tự động thì rà lại mọi chỗ **chặn**, **cảnh báo** và **hướng dẫn** nói điều ngược lại — khoá cũ còn đó thì tính năng mới như không có.
 - [ ] Không có nhãn nào dài quá 3 từ; không có cảnh báo nào thiếu cách sửa.
 - [ ] Thu gọn thanh bên vẫn đọc được tên mục.
 - [ ] Việc không hoàn tác được đều có màn xem trước đúng như thật.

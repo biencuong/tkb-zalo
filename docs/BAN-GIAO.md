@@ -1,6 +1,6 @@
 # Bàn giao — TKB Zalo
 
-Cập nhật: 21/9/2026 · Bản 0.1.11 · Đã phát hành trên GitHub và cài chạy thật trên máy `bienc`
+Cập nhật: 21/9/2026 · Bản 0.1.12 · Đã phát hành trên GitHub và cài chạy thật trên máy `bienc`
 
 ## 1. Trạng thái
 
@@ -103,6 +103,7 @@ mà trình nghe chưa bật bao giờ — sửa bằng `api.listener.start({retr
 | 0.1.8–0.1.9 | Gửi vào **nhóm Zalo**: chọn nhóm từ danh sách, dùng mã nhóm, không cần số điện thoại |
 | 0.1.10 | Hộp chọn "nhận thời khoá biểu nào" tách hai cột lớp \| giáo viên |
 | 0.1.11 | Sửa lỗi listener chồng; lời nhắn riêng cho nhóm; chỉnh "ai nhận gì" ngay trong hộp gửi; biểu mẫu in chuẩn; nút chờ "Lên CSDL ngành" |
+| 0.1.12 | **Chỉ cần một tệp Excel**: bỏ khoá "phải nạp giáo viên trước", tạo đủ 40/40 giáo viên kể cả chủ nhiệm không dạy; một hộp **Xem thử và nạp dữ liệu**; **Xoá thời khoá biểu** từng số / từng đợt / toàn bộ; **xoá toàn bộ giáo viên**; hướng dẫn viết lại theo luồng đơn giản |
 
 **Phát hành:** kho công khai `github.com/biencuong/tkb-zalo`. Quy trình mỗi bản: tăng `version` →
 viết khối đầu `GHI-CHU-PHAT-HANH.md` → `npm test` → `npx electron-builder --win nsis

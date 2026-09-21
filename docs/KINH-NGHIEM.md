@@ -247,3 +247,40 @@ Tra ngày 21/9/2026 cho việc "đưa thời khoá biểu lên CSDL ngành":
 tài khoản trường (giống cách nhập danh sách học sinh từ Excel). Muốn làm đúng mẫu thì phải có tệp mẫu
 tải từ chính tài khoản đó — không đăng nhập được thì không đoán mò.
 Trong app đã đặt sẵn nút **"Lên CSDL ngành"** kèm nhãn *sắp có*, bấm vào nói đúng hiện trạng này.
+
+---
+
+## [21/9/2026] Giao diện khoá một việc mà phần mềm đã tự làm được
+
+**Hiện tượng:** người dùng tưởng phải có danh sách giáo viên mới nạp được thời khoá biểu.
+
+**Nguyên nhân:** tính năng *tạo giáo viên từ bảng phân công* đã có trong hộp nhập thời khoá biểu từ trước,
+nhưng giao diện vẫn giữ luật cũ: thẻ tệp **khoá nút nhập** và báo "Nạp danh sách giáo viên trước" khi chưa
+có ai, hướng dẫn cũng ghi "nút nhập thời khoá biểu sẽ bị khoá". Người dùng không bao giờ tới được hộp có
+tính năng mới. Thêm khả năng mới mà **không rà lại các chỗ chặn cũ** thì khả năng đó như không có.
+
+**Sửa:** bỏ hai chỗ chặn `!soGv`, bỏ khoá nút, đổi thanh thứ tự thành *Thời khoá biểu → Số điện thoại*,
+viết lại hướng dẫn. **Luật:** thêm một cách làm tự động thì `grep` mọi câu chặn, câu cảnh báo và câu hướng
+dẫn nói điều ngược lại.
+
+**Bẫy kèm theo:** chủ nhiệm **không dạy tiết nào** thì không suy được mã từ phân công, nên bị bỏ qua —
+đúng những người cần nhận thời khoá biểu lớp. Mã của họ có sẵn trong tiêu đề cột lớp `6A1 (D.Nhàn)`.
+Kiểm thử bằng tệp thật mới lộ ra: trước 38/40, sau 40/40.
+
+---
+
+## [21/9/2026] Đường dẫn menu Smart Scheduler — đã đối chiếu trang chính thức
+
+Nguồn: `https://help.tinhochoanggia.com/smartscheduler/` (đọc 21/9/2026). **Đừng viết đường dẫn menu theo trí nhớ** —
+bản cũ của hướng dẫn ghi "Hệ thống → In ấn" cho tệp Word, trang chính thức không nói vậy.
+
+| Việc | Trang chính thức ghi | Trang |
+|---|---|---|
+| Excel tổng | **Hệ thống \| Chuyển đổi dữ liệu sang Excel** → chọn các lựa chọn → **Chấp nhận**. Chuyển PCGD, TKB lớp, giáo viên, phòng học. | `chuc-nang/chuyen-doi-du-lieu/excel/` |
+| Mẫu danh sách giáo viên | Mục Dữ liệu giáo viên: **Excel \| Copy file dữ liệu mẫu**; nhập lại bằng **Excel \| Nhập dữ liệu từ Excel** (khớp theo Mã giáo viên) | `chuc-nang/du-lieu/du-lieu-giao-vien/` |
+| Word từng người / từng lớp | **In ấn → In TKB cá nhân** → *In TKB giáo viên* / *In TKB lớp học*, khổ **A4 hoặc A5**, có *Chọn tất cả*, *Chấp nhận* | `chuc-nang/in-an/tkb-ca-nhan/` |
+| (không dùng) TKB toàn trường | In ấn → In TKB toàn trường: Excel 8 mẫu hoặc Word A3/A4 — bảng cả trường, KHÔNG cắt theo người được | `chuc-nang/in-an/tkb-toan-truong/` |
+
+Hộp *Chuyển đổi dữ liệu sang Excel* có các ô: Bảng phân công giảng dạy, TKB lớp học, TKB giáo viên, TKB phòng học,
+Hiển thị TKB sáng / chiều / sáng & chiều, TKB nhóm… Phần mềm cần **PCGD + TKB lớp học + TKB giáo viên**;
+thiếu TKB giáo viên thì không suy được mã viết tắt khi tạo giáo viên từ bảng phân công.

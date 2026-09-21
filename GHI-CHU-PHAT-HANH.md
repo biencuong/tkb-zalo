@@ -5,6 +5,38 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.12 — Chỉ cần một tệp Excel, xem thử rồi mới nạp, xoá thời khoá biểu và giáo viên
+
+### Chỉ cần một tệp Excel
+
+- Trên Smart Scheduler: **Hệ thống | Chuyển đổi dữ liệu sang Excel → Chấp nhận**, lưu tệp, thả vào TKB Zalo là đủ.
+- **Bỏ khoá "phải nạp danh sách giáo viên trước".** Chưa có danh sách thì phần mềm tạo giáo viên từ bảng phân
+  công trong tệp Excel, tự nhận ra mã viết tắt của từng người. Chỉ còn thiếu số điện thoại, điền trên bảng.
+- **Tạo đủ cả chủ nhiệm không dạy tiết nào** (trước đây bị bỏ qua) — lấy mã trong tiêu đề cột lớp.
+  Trên tệp mẫu: 40/40 giáo viên, không tiết nào thiếu người dạy.
+
+### Một hộp "Xem thử và nạp dữ liệu"
+
+- Thả tệp xong hiện ngay hộp xem thử: thời khoá biểu số mấy, từ ngày nào, bao nhiêu lớp, bao nhiêu tiết,
+  giáo viên nào được thêm hay cập nhật, bao nhiêu người có số điện thoại, lớp nào chưa có chủ nhiệm.
+  **Chưa ghi gì** cho tới khi bấm **Nạp dữ liệu**.
+- Bấm **Nạp dữ liệu** là nạp đúng thứ tự — giáo viên trước, thời khoá biểu sau — rồi tự tạo ảnh.
+
+### Xoá
+
+- **Xoá thời khoá biểu** (nút *Xoá…* ở đầu khu Thời khoá biểu): tích từng số, cả một đợt (năm học · học kỳ)
+  hoặc chọn tất cả. Tuỳ chọn xoá luôn ảnh và tệp Word đã tạo. Lịch sử gửi vẫn giữ.
+- **Xoá toàn bộ giáo viên** (biểu tượng thùng rác trên thanh tiêu đề bảng Giáo viên), phải tích *Tôi hiểu*.
+
+### Hướng dẫn
+
+- Viết lại **Trợ giúp** theo luồng đơn giản: một tệp → xem thử → nạp → điền số điện thoại → quét QR → gửi.
+- Đường dẫn menu Smart Scheduler **đối chiếu đúng trang hướng dẫn chính thức**. Sửa chỗ sai: tệp Word lấy ở
+  **In ấn → In TKB cá nhân** (In TKB giáo viên / In TKB lớp học, khổ A4 hoặc A5), không phải "Hệ thống → In ấn".
+- Dòng đầu trang Dữ liệu nay là hướng dẫn lấy tệp từ Smart Scheduler.
+
+---
+
 ## 0.1.11 — Hết thông báo lỗi lặp, lời nhắn cho nhóm, biểu mẫu in chuẩn
 
 ### Sửa lỗi

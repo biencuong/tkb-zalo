@@ -199,6 +199,13 @@ export function dangKyTatCa() {
   dangKy("gv:ds", (loc) => ({ ok: true, ds: gv.dsGiaoVien(loc || {}) }));
   dangKy("gv:luu", (g) => gv.luuGiaoVien(g));
   dangKy("gv:xoa", (id, ep) => gv.xoaGiaoVien(id, { ep: Boolean(ep) }));
+  dangKy("gv:xem-truoc-excel", (p) => gv.xemTruocDsGv(p));
+  dangKy("gv:xoa-tat-ca", () => {
+    const r = gv.xoaTatCaGiaoVien();
+    // Cho phép nạp lại đúng tệp cũ: bỏ dấu "đã nạp tệp này".
+    if (r.ok) db.datCaiDat("ds_gv_da_nap", "");
+    return r;
+  });
   dangKy("gv:nhap-excel", async (p) => {
     const r = await gv.nhapDsGvTuExcel(p);
     if (r?.ok) {
@@ -239,6 +246,8 @@ export function dangKyTatCa() {
     return { ...r, thu_muc: luu.thu_muc };
   });
   dangKy("tkb:xoa", (id) => tkb.xoaTkb(id));
+  dangKy("tkb:xoa-nhieu", (ids, { xoaTep = false } = {}) =>
+    tkb.xoaNhieuTkb(ids, { xoaTep: Boolean(xoaTep), gocKho: duongDan.goc_tai_lieu }));
   dangKy("tkb:dat-gvcn", (id, lop, gvId) => tkb.datGvcn(id, lop, gvId));
   dangKy("tkb:luoi", (id, p) => ({ ok: true, ds: tkb.luoiTiet(id, p || {}) }));
 

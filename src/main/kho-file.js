@@ -390,7 +390,7 @@ async function kiemSs(duongDan, kq) {
   try { d = await docTkbSs(duongDan); }
   catch (e) {
     kq.kiem.push(hong("Không đọc được: " + e.message,
-      "Đây phải là tệp Excel xuất từ phần mềm xếp thời khoá biểu (Hệ thống › Chuyển đổi dữ liệu sang Excel)."));
+      "Đây phải là tệp Excel xuất từ Smart Scheduler (Hệ thống | Chuyển đổi dữ liệu sang Excel)."));
     return kq;
   }
   const tt = d.thong_tin;

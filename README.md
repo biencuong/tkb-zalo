@@ -5,6 +5,10 @@ Gửi thời khoá biểu cho giáo viên qua Zalo cá nhân: mỗi người nh�
 
 Phần mềm cá nhân, miễn phí, **không liên kết với Zalo** hay bất kỳ phần mềm xếp thời khoá biểu nào.
 
+**Cách dùng:** trên Smart Scheduler chọn *Hệ thống | Chuyển đổi dữ liệu sang Excel* → *Chấp nhận*, lưu tệp →
+kéo thả vào trang **Dữ liệu** → xem thử → **Nạp dữ liệu** (tự tạo danh sách giáo viên và ảnh) →
+lần đầu điền số điện thoại và quét mã QR Zalo → **Gửi**. Chỉ cần một tệp Excel đó.
+
 > **Cảnh báo:** phần mềm dùng thư viện Zalo không chính thức. Gửi nhiều tin cho người lạ có thể
 > khiến tài khoản Zalo bị hạn chế hoặc khoá. Đọc `build/DIEU-KHOAN-RUI-RO.txt` trước khi dùng.
 
@@ -19,7 +23,7 @@ npm start
 ## Kiểm thử
 
 ```bash
-npm test                                  # 75 test cho phần xử lý
+npm test                                  # 79 test cho phần xử lý
 npx electron scripts/thu-chay.mjs         # chạy app thật, chụp màn hình từng trang
 npm run kiem-sqlite                       # xác nhận node:sqlite có trong Electron
 ```

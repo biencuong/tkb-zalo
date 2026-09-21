@@ -140,6 +140,15 @@ textarea{resize:vertical;min-height:70px;line-height:1.5}
 .hang-nhan.thieu .hang-nhan-ten .nho{color:var(--bad)}
 /* Danh sách gọn trong hộp thoại giải thích. */
 .ds-gon{margin:.2rem 0 .8rem;padding-left:1.1rem}
+/* Nút có biểu tượng. */
+.nut .icon{vertical-align:-3px;flex:0 0 auto}
+.nut.nut-icon{padding-left:.55rem;padding-right:.55rem}
+/* Hộp xoá thời khoá biểu: từng đợt, mỗi đợt nhiều số. */
+.ds-dot-xoa{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:var(--r-nho);
+  padding:.35rem .6rem;background:var(--chim)}
+.dot-xoa{padding:.35rem 0;border-bottom:1px solid var(--line)}
+.dot-xoa:last-child{border-bottom:0}
+.dot-xoa .dot-muc{margin-left:1.6rem}
 .ds-gon li{margin:.25rem 0;font-size:.92rem;line-height:1.5}
 .luoi.c2>.o-loc{display:flex;flex-direction:column}
 .luoi.c2>.o-loc .ds-tich{flex:1 1 auto}

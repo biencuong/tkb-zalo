@@ -132,11 +132,15 @@ export async function nhapTkb(p) {
   const gvBoQua = [];
   if (p.taoGvThieu) {
     const maSuyRa = suyMaTuPhanCong(d.pcgd, d.tiet_gv || []);
+    // Chủ nhiệm KHÔNG dạy tiết nào thì không suy được mã từ phân công — nhưng tiêu đề cột lớp
+    // trong thời khoá biểu có ghi mã chủ nhiệm, kiểu "6A1 (D.Nhàn)". Lấy mã ở đó.
+    const maCnTheoLop = new Map((d.lop || []).filter((l) => l.gvcn_ma)
+      .map((l) => [String(l.ten).toUpperCase(), l.gvcn_ma]));
     for (const r of d.pcgd) {
       if (gvTheoTen.has(r.ho_ten)) continue;
       const phan = String(r.ho_ten || "").trim().split(/\s+/).filter(Boolean);
       if (!phan.length) continue;
-      const ma = maSuyRa.get(r.ho_ten) || "";
+      const ma = maSuyRa.get(r.ho_ten) || (r.cn ? maCnTheoLop.get(String(r.cn).toUpperCase()) : "") || "";
       if (!ma) { gvBoQua.push({ ho_ten: r.ho_ten, ly_do: "không suy được mã viết tắt" }); continue; }
       const ten = phan.pop();
       const kq = luuGiaoVien({
@@ -389,10 +393,42 @@ export function datGvcn(tkbId, lop, giaoVienId) {
 }
 
 export function xoaTkb(id) {
-  const t = mot("SELECT * FROM tkb WHERE id=?", id);
-  if (!t) return { ok: false, loi: ["Không tìm thấy thời khoá biểu."] };
-  const daGui = mot("SELECT COUNT(*) n FROM lich_su_gui WHERE tkb_id=? AND ket_qua='xong'", id).n;
-  chay("DELETE FROM tkb WHERE id=?", id);
-  ghiNhatKy("xoa_tkb", { doi_tuong: `TKB số ${t.so_tkb} ${t.nam_hoc}`, muc: "canh_bao", mo_ta: `Đã từng gửi ${daGui} lượt (lịch sử gửi vẫn giữ)` });
-  return { ok: true };
+  return xoaNhieuTkb([id]);
+}
+
+/**
+ * Xoá một hoặc nhiều thời khoá biểu. Lịch sử gửi GIỮ NGUYÊN (khoá ngoại để SET NULL).
+ * xoaTep: xoá luôn thư mục ảnh + Word đã cắt của từng bản — chỉ khi thư mục nằm trong kho của
+ * phần mềm (gocKho) và không còn thời khoá biểu nào khác dùng chung thư mục đó.
+ */
+export function xoaNhieuTkb(ids = [], { xoaTep = false, gocKho = "" } = {}) {
+  const ds = [...new Set((ids || []).map(Number))]
+    .map((id) => mot("SELECT * FROM tkb WHERE id=?", id)).filter(Boolean);
+  if (!ds.length) return { ok: false, loi: ["Chưa chọn thời khoá biểu nào."] };
+
+  giaoDich(() => {
+    for (const t of ds) {
+      const daGui = mot("SELECT COUNT(*) n FROM lich_su_gui WHERE tkb_id=? AND ket_qua='xong'", t.id).n;
+      chay("DELETE FROM tkb WHERE id=?", t.id);
+      ghiNhatKy("xoa_tkb", {
+        doi_tuong: `TKB số ${t.so_tkb} ${t.nam_hoc}${t.hoc_ky ? " HK" + t.hoc_ky : ""}`, muc: "canh_bao",
+        mo_ta: `Đã từng gửi ${daGui} lượt (lịch sử gửi vẫn giữ)`,
+      });
+    }
+  });
+
+  let soThuMuc = 0;
+  const loiTep = [];
+  if (xoaTep && gocKho) {
+    const goc = path.resolve(gocKho) + path.sep;
+    for (const t of ds) {
+      if (!t.thu_muc) continue;
+      const tm = path.resolve(t.thu_muc);
+      if (!tm.startsWith(goc)) continue;                                   // ngoài kho: không đụng
+      if (mot("SELECT COUNT(*) n FROM tkb WHERE thu_muc=?", t.thu_muc).n) continue;  // còn bản khác dùng
+      try { fs.rmSync(tm, { recursive: true, force: true }); soThuMuc++; }
+      catch (e) { loiTep.push(`${tm}: ${e.message}`); }
+    }
+  }
+  return { ok: true, so: ds.length, so_thu_muc: soThuMuc, loi_tep: loiTep };
 }

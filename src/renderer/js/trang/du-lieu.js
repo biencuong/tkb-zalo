@@ -33,26 +33,34 @@ const NHAN_CAN = {
 };
 
 /** Hộp BÁO CÁO sau khi nhận tệp: từng tệp thành gì, đặt tên gì, để ở đâu, còn thiếu gì. */
-async function hopBaoCaoNhan(r) {
-  const hang = (x) => {
-    const nhan = x.dat
-      ? (x.ghi_de ? '<span class="nhan n-canh">Thay tệp cũ</span>' : '<span class="nhan n-ok">Đã nhận</span>')
-      : x.trung ? '<span class="nhan n-xam">Trùng, bỏ qua</span>'
-      : '<span class="nhan n-xau">Không nhận</span>';
-    const loi = (x.kiem || []).filter((k) => k.muc !== "dat");
-    return `<tr class="${x.dat ? "" : x.trung ? "mo" : "lech"}">
-      <td><b>${esc(x.ten_goc)}</b><br><span class="nho mo">${esc(x.chu_loai)}</span></td>
-      <td>${nhan}</td>
-      <td class="nho">${x.ten_moi ? `<span class="mono">${esc(x.ten_moi)}</span>` : "—"}
-        ${x.noi ? `<br><span class="mo">${esc(x.noi)}</span>` : ""}</td>
-      <td class="nho">${NHAN_CAN[x.can] || ""}<br>${esc(x.tac_dung || "")}</td>
-      <td class="nho">${x.tom_tat ? esc(x.tom_tat) : ""}
-        ${x.ly_do ? `<br><span class="mo">${esc(x.ly_do)}</span>` : ""}
-        ${x.loi ? `<br><span style="color:var(--bad)">${esc(x.loi)}</span>` : ""}
-        ${loi.length ? loi.slice(0, 3).map((k) => `<br><span class="mo">• ${esc(k.noi_dung)}${k.cach_sua ? " → " + esc(k.cach_sua) : ""}</span>`).join("") : ""}</td>
-    </tr>`;
-  };
+/** Một dòng trong bảng tệp vừa nhận. */
+function hangTepNhan(x) {
+  const nhan = x.dat
+    ? (x.ghi_de ? '<span class="nhan n-canh">Thay tệp cũ</span>' : '<span class="nhan n-ok">Đã nhận</span>')
+    : x.trung ? '<span class="nhan n-xam">Trùng, bỏ qua</span>'
+    : '<span class="nhan n-xau">Không nhận</span>';
+  const loi = (x.kiem || []).filter((k) => k.muc !== "dat");
+  return `<tr class="${x.dat ? "" : x.trung ? "mo" : "lech"}">
+    <td><b>${esc(x.ten_goc)}</b><br><span class="nho mo">${esc(x.chu_loai)}</span></td>
+    <td>${nhan}</td>
+    <td class="nho">${x.ten_moi ? `<span class="mono">${esc(x.ten_moi)}</span>` : "—"}
+      ${x.noi ? `<br><span class="mo">${esc(x.noi)}</span>` : ""}</td>
+    <td class="nho">${NHAN_CAN[x.can] || ""}<br>${esc(x.tac_dung || "")}</td>
+    <td class="nho">${x.tom_tat ? esc(x.tom_tat) : ""}
+      ${x.ly_do ? `<br><span class="mo">${esc(x.ly_do)}</span>` : ""}
+      ${x.loi ? `<br><span style="color:var(--bad)">${esc(x.loi)}</span>` : ""}
+      ${loi.length ? loi.slice(0, 3).map((k) => `<br><span class="mo">• ${esc(k.noi_dung)}${k.cach_sua ? " → " + esc(k.cach_sua) : ""}</span>`).join("") : ""}</td>
+  </tr>`;
+}
 
+/** Bảng các tệp vừa nhận: loại gì, lưu thành gì, cần hay không. */
+function bangTepNhan(r) {
+  return `<div class="bang-cuon cuon-doc"><table class="b">
+    <thead><tr><th>Tệp thả vào</th><th>Kết quả</th><th>Lưu thành</th><th>Cần hay không</th><th>Chi tiết</th></tr></thead>
+    <tbody>${r.bao_cao.map(hangTepNhan).join("")}</tbody></table></div>`;
+}
+
+async function hopBaoCaoNhan(r) {
   return moHop({
     tieuDe: "Kết quả nhận tệp", rong: "rat-rong",
     noiDung: `
@@ -81,26 +89,38 @@ async function hopBaoCaoNhan(r) {
       ${r.thieu_ss ? `<div class="bao canh"><b>Có tệp Word nhưng thiếu tệp Excel tổng.</b>
         <span class="sua">Tên tệp Word đang ghi CHUA-RO vì chưa biết thuộc thời khoá biểu số mấy.
         Thả thêm tệp Excel tổng (SS….xlsx) là đủ bộ.</span></div>` : ""}
-      <div class="bang-cuon cuon-doc"><table class="b">
-        <thead><tr><th>Tệp thả vào</th><th>Kết quả</th><th>Lưu thành</th><th>Cần hay không</th><th>Chi tiết</th></tr></thead>
-        <tbody>${r.bao_cao.map(hang).join("")}</tbody></table></div>
+      ${bangTepNhan(r)}
       <p class="nho mo" style="margin:.6rem 0 0">Tên chuẩn: <span class="mono">TKB-&lt;năm học&gt;-So-&lt;số&gt;-TONG/GV/LOP</span>,
         danh sách giáo viên là <span class="mono">DS-GV.xlsx</span>.</p>`,
     nut: [{ ten: "Mở thư mục", giaTri: "mo" }, { ten: "Đóng", kieu: "chinh", giaTri: null }],
   });
 }
 
-/** Hộp nhập một thời khoá biểu, rồi tạo ảnh luôn cho đỡ một bước. */
-export async function hopNhapTkb({ xlsx, docxGv, docxLop, donSauKhiXong = [] }) {
-  const cho = hopCho("Đang đọc tệp", "Đọc bảng phân công và thời khoá biểu…");
-  let xt;
-  try { xt = await window.api.tkb.xemTruoc(xlsx); }
-  catch (e) { cho.dong(); await cho.doi; baoXau("<b>Không đọc được tệp.</b><br>" + esc(e?.message || e)); return false; }
-  cho.dong(); await cho.doi;
-
+/**
+ * Phần xem trước của MỘT thời khoá biểu — dùng chung cho hộp nạp lẻ và hộp "Xem thử và nạp".
+ * tp: tiền tố id, để nhiều thời khoá biểu cùng một hộp không đụng nhau.
+ * seNapGv: cùng lượt này còn nạp danh sách giáo viên, nên khớp giáo viên tính SAU khi nạp.
+ */
+function htmlXemTruocTkb(xt, { docxGv, docxLop, soGvHienCo = 0, seNapGv = false, tp = "" } = {}) {
   const tt = xt.thong_tin, trung = xt.trung;
-  const soGvHienCo = (await window.api.gv.ds({}).catch(() => ({ ds: [] }))).ds?.length || 0;
-  const noiDung = `
+  const chuaKhop = xt.chua_khop || [];
+  const khoiKhop = seNapGv
+    ? `<div class="bao tin"><b>Giáo viên sẽ được ghép sau khi nạp danh sách giáo viên ở trên.</b></div>`
+    : soGvHienCo === 0
+      ? `<div class="bao tin"><b>Chưa có danh sách giáo viên — không sao.</b>
+          <span class="sua">Bảng phân công trong tệp này có đủ họ tên; phần mềm tạo giáo viên và tự nhận ra
+          mã viết tắt của từng người, kể cả chủ nhiệm không dạy tiết nào. Chỉ thiếu số điện thoại,
+          điền sau ngay trên bảng Giáo viên.</span>
+          <label class="tich" style="margin-top:.4rem"><input type="checkbox" id="${tp}tao-gv" checked>
+            <span>Tạo <b>${so(tt.so_gv_pcgd || 0)} giáo viên</b> từ bảng phân công</span></label></div>`
+      : chuaKhop.length
+        ? `<div class="bao xau"><b>${so(chuaKhop.length)} mục chưa khớp danh sách giáo viên:</b>
+            <span class="sua">${esc(chuaKhop.slice(0, 10).map((x) => x.gia_tri).join(", "))}${chuaKhop.length > 10 ? "…" : ""}</span>
+            <label class="tich" style="margin-top:.4rem"><input type="checkbox" id="${tp}tao-gv">
+              <span>Tạo thêm những người còn thiếu từ bảng phân công</span></label></div>`
+        : '<div class="bao ok">Khớp đủ giáo viên với danh sách.</div>';
+
+  return `
     <div class="luoi c3" style="margin-bottom:.7rem">
       <div class="o-so vach"><b>Số thời khoá biểu</b><span class="v">${tt.so_tkb ?? "?"}</span>
         <span class="g">${esc(tt.nam_hoc || "chưa rõ")}${tt.hoc_ky ? " · HK " + tt.hoc_ky : ""}</span></div>
@@ -110,59 +130,44 @@ export async function hopNhapTkb({ xlsx, docxGv, docxLop, donSauKhiXong = [] }) 
         <span class="g">${so(xt.so_lop)} lớp · ${so(xt.so_gv_pcgd)} giáo viên</span></div>
     </div>
     ${trung ? `<div class="bao canh"><b>Đã có thời khoá biểu số ${tt.so_tkb} (bản ${trung.phien_ban}, nhập ${esc(gioVn(trung.nhap_luc))}).</b>
-      <span class="sua">Cũ: ${so(trung.cu.so_tiet)} tiết, áp dụng ${esc(ngayVn(trung.cu.ngay_ap_dung)) || "?"}, đã gửi ${so(trung.da_gui)} lượt.
+      <span class="sua">Nạp sẽ <b>cập nhật</b> bản đó và lưu vết bản cũ.
+      Cũ: ${so(trung.cu.so_tiet)} tiết, áp dụng ${esc(ngayVn(trung.cu.ngay_ap_dung)) || "?"}, đã gửi ${so(trung.da_gui)} lượt.
       Mới: ${so(trung.moi.so_tiet)} tiết, áp dụng ${esc(ngayVn(trung.moi.ngay_ap_dung)) || "?"}.</span></div>` : ""}
     ${(xt.canh_bao || []).map((c) => `<div class="bao canh">${esc(c)}</div>`).join("")}
-    ${xt.chua_khop?.length
-      ? `<div class="bao xau"><b>${xt.chua_khop.length} mục chưa khớp danh sách giáo viên:</b>
-          <span class="sua">${esc(xt.chua_khop.slice(0, 10).map((x) => x.gia_tri).join(", "))}${xt.chua_khop.length > 10 ? "…" : ""}</span></div>`
-      : '<div class="bao ok">Khớp đủ giáo viên với danh sách.</div>'}
-    ${soGvHienCo === 0 ? `<div class="bao tin">
-        <b>Chưa có danh sách giáo viên.</b>
-        <span class="sua">Bảng phân công trong tệp này đã có đủ họ tên, phần mềm tạo giáo viên thẳng từ đó được —
-        chỉ thiếu số điện thoại, điền sau ngay trên bảng. Nhờ vậy chỉ cần một tệp Excel tổng là chạy được.</span>
-        <label class="tich" style="margin-top:.4rem"><input type="checkbox" id="tao-gv" checked>
-          <span>Tạo <b>${so(tt.so_gv_pcgd || 0)} giáo viên</b> từ bảng phân công</span></label>
-      </div>` : ""}
+    ${khoiKhop}
     ${!docxGv && !docxLop ? `<div class="bao tin">
       <b>Không có tệp Word — vẫn dùng được bình thường.</b>
-      <span class="sua">Ảnh thời khoá biểu dựng từ chính tệp Excel này, không cần Word.
-      Mỗi giáo viên sẽ nhận <b>một ảnh xem ngay</b>. Muốn họ tải về in nữa thì lần sau thả thêm tệp Word.</span>
+      <span class="sua">Ảnh thời khoá biểu dựng từ chính tệp Excel này. Mỗi giáo viên nhận <b>ảnh xem ngay</b>;
+      muốn họ có thêm file Word để in thì lần sau thả kèm tệp Word.</span>
     </div>` : ""}
     ${tt.so_tkb == null || !tt.ngay_ap_dung || !tt.nam_hoc ? `<hr class="tach">
       <div class="luoi c3">
-        ${tt.so_tkb == null ? '<div class="o-nhap"><label>Số thời khoá biểu</label><input type="number" id="ghi-so" min="1" value="1"></div>' : ""}
-        ${!tt.ngay_ap_dung ? '<div class="o-nhap"><label>Thực hiện từ ngày</label><input type="date" id="ghi-ngay"></div>' : ""}
-        ${!tt.nam_hoc ? '<div class="o-nhap"><label>Năm học</label><input type="text" id="ghi-nam" placeholder="2025-2026"></div>' : ""}
+        ${tt.so_tkb == null ? `<div class="o-nhap"><label>Số thời khoá biểu</label><input type="number" id="${tp}ghi-so" min="1" value="1"></div>` : ""}
+        ${!tt.ngay_ap_dung ? `<div class="o-nhap"><label>Thực hiện từ ngày</label><input type="date" id="${tp}ghi-ngay"></div>` : ""}
+        ${!tt.nam_hoc ? `<div class="o-nhap"><label>Năm học</label><input type="text" id="${tp}ghi-nam" placeholder="2025-2026"></div>` : ""}
       </div>` : ""}`;
+}
 
-  let ghiDe = {};
-  let taoGv = false;
-  const chon = await moHop({
-    tieuDe: "Xem trước trước khi nhập", noiDung, rong: "rong",
-    nut: [{ ten: "Huỷ", giaTri: null },
-          { ten: trung ? "Cập nhật (giữ lưu vết bản cũ)" : "Nhập vào phần mềm", kieu: "chinh", giaTri: trung ? "cap_nhat" : "tao_moi" }],
-    khiMo: (hop) => {
-      hop.querySelector(".hop-chan .nut.chinh")?.addEventListener("click", () => {
-        const g = (id) => hop.querySelector(id)?.value;
-        ghiDe = {};
-        if (g("#ghi-so")) ghiDe.so_tkb = Number(g("#ghi-so"));
-        if (g("#ghi-ngay")) ghiDe.ngay_ap_dung = g("#ghi-ngay");
-        if (g("#ghi-nam")) ghiDe.nam_hoc = g("#ghi-nam").trim();
-        taoGv = Boolean(hop.querySelector("#tao-gv")?.checked);
-      }, true);
-    },
-  });
-  if (!chon) return false;
+/** Đọc lựa chọn người dùng đã đặt trong phần xem trước của một thời khoá biểu. */
+function docLuaChonTkb(hop, tp = "") {
+  const g = (id) => hop.querySelector("#" + tp + id)?.value;
+  const ghiDe = {};
+  if (g("ghi-so")) ghiDe.so_tkb = Number(g("ghi-so"));
+  if (g("ghi-ngay")) ghiDe.ngay_ap_dung = g("ghi-ngay");
+  if (g("ghi-nam")) ghiDe.nam_hoc = g("ghi-nam").trim();
+  return { ghiDe, taoGv: Boolean(hop.querySelector("#" + tp + "tao-gv")?.checked) };
+}
 
+/** Nạp một thời khoá biểu đã xem thử: ghi dữ liệu, cắt Word, tạo ảnh, báo kết quả. */
+async function thucHienNapTkb({ xlsx, docxGv, docxLop, donSauKhiXong = [], chePhu, ghiDe, taoGv }) {
   const cho2 = hopCho("Đang nhập dữ liệu", "Đọc tiết học, khớp giáo viên, cắt tệp Word…");
   let r;
   try {
     r = await window.api.tkb.nhap({
       duongDanXlsx: xlsx, docxGv, docxLop,
-      chePhu: chon === "cap_nhat" ? "cap_nhat" : undefined,
-      ghiDeThongTin: Object.keys(ghiDe).length ? ghiDe : undefined,
-      taoGvThieu: taoGv,
+      chePhu,
+      ghiDeThongTin: Object.keys(ghiDe || {}).length ? ghiDe : undefined,
+      taoGvThieu: Boolean(taoGv),
     });
   } finally { cho2.dong(); await cho2.doi; }
   if (!r.ok) { baoKetQua(r); return false; }
@@ -192,6 +197,140 @@ export async function hopNhapTkb({ xlsx, docxGv, docxLop, donSauKhiXong = [] }) 
     nut: [{ ten: "Đóng", giaTri: null }, { ten: "Mở thời khoá biểu", kieu: "chinh", giaTri: "tkb" }],
   });
   if (c === "tkb") di("du-lieu", { tkbId: r.tkb_id, neo: "khu-tkb" });
+  return true;
+}
+
+
+/** Hộp xem thử rồi nạp MỘT thời khoá biểu (nút "Xem thử và nạp" trên thẻ tệp đang chờ). */
+export async function hopNhapTkb({ xlsx, docxGv, docxLop, donSauKhiXong = [] }) {
+  const cho = hopCho("Đang đọc thử tệp", "Chỉ đọc để xem trước, chưa ghi gì vào phần mềm…");
+  let xt;
+  try { xt = await window.api.tkb.xemTruoc(xlsx); }
+  catch (e) { cho.dong(); await cho.doi; baoXau("<b>Không đọc được tệp.</b><br>" + esc(e?.message || e)); return false; }
+  cho.dong(); await cho.doi;
+
+  const soGvHienCo = (await window.api.gv.ds({}).catch(() => ({ ds: [] }))).ds?.length || 0;
+  let luaChon = { ghiDe: {}, taoGv: false };
+  const chon = await moHop({
+    tieuDe: "Xem thử và nạp dữ liệu", rong: "rong",
+    noiDung: htmlXemTruocTkb(xt, { docxGv, docxLop, soGvHienCo }),
+    nut: [{ ten: "Huỷ", giaTri: null },
+          { ten: xt.trung ? "Nạp (cập nhật, giữ lưu vết bản cũ)" : "Nạp dữ liệu", kieu: "chinh", giaTri: "nap" }],
+    khiMo: (hop) => {
+      hop.querySelector(".hop-chan .nut.chinh")?.addEventListener("click", () => {
+        luaChon = docLuaChonTkb(hop);
+      }, true);
+    },
+  });
+  if (!chon) return false;
+  return thucHienNapTkb({
+    xlsx, docxGv, docxLop, donSauKhiXong, chePhu: xt.trung ? "cap_nhat" : undefined, ...luaChon,
+  });
+}
+
+/** Phần xem thử của một tệp danh sách giáo viên. */
+function veXemThuGv(g, x) {
+  if (!x?.ok) {
+    return `<div class="bao xau"><b>Không đọc được danh sách giáo viên ${esc(g.ten_tep || "")}.</b>
+      <span class="sua">${esc((x?.loi || []).join(" "))}</span></div>`;
+  }
+  const soNguoi = x.them + x.cap_nhat;
+  return `<h3 style="margin:.2rem 0 .5rem">Danh sách giáo viên — ${esc(g.ten_tep || "")}</h3>
+    <div class="luoi c4" style="margin-bottom:.5rem">
+      <div class="o-so vach"><b>Trong tệp</b><span class="v">${so(soNguoi)}</span>
+        <span class="g">${x.bo_qua ? so(x.bo_qua) + " dòng trống bỏ qua" : "người"}</span></div>
+      <div class="o-so vach-ok"><b>Thêm mới</b><span class="v">${so(x.them)}</span>
+        <span class="g">chưa có trong phần mềm</span></div>
+      <div class="o-so vach"><b>Cập nhật</b><span class="v">${so(x.cap_nhat)}</span>
+        <span class="g">đã có, bổ sung thông tin</span></div>
+      <div class="o-so ${x.co_sdt ? "vach-ok" : "vach-xau"}"><b>Có số điện thoại</b><span class="v">${so(x.co_sdt)}</span>
+        <span class="g">${x.co_sdt < soNguoi ? `${so(soNguoi - x.co_sdt)} người thiếu số` : "đủ để tìm Zalo"}</span></div>
+    </div>
+    <details><summary class="nho" style="cursor:pointer">Xem từng người</summary>
+      <div class="bang-cuon" style="max-height:260px;overflow:auto;margin-top:.4rem"><table class="b">
+        <thead><tr><th>Họ và tên</th><th>Mã GV</th><th>Điện thoại</th><th>Sẽ làm</th></tr></thead>
+        <tbody>${x.dong.map((d) => `<tr><td>${esc(d.ho_ten)}</td><td class="mono">${esc(d.ma_gv || "")}</td>
+          <td class="mono">${d.dien_thoai ? esc(d.dien_thoai) : '<span class="mo">—</span>'}</td>
+          <td>${d.viec === "them" ? '<span class="nhan n-ok">thêm mới</span>' : '<span class="nhan n-xam">cập nhật</span>'}</td></tr>`).join("")}
+        </tbody></table></div></details>`;
+}
+
+/**
+ * XEM THỬ VÀ NẠP DỮ LIỆU — một hộp duy nhất sau khi thả / chọn tệp.
+ * Đọc thử mọi thứ nạp được (danh sách giáo viên, từng thời khoá biểu) mà CHƯA ghi gì; bấm một nút
+ * là nạp theo đúng thứ tự: giáo viên trước, thời khoá biểu sau, rồi tự tạo ảnh.
+ * Không có gì nạp được thì chỉ hiện bảng báo cáo tệp. Trả về true nếu đã nạp.
+ */
+export async function hopXemThuVaNap(r) {
+  const hopThu = await window.api.tep.quetHopThu().catch(() => ({}));
+  const dsGvTep = hopThu.ds_gv || [];
+  const nhom = (hopThu.nhom || []).filter((n) => n.xlsx && n.san_sang);
+  if (!dsGvTep.length && !nhom.length) {
+    if ((await hopBaoCaoNhan(r)) === "mo") window.api.app.moThuMuc(r.thu_muc_cho);
+    return false;
+  }
+
+  const cho = hopCho("Đang đọc thử dữ liệu", "Chỉ đọc để xem trước, chưa ghi gì vào phần mềm…");
+  let xtGv = [], xtTkb = [];
+  try {
+    xtGv = await Promise.all(dsGvTep.map((g) => window.api.gv.xemTruocExcel(g.duong_dan)
+      .catch((e) => ({ ok: false, loi: [String(e?.message || e)] }))));
+    xtTkb = await Promise.all(nhom.map((n) => window.api.tkb.xemTruoc(n.xlsx.duong_dan)
+      .catch((e) => ({ loi: String(e?.message || e) }))));
+  } finally { cho.dong(); await cho.doi; }
+
+  const soGvHienCo = (await window.api.gv.ds({}).catch(() => ({ ds: [] }))).ds?.length || 0;
+  const seNapGv = xtGv.some((x) => x?.ok);
+  const coTrung = xtTkb.some((x) => x?.trung);
+  const khoiGv = dsGvTep.map((g, i) => veXemThuGv(g, xtGv[i])).join('<hr class="tach">');
+  const khoiTkb = nhom.map((n, i) => {
+    const xt = xtTkb[i];
+    if (!xt?.thong_tin) {
+      return `<div class="bao xau"><b>Không đọc được tệp Excel tổng.</b><span class="sua">${esc(xt?.loi || "")}</span></div>`;
+    }
+    const tt = xt.thong_tin;
+    return `<h3 style="margin:.2rem 0 .5rem">Thời khoá biểu số ${tt.so_tkb ?? "?"}${tt.nam_hoc ? " · " + esc(tt.nam_hoc) : ""}</h3>` +
+      htmlXemTruocTkb(xt, {
+        docxGv: n.docx_gv?.duong_dan, docxLop: n.docx_lop?.duong_dan, soGvHienCo, seNapGv, tp: `t${i}-`,
+      });
+  }).join('<hr class="tach">');
+
+  let luaChon = [];
+  const chon = await moHop({
+    tieuDe: "Xem thử và nạp dữ liệu", rong: "rat-rong",
+    noiDung: `
+      <div class="bao tin" style="margin-bottom:.7rem"><b>Đây là bản xem thử — chưa có gì được ghi vào phần mềm.</b>
+        <span class="sua">Bấm <b>Nạp dữ liệu</b> để nạp theo đúng thứ tự: danh sách giáo viên trước,
+        thời khoá biểu sau, rồi tự tạo ảnh.</span></div>
+      ${khoiGv}${khoiGv && khoiTkb ? '<hr class="tach">' : ""}${khoiTkb}
+      <details style="margin-top:.8rem"><summary class="nho" style="cursor:pointer">
+        Chi tiết ${so(r.bao_cao?.length || 0)} tệp đã nhận</summary>
+        <div style="margin-top:.4rem">${bangTepNhan(r)}</div></details>`,
+    nut: [{ ten: "Mở thư mục", giaTri: "mo" }, { ten: "Để sau", giaTri: null },
+          { ten: coTrung ? "Nạp dữ liệu (cập nhật bản đã có)" : "Nạp dữ liệu", kieu: "chinh", giaTri: "nap" }],
+    khiMo: (hop) => {
+      hop.querySelector(".hop-chan .nut.chinh")?.addEventListener("click", () => {
+        luaChon = nhom.map((_, i) => docLuaChonTkb(hop, `t${i}-`));
+      }, true);
+    },
+  });
+  if (chon === "mo") { window.api.app.moThuMuc(r.thu_muc_cho); return false; }
+  if (chon !== "nap") return false;
+
+  // 1. Giáo viên trước — thời khoá biểu ghép vào đúng người.
+  for (const [i, g] of dsGvTep.entries()) {
+    if (xtGv[i]?.ok) await napDsGv(g.duong_dan, true);
+  }
+  // 2. Thời khoá biểu, rồi tự tạo ảnh (trong thucHienNapTkb).
+  for (const [i, n] of nhom.entries()) {
+    const xt = xtTkb[i];
+    if (!xt?.thong_tin) continue;
+    await thucHienNapTkb({
+      xlsx: n.xlsx.duong_dan, docxGv: n.docx_gv?.duong_dan, docxLop: n.docx_lop?.duong_dan,
+      donSauKhiXong: [n.xlsx.duong_dan, n.docx_gv?.duong_dan, n.docx_lop?.duong_dan].filter(Boolean),
+      chePhu: xt.trung ? "cap_nhat" : undefined, ...(luaChon[i] || {}),
+    });
+  }
   return true;
 }
 
@@ -271,29 +410,30 @@ async function veKho(khung, ti) {
  */
 const veBaBuoc = () => `
   <div class="the" style="border-left:3px solid var(--accent)">
-    <div class="the-dau"><h3 style="margin:0">Lấy tệp ra khỏi phần mềm xếp thời khoá biểu</h3>
+    <div class="the-dau"><h3 style="margin:0">Lấy tệp ra khỏi Smart Scheduler</h3>
       <button class="nut nho" id="mo-huong-dan-tep">Xem hướng dẫn đầy đủ</button></div>
     <div class="ba-buoc">
       <div><span class="bb-so">1</span>
-        <b>Danh sách giáo viên</b>
-        <span>Dữ liệu → Dữ liệu giáo viên → Danh sách giáo viên → bấm biểu tượng Excel →
-          <b>Copy file dữ liệu mẫu</b>. Mở ra điền số điện thoại rồi lưu.</span></div>
+        <b>Excel tổng — chỉ cần tệp này</b>
+        <span><b>Hệ thống | Chuyển đổi dữ liệu sang Excel</b> → giữ tích <b>Bảng phân công giảng dạy</b>,
+          <b>TKB lớp học</b>, <b>TKB giáo viên</b> → <b>Chấp nhận</b>, lưu tệp. Có đủ phân công, họ tên giáo viên
+          và toàn bộ tiết học — phần mềm tự tạo danh sách giáo viên.</span></div>
       <div><span class="bb-so">2</span>
-        <b>Excel tổng</b>
-        <span>Hệ thống → <b>Chuyển đổi dữ liệu sang Excel</b>. Ra tệp <span class="mono">SS….xlsx</span>
-          chứa phân công và toàn bộ tiết học.</span></div>
+        <b>Số điện thoại giáo viên</b>
+        <span>Điền thẳng trên bảng Giáo viên sau khi nạp. Hoặc thả kèm tệp danh sách giáo viên có cột
+          số điện thoại (mục Dữ liệu giáo viên → <b>Excel | Copy file dữ liệu mẫu</b>).</span></div>
       <div><span class="bb-so">3</span>
-        <b>Hai tệp Word</b>
-        <span>Hệ thống → In ấn → Thời khoá biểu <b>theo lớp</b>, rồi <b>theo giáo viên</b>,
-          xuất ra tệp Word để in.</span></div>
+        <b>Tệp Word — không bắt buộc</b>
+        <span>Mục <b>In ấn → In TKB cá nhân</b> → <b>In TKB giáo viên</b> và <b>In TKB lớp học</b>
+          (Chọn tất cả, khổ A4 hoặc A5) → Chấp nhận. Có thì giáo viên nhận thêm file Word để in.</span></div>
     </div>
-    <p class="nho mo" style="margin:.6rem 0 0">Đủ ba loại rồi thì kéo thả tất cả vào vùng bên dưới
-      <b>một lượt</b> — thả cùng lượt thì tệp Word mới biết nó thuộc thời khoá biểu số mấy.</p>
+    <p class="nho mo" style="margin:.6rem 0 0">Thả các tệp vào vùng bên dưới <b>một lượt</b> — phần mềm cho
+      <b>xem thử</b> trước, bấm <b>Nạp dữ liệu</b> mới ghi vào.</p>
   </div>`;
 
 /**
- * Thẻ tệp đang chờ. DANH SÁCH GIÁO VIÊN LUÔN ĐỨNG TRƯỚC: thời khoá biểu phải khớp được
- * với giáo viên mới nhập được, chưa có ai trong danh sách thì nhập thời khoá biểu là vô nghĩa.
+ * Thẻ tệp đang chờ. Danh sách giáo viên đứng trước cho dễ thấy, nhưng KHÔNG bắt buộc:
+ * chưa có ai thì lúc nhập thời khoá biểu, phần mềm tạo giáo viên từ bảng phân công.
  */
 function veNhom(hop, coGv) {
   const n = hop.nhom || [];
@@ -307,12 +447,12 @@ function veNhom(hop, coGv) {
       <div class="the-dau">
         <h3 style="margin:0"><span class="stt-buoc">1</span> Danh sách giáo viên — ${esc(x.ten_tep)}</h3>
         <span class="nhan ${x.so_loi ? "n-xau" : "n-ok"}">${esc(x.tom_tat)}</span></div>
-      <p class="nho mo" style="margin:.1rem 0 .55rem">Nạp danh sách này trước, rồi mới nhập thời khoá biểu.</p>
+      <p class="nho mo" style="margin:.1rem 0 .55rem">Nạp để có số điện thoại của giáo viên.</p>
       <div class="hang-nut"><button class="nut chinh" data-nhap-gv="${i}">Nhập danh sách</button></div>
     </div>`).join("");
 
   const theTkb = n.map((x, i) => `
-    <div class="the${coGv ? "" : " mo"}">
+    <div class="the">
       <div class="the-dau">
         <h3 style="margin:0"><span class="stt-buoc">2</span> Thời khoá biểu số ${x.so_tkb ?? "?"} · ${esc(x.nam_hoc || "?")}</h3>
         <span class="nhan ${x.san_sang ? "n-ok" : "n-xau"}">${x.san_sang ? "Sẵn sàng" : "Chưa dùng được"}</span>
@@ -321,9 +461,9 @@ function veNhom(hop, coGv) {
         Từ ${esc(ngayVn(x.ngay_ap_dung)) || "?"} · ${so(x.xlsx.thong_tin.so_lop)} lớp · ${so(x.xlsx.thong_tin.so_tiet)} tiết ·
         ${so(x.xlsx.thong_tin.so_gvcn)}/${so(x.xlsx.thong_tin.so_lop)} lớp có chủ nhiệm ·
         Word ${x.docx_gv ? "GV ✓" : "GV ✗"} ${x.docx_lop ? "lớp ✓" : "lớp ✗"}</p>
-      ${coGv ? "" : '<div class="bao canh" style="margin:.2rem 0 .5rem"><b>Nạp danh sách giáo viên trước đã.</b> Chưa có ai trong danh sách thì không khớp được thời khoá biểu.</div>'}
+      ${coGv ? "" : '<p class="nho mo" style="margin:.2rem 0 .5rem">Chưa có danh sách giáo viên — khi nhập, phần mềm tạo giáo viên từ bảng phân công.</p>'}
       <div class="hang-nut">
-        <button class="nut chinh" data-nhap-nhom="${i}"${x.san_sang && coGv ? "" : " disabled"}>Nhập vào phần mềm</button>
+        <button class="nut chinh" data-nhap-nhom="${i}"${x.san_sang ? "" : " disabled"}>Xem thử và nạp</button>
         <button class="nut nho" data-xem-kiem="${i}">Chi tiết kiểm tra</button>
       </div>
     </div>`).join("");
@@ -335,7 +475,9 @@ function veNhom(hop, coGv) {
 async function veKhuNhap(khung, ti) {
   const hop = await window.api.tep.quetHopThu();
   // Nạp theo đúng thứ tự: có giáo viên rồi mới nhập được thời khoá biểu.
-  const soGv = (await window.api.gv.ds({}).catch(() => ({ ds: [] }))).ds?.length || 0;
+  const dsGvHt = (await window.api.gv.ds({}).catch(() => ({ ds: [] }))).ds || [];
+  const soGv = dsGvHt.length;
+  const soSdt = dsGvHt.filter((g) => g.dien_thoai).length;
   const soTkb = (await window.api.tkb.ds().catch(() => ({ ds: [] }))).ds?.length || 0;
   const kho = await window.api.tep.duyetKho(false);
   const canNap = (kho.muc || []).filter((m) => m.canh_bao);
@@ -366,9 +508,10 @@ async function veKhuNhap(khung, ti) {
   </div>` : ""}
 
   <div class="thu-tu-nap">
-    <span class="${soGv ? "xong" : "dang"}">${soGv ? "✓" : "1"} Danh sách giáo viên${soGv ? ` (${so(soGv)} người)` : ""}</span>
+    <span class="${soTkb ? "xong" : "dang"}">${soTkb ? "✓" : "1"} Thời khoá biểu${soTkb ? ` (${so(soTkb)} bản)` : ""}</span>
     <span class="mui">→</span>
-    <span class="${soGv ? "dang" : "khoa"}">2 Thời khoá biểu</span>
+    <span class="${soGv && soSdt === soGv ? "xong" : soGv ? "dang" : "khoa"}">${soGv && soSdt === soGv ? "✓" : "2"}
+      Số điện thoại giáo viên${soGv ? ` (${so(soSdt)}/${so(soGv)})` : ""}</span>
   </div>
 
   <div id="ds-nhom">${veNhom(hop, soGv > 0)}</div>
@@ -401,8 +544,7 @@ async function veKhuNhap(khung, ti) {
     try { r = await window.api.tm.nhanTep(ds); } finally { cho.dong(); await cho.doi; }
     if (!r.ok) return baoKetQua(r);
     await veKhuNhap(khung, ti);
-    const c = await hopBaoCaoNhan(r);
-    if (c === "mo") window.api.app.moThuMuc(r.thu_muc_cho);
+    if (await hopXemThuVaNap(r)) veTatCa();
   })];
 
   await veKho(khung.querySelector("#tm-khung"), ti);
@@ -432,8 +574,7 @@ async function veKhuNhap(khung, ti) {
       try { t = await window.api.tm.nhanTep(r.duong_dan); } finally { cho.dong(); await cho.doi; }
       if (!t.ok) return baoKetQua(t);
       await veKhuNhap(khung, ti);
-      const c = await hopBaoCaoNhan(t);
-      if (c === "mo") window.api.app.moThuMuc(t.thu_muc_cho);
+      if (await hopXemThuVaNap(t)) veTatCa();
       return;
     }
     if (b.id === "nap-ds-kho") return napDsGv(dsGvKho.moi_nhat.duong_dan, false, () => veKhuNhap(khung, ti));
@@ -444,7 +585,6 @@ async function veKhuNhap(khung, ti) {
         nut: [{ ten: "Đóng", kieu: "chinh", giaTri: true }] });
     }
     if (b.dataset.nhapNhom != null) {
-      if (!soGv) return baoXau("<b>Chưa có danh sách giáo viên.</b><br>Nạp danh sách giáo viên trước rồi mới nhập thời khoá biểu.");
       const n = hop.nhom[Number(b.dataset.nhapNhom)];
       if (await hopNhapTkb({
         xlsx: n.xlsx.duong_dan, docxGv: n.docx_gv?.duong_dan, docxLop: n.docx_lop?.duong_dan,
@@ -457,7 +597,6 @@ async function veKhuNhap(khung, ti) {
       return napDsGv(g.duong_dan, true, () => veTatCa());
     }
     if (b.dataset.napKho != null) {
-      if (!soGv) return baoXau("<b>Chưa có danh sách giáo viên.</b><br>Nạp danh sách giáo viên trước rồi mới nhập thời khoá biểu.");
       const m = canNap[Number(b.dataset.napKho)];
       const s = await window.api.tep.soiThuMuc(m.thu_muc);
       if (!s.tim_thay?.xlsx) return baoXau("<b>Thư mục thiếu tệp Excel tổng.</b>");
@@ -500,7 +639,8 @@ export async function ve(khung, thamSo = {}) {
   khung.innerHTML = `
   <div class="dau-trang">
     <div><h1>Dữ liệu</h1>
-      <p class="mo-ta">Kéo tệp vào là xong. Danh sách giáo viên và thời khoá biểu đều nằm ở trang này.</p></div>
+      <p class="mo-ta">Trên <b>Smart Scheduler</b>, chọn <b>Hệ thống | Chuyển đổi dữ liệu sang Excel</b> →
+        <b>Chấp nhận</b>, lưu tệp → <b>kéo thả</b> vào đây hoặc bấm <b>＋ Thêm tệp dữ liệu</b>.</p></div>
     <div class="hang-nut">
       <button class="nut nho" id="mo-kho-win">Mở thư mục</button>
     </div>

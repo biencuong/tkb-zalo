@@ -109,6 +109,51 @@ export function xoaGiaoVien(id, { ep = false } = {}) {
  * Nhập danh sách giáo viên từ Excel. Khoá khớp: Mã GV, rồi Họ tên.
  * → {them, capNhat, boQua, chiTiet:[]}
  */
+/** Người trong danh sách đã có mà một dòng của tệp Excel sẽ cập nhật (khớp Mã GV, rồi họ tên). */
+function timGvKhopDong(g) {
+  let cu = g.ma_gv ? mot("SELECT * FROM giao_vien WHERE lower(ma_gv)=lower(?)", g.ma_gv) : null;
+  if (!cu && g.ho_ten) {
+    const theoTen = nhieu("SELECT * FROM giao_vien WHERE lower(ho_ten)=lower(?)", g.ho_ten);
+    if (theoTen.length === 1) cu = theoTen[0];
+  }
+  return cu;
+}
+
+/**
+ * XEM THỬ một tệp danh sách giáo viên: ai sẽ được thêm, ai được cập nhật — KHÔNG ghi gì.
+ * Dùng cho hộp "Xem thử và nạp dữ liệu".
+ */
+export async function xemTruocDsGv(duongDan) {
+  const ds = await docDsGv(duongDan);
+  if (!ds.length) return { ok: false, loi: ["File không có dòng giáo viên nào."] };
+  let them = 0, capNhat = 0, boQua = 0, coSdt = 0;
+  const dong = [];
+  for (const g of ds) {
+    if (!g.ten && !g.ma_gv) { boQua++; continue; }
+    const cu = timGvKhopDong(g);
+    if (g.dien_thoai) coSdt++;
+    if (cu) capNhat++; else them++;
+    dong.push({ ho_ten: g.ho_ten, ma_gv: g.ma_gv, dien_thoai: g.dien_thoai, viec: cu ? "cap_nhat" : "them" });
+  }
+  return { ok: true, tong: ds.length, them, cap_nhat: capNhat, bo_qua: boQua, co_sdt: coSdt, dong };
+}
+
+/**
+ * Xoá TOÀN BỘ danh sách giáo viên. Lịch sử gửi giữ nguyên (ghi theo tên);
+ * thời khoá biểu đã nạp mất liên kết với giáo viên — nạp lại thời khoá biểu để ghép lại.
+ */
+export function xoaTatCaGiaoVien() {
+  const n = mot("SELECT COUNT(*) n FROM giao_vien").n;
+  if (!n) return { ok: true, so: 0 };
+  return giaoDich(() => {
+    chay("DELETE FROM giao_vien");
+    ghiNhatKy("xoa_tat_ca_giao_vien", {
+      doi_tuong: `${n} giáo viên`, muc: "canh_bao", mo_ta: "Xoá toàn bộ danh sách giáo viên",
+    });
+    return { ok: true, so: n };
+  });
+}
+
 export async function nhapDsGvTuExcel(duongDan) {
   const ds = await docDsGv(duongDan);
   if (!ds.length) return { ok: false, loi: ["File không có dòng giáo viên nào."] };
@@ -117,11 +162,7 @@ export async function nhapDsGvTuExcel(duongDan) {
     const chiTiet = [];
     for (const g of ds) {
       if (!g.ten && !g.ma_gv) { boQua++; continue; }
-      let cu = g.ma_gv ? mot("SELECT * FROM giao_vien WHERE lower(ma_gv)=lower(?)", g.ma_gv) : null;
-      if (!cu && g.ho_ten) {
-        const theoTen = nhieu("SELECT * FROM giao_vien WHERE lower(ho_ten)=lower(?)", g.ho_ten);
-        if (theoTen.length === 1) cu = theoTen[0];
-      }
+      const cu = timGvKhopDong(g);
       if (cu) {
         chay(
           `UPDATE giao_vien SET ho_dem=?,ten=?,ho_ten=?,ma_gv=?,ma_gv_2=?,

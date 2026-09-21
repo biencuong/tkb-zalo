@@ -11,9 +11,9 @@
 - [1. App làm gì](#bat-dau)
 - [2. Cài đặt và cập nhật](#cai-dat)
 - [3. Chuẩn bị tệp](#chuan-bi)
-- [4. Thư mục dữ liệu](#thu-muc)
+- [4. Nạp dữ liệu](#thu-muc)
 - [5. Danh sách giáo viên](#giao-vien)
-- [6. Nhập thời khoá biểu](#nhap-tkb)
+- [6. Thời khoá biểu](#nhap-tkb)
 - [7. Kết nối Zalo](#zalo)
 - [8. Vì sao có người không nhận được](#ket-ban)
 - [9. Gửi thời khoá biểu](#gui)
@@ -33,11 +33,12 @@ Nhận thời khoá biểu bạn xuất từ phần mềm xếp TKB, gửi cho t
 
 ### Làm theo thứ tự
 
-1. Nhập **danh sách giáo viên** có số điện thoại — làm một lần.
-2. Mỗi lần đổi TKB: **nhập tệp** vừa xuất ra.
-3. **Tạo ảnh**.
-4. **Kết nối Zalo** bằng quét QR — làm một lần.
-5. **Gửi**: chọn gửi gì cho ai, gửi thử vài người, rồi gửi cả trường.
+1. Trên **Smart Scheduler**: chọn **Hệ thống | Chuyển đổi dữ liệu sang Excel**, bấm **Chấp nhận**, lưu tệp Excel vừa tạo.
+2. **Kéo thả** tệp đó vào trang **Dữ liệu** (hoặc bấm **＋ Thêm tệp dữ liệu**) → xem thử → bấm **Nạp dữ liệu**. Phần mềm tự tạo danh sách giáo viên và ảnh thời khoá biểu.
+3. Lần đầu: **điền số điện thoại** giáo viên ngay trên bảng, rồi **quét mã QR Zalo**.
+4. Bấm **Gửi**: chọn gửi gì cho ai rồi gửi. Muốn chắc thì gửi thử vài người trước.
+
+Lần sau có thời khoá biểu mới: xuất tệp mới, thả vào, nạp, bấm **Gửi**.
 
 ### Màn hình có gì
 
@@ -49,18 +50,14 @@ Thanh bên trái là **ba bước theo đúng thứ tự**: Dữ liệu → Kế
 
 ### Vì sao có phần mềm này
 
-Phát thời khoá biểu cho giáo viên, cách chính thống là **gửi email** hoặc **Zalo OA của trường**. Hai cách đó đều dùng được, nhưng **dựng lên khá phức tạp**:
-
-- **Email:** phải có địa chỉ đúng của từng người, trộn thư, đính kèm đúng tệp của từng người. Nhiều thầy/cô không mở hộp thư hằng ngày nên tin đến mà không ai đọc.
-- **Zalo OA:** phải đăng ký tài khoản chính thức, xác minh, chờ duyệt, giáo viên phải quan tâm OA thì mới nhận được; gửi tin theo mẫu, có loại tin phải trả phí.
+Cách chính thống để gửi thời khoá biểu là qua **email** hoặc **Zalo OA của trường**, nhưng **cài đặt khá phức tạp**, Zalo OA còn phải đăng ký và chờ được duyệt.
 
 Phần mềm này **đi đường đơn giản**: dùng chính tài khoản Zalo cá nhân sẵn có, quét mã QR một lần là gửi được ngay — không đăng ký, không chờ duyệt, không tốn phí. Đổi lại, phải gửi chừng mực để tài khoản không bị hạn chế (xem mục **Điều khoản và rủi ro**), nên khuyến cáo dùng **một tài khoản Zalo phụ**.
 
 Ngoài việc gửi, phần mềm làm thêm mấy việc mà gửi tay không làm được:
 
-- **Tự cắt** tệp Word của cả trường thành tệp riêng từng giáo viên, từng lớp.
-- **Tự vẽ ảnh thời khoá biểu** gọn cho màn hình điện thoại — mở là đọc được, khỏi tải tệp.
-- **Gửi vào nhóm Zalo** của tổ chuyên môn hay của trường.
+- Mỗi thầy/cô nhận đúng thời khoá biểu của mình: **dạng ảnh xem ngay** trên điện thoại và **file Word để in**; chủ nhiệm nhận thêm thời khoá biểu lớp.
+- **Gửi vào nhóm Zalo** của tổ chuyên môn, của trường, của nhóm cha mẹ học sinh...
 - **Thống kê số tiết** theo giáo viên, lớp, môn, buổi; xuất Excel và in biểu mẫu báo cáo.
 - **Lịch sử gửi** có trạng thái tin đã tới nơi hay chưa, ai chưa nhận được và vì sao.
 
@@ -95,101 +92,86 @@ Cập nhật **không mất** dữ liệu. Gỡ app cũng không xoá thư mục
 
 ## 3. Chuẩn bị tệp
 
-### Cần ít nhất bao nhiêu tệp?
+> **Chỉ cần một tệp: tệp Excel do Smart Scheduler chuyển đổi ra.** Tệp này có đủ bảng phân công, họ tên giáo viên và toàn bộ tiết học.
 
-> **Một tệp duy nhất là chạy được: tệp Excel tổng, tên bắt đầu bằng `SS.` — ví dụ `SS.2609201832133477.xlsx`.** Lấy bằng **Hệ thống → Chuyển đổi dữ liệu sang Excel** trong phần mềm xếp thời khoá biểu.
-> Nhận ra tệp đúng bằng cách mở lên xem có sheet tên `PCGD` và các sheet `TKB_LOP_…`, `TKB_GV_…` hay không.
+### Lấy tệp Excel từ Smart Scheduler
 
-Ảnh thời khoá biểu do phần mềm tự vẽ từ số liệu trong tệp đó, không cần tệp Word nào. Thêm tệp chỉ để tiện hơn:
+1. Chọn **Hệ thống | Chuyển đổi dữ liệu sang Excel**.
+2. Hộp **Chuyển đổi dữ liệu sang Excel** hiện ra. Giữ tích ít nhất ba ô: **Bảng phân công giảng dạy**, **TKB lớp học**, **TKB giáo viên** (mặc định đã tích sẵn). Các ô khác để nguyên cũng được.
+3. Bấm **Chấp nhận**. Smart Scheduler chuyển toàn bộ dữ liệu sang một tệp Excel — lưu tệp đó lại.
+4. Sang TKB Zalo: **kéo thả** tệp đó vào trang **Dữ liệu**, hoặc bấm **＋ Thêm tệp dữ liệu** → xem thử → **Nạp dữ liệu**.
 
-| Mức | Tệp cần có | Người nhận được gì |
+> **Đừng bỏ tích “TKB giáo viên”.** Phần mềm dùng sheet đó để nhận ra mã viết tắt của từng giáo viên khi tạo danh sách giáo viên từ bảng phân công.
+
+### Phần mềm tự làm từ tệp đó
+
+- **Tạo danh sách giáo viên** từ bảng phân công và tự nhận ra mã viết tắt của từng người (`P.Ha`, `Thuy Ha`…) — kể cả chủ nhiệm không dạy tiết nào.
+- **Ghép từng tiết** vào đúng giáo viên, đúng lớp.
+- **Vẽ ảnh thời khoá biểu** cho từng giáo viên và từng lớp, xem ngay trên điện thoại.
+
+Việc duy nhất phải làm thêm: **điền số điện thoại** giáo viên, vì tệp Excel không có số. Chỉ làm một lần, những lần sau phần mềm nhớ.
+
+### Thêm tệp nếu muốn
+
+| Tệp | Lấy ở đâu trên Smart Scheduler | Được thêm gì |
 |---|---|---|
-| **Tối thiểu** [1 tệp] | **Excel tổng** (`SS….xlsx`) | Một **ảnh** thời khoá biểu xem ngay trên điện thoại. Phần mềm tạo luôn danh sách giáo viên từ bảng phân công trong tệp này; bạn chỉ cần điền **số điện thoại** ngay trên bảng. |
-| **Nên dùng** [2 tệp] | Thêm **Excel danh sách giáo viên** | Như trên, nhưng số điện thoại có sẵn trong tệp, khỏi gõ tay từng người. |
-| **Đầy đủ** [4 tệp] | Thêm **2 tệp Word** (thời khoá biểu giáo viên và lớp) | Ảnh xem ngay **và** tệp Word để tải về in. |
+| **Danh sách giáo viên** có số điện thoại | Mục **Dữ liệu giáo viên**, chọn **Excel | Copy file dữ liệu mẫu**. Mở ra điền danh sách và số điện thoại rồi lưu. | Khỏi gõ số điện thoại từng người. |
+| **Hai tệp Word** | Mục **In ấn → In TKB cá nhân**: vào **In TKB giáo viên**, tích **Chọn tất cả**, chọn khổ **A4** hoặc **A5**, bấm **Chấp nhận**. Làm tương tự với **In TKB lớp học**. Mỗi lần ra một tệp Word. | Giáo viên nhận thêm **file Word để in**. |
 
 
-> **Tệp Word chỉ dùng để cắt ra bản in.** Không có Word thì mọi thứ vẫn chạy, giáo viên vẫn nhận đủ thời khoá biểu của mình dưới dạng ảnh.
-> Chỉ khác là không tải về in được.
+> **Có thêm tệp thì thả cùng lượt với tệp Excel tổng.** Thả cùng lượt thì tệp Word mới biết nó thuộc thời khoá biểu số mấy.
 
-### Lấy tệp ra khỏi phần mềm xếp thời khoá biểu
+### Nhớ nhập giáo viên chủ nhiệm
 
-| Bước | Vào đâu | Ra tệp gì |
-|---|---|---|
-| **1** | **Hệ thống → Chuyển đổi dữ liệu sang Excel** | **Bắt buộc.** Tệp Excel tổng `SS….xlsx` — bảng phân công và toàn bộ tiết học. Riêng tệp này là đủ để gửi ảnh. |
-| **2** | **Dữ liệu → Dữ liệu giáo viên → Danh sách giáo viên**, bấm **biểu tượng Excel**, chọn **Copy file dữ liệu mẫu** | Nên có. Tệp Excel danh sách giáo viên đúng mẫu. Mở ra điền **số điện thoại** từng người rồi lưu. |
-| **3** | **Hệ thống → In ấn → Thời khoá biểu theo lớp**, rồi **theo giáo viên**, xuất ra tệp Word | Tuỳ chọn. Hai tệp Word để giáo viên tải về in. |
+> **Chưa nhập thì phần mềm không biết gửi thời khoá biểu lớp cho ai.** Nhập “Danh sách giáo viên chủ nhiệm” trên Smart Scheduler rồi xuất Excel lại.
+> Hoặc chọn tay từng lớp ở tab Thời khoá biểu.
 
-
-> **Thả tất cả vào phần mềm này một lượt.** Thả cùng lượt thì tệp Word mới biết nó thuộc thời khoá biểu số mấy.
-> Phần mềm tự phân loại, đặt tên chuẩn và cất đúng chỗ.
-
-### Nhớ nhập danh sách giáo viên chủ nhiệm
-
-> **Chưa nhập thì cột chủ nhiệm trống, phần mềm không biết gửi thời khoá biểu lớp cho ai.** Nhập “Danh sách giáo viên chủ nhiệm” trong phần mềm xếp thời khoá biểu rồi xuất Excel lại.
-> Hoặc chọn tay từng lớp trong khu Thời khoá biểu.
-
-### Thứ tự nạp
-
-1. **Danh sách giáo viên trước** — nếu có tệp danh sách. Không có thì bỏ qua, phần mềm tự tạo từ bảng phân công khi bạn nhập thời khoá biểu.
-2. **Thời khoá biểu sau** — nhập xong phần mềm tạo ảnh luôn.
-3. **Điền số điện thoại** còn thiếu ngay trên bảng ở tab Giáo viên, rời ô là tự lưu.
-
-Đóng Word và Excel trước khi nhập, nếu không phần mềm báo lỗi đọc tệp.
+Đóng Word và Excel trước khi nạp, nếu không phần mềm báo lỗi đọc tệp.
 
 ---
 
 <a id="thu-muc"></a>
 
-## 4. Thư mục dữ liệu
+## 4. Nạp dữ liệu
 
-App tạo sẵn cây thư mục trong **Tài liệu → TKB Zalo**:
+### Kéo thả, xem thử, nạp
+
+1. Ở trang **Dữ liệu**, **kéo thả** tệp vào, hoặc bấm **＋ Thêm tệp dữ liệu** để chọn tệp.
+2. Hộp **Xem thử và nạp dữ liệu** hiện ra: số thời khoá biểu, ngày thực hiện, số lớp, số tiết, giáo viên nào được thêm hay cập nhật, lớp nào chưa có chủ nhiệm. **Lúc này chưa ghi gì.**
+3. Bấm **Nạp dữ liệu**. Phần mềm nạp đúng thứ tự — danh sách giáo viên trước, thời khoá biểu sau — rồi **tự tạo ảnh**.
+
+> **Chưa có danh sách giáo viên cũng nạp được.** Hộp xem thử có sẵn ô **Tạo giáo viên từ bảng phân công**, đã tích sẵn.
+
+Bấm **Để sau** thì tệp nằm chờ ở tab **Nhập tệp**; khi sẵn sàng bấm **Xem thử và nạp** trên thẻ tệp.
+
+### Phần mềm tự đặt tên và cất tệp
+
+Phần mềm **đọc nội dung từng tệp** để biết đó là gì, rồi tự đặt tên chuẩn:
 
 |   |   |
 |---|---|
-| 1 - CHO XU LY | **Hộp thư vào.** Chép tệp vừa xuất vào đây, bấm **Quét lại** ở mục Nhập dữ liệu. |
-| 2 - DU LIEU DA NHAP | Tệp gốc theo năm học và số TKB, ví dụ `2025-2026\So 01\`. Bên trong có `gv\`, `lop\`, `anh\`. |
+| Excel tổng | `TKB-2025-2026-So-01-TONG.xlsx` |
+| Word thời khoá biểu giáo viên | `TKB-2025-2026-So-01-GV-A4.docx` |
+| Word thời khoá biểu lớp | `TKB-2025-2026-So-01-LOP-A4.docx` |
+| Danh sách giáo viên | `DS-GV.xlsx` |
+| Không nhận ra | để riêng trong `KHONG DUNG DINH DANG`, không xoá |
+
+
+**Không lưu trùng:** thả lại tệp có nội dung y hệt (kể cả khác tên) thì phần mềm bỏ qua. Tệp nào không dùng được, hộp xem thử nói rõ vì sao và cần tệp nào thay.
+
+### Thư mục dữ liệu
+
+Mọi tệp nằm trong **Tài liệu → TKB Zalo**:
+
+|   |   |
+|---|---|
+| 1 - CHO XU LY | Tệp vừa thả, chờ nạp. |
+| 2 - DU LIEU DA NHAP | Tệp gốc theo năm học và số thời khoá biểu, kèm ảnh và tệp Word đã cắt. |
 | 3 - DANH SACH GIAO VIEN | Tệp Excel danh sách giáo viên. |
 | 4 - KET XUAT | Bảng thống kê bạn xuất ra. |
 
 
-### Cách nhanh
-
-Tự tạo thư mục `2 - DU LIEU DA NHAP\<năm học>\So <số>\` rồi chép ba tệp vào. App thấy ngay ở tab **Kho dữ liệu đã lưu**.
-
-> **App đối chiếu thư mục với dữ liệu đã nạp.** Có tệp mà chưa nạp → báo **Chưa nạp**.
-> Tệp mới hơn lần nạp → báo **Có tệp mới hơn**, tránh gửi nhầm TKB cũ.
-
-### Tệp thừa, tệp sai
-
-Bấm **Soi thư mục** để xem tệp nào đúng, tệp nào **thừa**, tệp nào **hỏng** và hỏng thế nào. Ví dụ tệp `.doc` đời cũ phải lưu lại thành `.docx`.
-
-### Kéo thả là xong
-
-Thả tệp vào vùng **Kéo tệp vào đây** ở trang Dữ liệu. Phần mềm **đọc nội dung từng tệp** để biết đó là gì, rồi tự đặt tên chuẩn và cất đúng thư mục:
-
-|   |   |
-|---|---|
-| Excel tổng hợp | `TKB-2025-2026-So-01-TONG.xlsx` → thư mục chờ xử lý |
-| Word thời khoá biểu giáo viên | `TKB-2025-2026-So-01-GV-A4.docx` |
-| Word thời khoá biểu lớp | `TKB-2025-2026-So-01-LOP-A4.docx` |
-| Danh sách giáo viên | `DS-GV.xlsx` → thư mục danh sách giáo viên |
-| Không nhận ra | để riêng trong `KHONG DUNG DINH DANG`, không xoá |
-
-
-Tệp Word không tự nói được nó thuộc thời khoá biểu số mấy, nên hãy **thả cùng lượt với tệp Excel tổng**. Thả riêng thì tên ghi `CHUA-RO`, vẫn nhập được.
-
-### Không lưu trùng
-
-Thả lại tệp đã có, phần mềm nhận ra **nội dung y hệt** (kể cả khi tên khác) và **không lưu thêm**. Nội dung có đổi thì thay tệp cũ, kho luôn chỉ một bản.
-
-### Xong là có báo cáo
-
-Sau mỗi lần thả, phần mềm hiện bảng: từng tệp **thành gì · đặt tên gì · để ở đâu · cái nào không nhận và vì sao**, kèm bốn con số đã nhận / trùng / không nhận / thiếu dữ liệu.
-
-### Thứ tự nạp
-
-> **Nạp danh sách giáo viên trước, thời khoá biểu sau.** Chưa có ai trong danh sách thì không khớp được thời khoá biểu vào từng người, nên nút nhập thời khoá biểu sẽ bị khoá.
+Tab **Nhập tệp** có mục **Kho tệp** để xem, tạo, đổi tên, xoá thư mục ngay trong phần mềm. Phần mềm đối chiếu thư mục với dữ liệu đã nạp: có tệp **chưa nạp** hoặc **mới hơn lần nạp** thì hiện nút nạp ngay, tránh gửi nhầm thời khoá biểu cũ.
 
 ---
 
@@ -197,7 +179,9 @@ Sau mỗi lần thả, phần mềm hiện bảng: từng tệp **thành gì · 
 
 ## 5. Danh sách giáo viên
 
-### Các cột trong tệp Excel
+Nạp tệp Excel tổng là phần mềm tự tạo danh sách giáo viên từ bảng phân công. Nếu muốn có sẵn số điện thoại, thả kèm tệp danh sách giáo viên với các cột dưới đây.
+
+### Các cột trong tệp Excel danh sách giáo viên
 
 | Cột | Ý nghĩa |
 |---|---|
@@ -224,30 +208,47 @@ Bấm thẳng vào ô **họ tên, mã GV, tổ, điện thoại, email, lớp c
 
 Đổi số điện thoại thì nhớ bấm **Dò Zalo** lại cho người đó. Nút **⋯** mở hộp đầy đủ khi cần sửa nhiều trường một lúc.
 
+### Xoá toàn bộ giáo viên
+
+Biểu tượng **thùng rác** ở cuối thanh tiêu đề bảng Giáo viên xoá hết danh sách. Phải tích **Tôi hiểu** thì nút xoá mới bấm được.
+
+- Mất cả số điện thoại đã nhập và kết quả dò Zalo. Không hoàn tác được.
+- Vẫn giữ: lịch sử gửi, nhóm Zalo, người nhận ngoài danh sách.
+- Xoá xong, **nạp lại tệp thời khoá biểu** để phần mềm tạo và ghép lại giáo viên.
+
 ---
 
 <a id="nhap-tkb"></a>
 
-## 6. Nhập thời khoá biểu
+## 6. Thời khoá biểu
 
-Vào **Nhập dữ liệu**, chọn nhóm tệp rồi bấm **Nhập vào phần mềm**. App hiện bảng **xem trước** để bạn kiểm tra.
+Nạp xong, thời khoá biểu hiện ở tab **Thời khoá biểu** của trang Dữ liệu, **mặc định là bản mới nhất**. Ảnh đã được tạo sẵn.
 
-### App kiểm tra gì
+### Hộp xem thử kiểm tra gì
 
-- Số TKB, ngày thực hiện, năm học, học kỳ, tên trường. Thiếu thì cho điền tay ngay.
+- Số thời khoá biểu, ngày thực hiện, năm học, học kỳ, tên trường. Thiếu thì cho điền tay ngay.
 - Số lớp, số giáo viên, tổng tiết.
 - **Lớp nào chưa có giáo viên chủ nhiệm.**
-- Giáo viên nào **chưa khớp** danh sách.
-- Số tiết bảng phân công có khớp thời khoá biểu không.
+- Giáo viên nào **chưa khớp** danh sách — có ô **Tạo thêm những người còn thiếu** từ bảng phân công.
 
-### Nhập trùng số
+### Nạp trùng số
 
-> **Số đã có thì app cảnh báo kèm so sánh cũ – mới.** Chọn **Cập nhật** thì bản cũ được lưu vết ở tab Lịch sử bản.
+> **Số đã có thì hộp xem thử nói rõ, kèm so sánh cũ – mới.** Bấm **Nạp dữ liệu (cập nhật bản đã có)** thì bản cũ được lưu vết ở tab Lịch sử bản.
 > Không mất gì.
 
-### Tạo ảnh
+### Ảnh
 
-Vào màn **Thời khoá biểu** bấm **Tạo ảnh**. Mỗi giáo viên và mỗi lớp một ảnh, chữ to, xem rõ trên điện thoại. Bấm **Xem** ở từng dòng để soi trước.
+Mỗi giáo viên và mỗi lớp một ảnh, chữ to, xem rõ trên điện thoại. Bấm **Xem** hoặc **Trên ĐT** ở từng dòng để soi trước. Sửa chủ nhiệm xong thì bấm **Tạo ảnh** để vẽ lại.
+
+### Xoá thời khoá biểu
+
+Bấm **Xoá…** ở đầu khu Thời khoá biểu. Trong hộp xoá, chọn một trong ba cách:
+
+- Tích **từng số**.
+- Tích **cả một đợt** — các số cùng năm học và học kỳ.
+- Tích **Chọn tất cả** để xoá toàn bộ.
+
+Mặc định xoá luôn ảnh và tệp Word đã tạo của các bản đó. **Lịch sử gửi vẫn giữ**; tệp gốc vẫn còn trong thư mục dữ liệu, cần thì nạp lại.
 
 ---
 
@@ -489,7 +490,7 @@ Xem theo giáo viên với đúng một TKB thì app so **số tiết đếm đ�
 | **Phiên Zalo hết hạn** | Quét lại mã QR rồi bấm **Tiếp tục**. Phần đã gửi không bị gửi lại. |
 | **Dừng vì 3 lỗi liên tiếp** | Mất mạng, hoặc Zalo đang hạn chế. Thử gửi tay một tin trên Zalo xem còn được không. |
 | **Chạm giới hạn an toàn** | Đã gửi đủ mức trong 24 giờ. Hôm sau mở lại bấm **Tiếp tục**. |
-| **Ảnh chưa tạo** | Vào màn Thời khoá biểu bấm **Tạo ảnh**. |
+| **Ảnh chưa tạo** | Ảnh tự tạo khi nạp. Thiếu thì vào tab Thời khoá biểu bấm **Tạo ảnh**. |
 | **Thư mục báo “Có tệp mới hơn”** | Bạn chép tệp mới mà chưa nạp lại. Bấm **Nạp lại**. |
 
 

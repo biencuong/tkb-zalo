@@ -346,3 +346,24 @@ làm vân tay (buổi phải nằm trong số liệu ảnh). Nay mỗi lần g�
 Người dùng để app mở cả buổi; ba bản 0.1.13 → 0.1.15 ra sau khi mở nên số phiên bản không hề có chấm đỏ.
 Nay hỏi lại mỗi giờ và khi quay lại cửa sổ. Kiểm bằng cách giả máy bản cũ (chép `src/main` + `package.json`
 đổi version ra thư mục tạm) rồi cho chu kỳ vài giây — thấy báo lặp đúng nhịp.
+
+---
+
+## [21/9/2026] Đóng cửa sổ mà app không thoát — phải khởi động lại máy mới mở được
+
+**Hiện tượng:** chạy lần đầu được; đóng rồi mở lại thì không lên gì. Khởi động lại máy mới mở được.
+
+**Nguyên nhân:** app vẽ ảnh bằng một **cửa sổ ẩn** (offscreen) giữ suốt phiên. Electron chỉ tự thoát qua
+`window-all-closed` khi **mọi** cửa sổ đóng — cửa sổ ẩn còn nên sự kiện không bao giờ tới. Đóng cửa sổ chính
+xong app chạy ngầm không cửa sổ; lần mở sau `requestSingleInstanceLock()` thất bại → bản mới tự thoát
+("đã có bản đang chạy"), còn bản ngầm không có cửa sổ để `second-instance` đưa lên. Nhật ký chứng minh:
+phiên nào không vẽ ảnh thì có dòng "[thoat] het cua so", phiên có vẽ ảnh thì không. Bản 0.1.15 tự vẽ ảnh
+khi mở tab Thời khoá biểu nên lỗi gặp thường xuyên hơn.
+
+**Sửa:** (1) `cua.on("closed")` gọi `app.quit()` — đóng cửa sổ chính là thoát hẳn; (2) `before-quit` hẹn
+`app.exit(0)` sau 5 giây làm chốt chặn; (3) `second-instance` mà không còn cửa sổ chính thì **mở lại cửa sổ**.
+**Kiểm:** biến môi trường `TKBZALO_DU_LIEU` (thư mục dữ liệu riêng) + `TKBZALO_TU_KIEM_THOAT=1` (mở cửa sổ ẩn
+rồi đóng cửa sổ chính): có sửa → thoát sau 0,04 giây; bỏ dòng sửa → treo tới hết giờ (tái hiện đúng lỗi).
+
+**Luật:** app có cửa sổ ẩn / cửa sổ phụ thì **đóng cửa sổ chính phải gọi `app.quit()`**; đừng dựa vào
+`window-all-closed`. Khoá một bản phải có đường tự cứu khi bản đang giữ khoá mất cửa sổ.

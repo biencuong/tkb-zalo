@@ -54,6 +54,9 @@ async function moCuaSo(duongDanHtml) {
   try { return await dangNap; } finally { dangNap = null; }
 }
 
+/** Mở sẵn cửa sổ vẽ ẩn (dùng cho kịch bản tự kiểm lúc thoát app). */
+export const hamNongCuaSoVe = (duongDanHtml) => moCuaSo(duongDanHtml);
+
 export function dongCuaSoVe() {
   try { if (cua && !cua.isDestroyed()) cua.destroy(); } catch { /* */ }
   cua = null;

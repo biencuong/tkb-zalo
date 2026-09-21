@@ -10,7 +10,7 @@ import * as tep from "./kho-file.js";
 import * as zalo from "./zalo.js";
 import * as capNhat from "./cap-nhat.js";
 import { dangKyTatCa, datCuaSo, datDuongDan } from "./ipc.js";
-import { dongCuaSoVe } from "./anh-tkb.js";
+import { dongCuaSoVe, hamNongCuaSoVe } from "./anh-tkb.js";
 
 const GOC = path.dirname(path.dirname(fileURLToPath(import.meta.url)));   // …/src
 const RENDERER = path.join(GOC, "renderer");
@@ -26,6 +26,9 @@ function ghiLoiRaTep(chu) {
       "[" + new Date().toISOString() + "] " + chu + String.fromCharCode(10));
   } catch { /* không ghi được thì thôi, không để chết app */ }
 }
+
+// Thư mục dữ liệu riêng cho kịch bản kiểm thử (không đụng dữ liệu thật). Phải đặt TRƯỚC khoá một bản.
+if (process.env.TKBZALO_DU_LIEU) app.setPath("userData", process.env.TKBZALO_DU_LIEU);
 
 // Chỉ cho chạy một bản. Bản thứ hai thoát ngay và đánh thức bản đang mở.
 if (!app.requestSingleInstanceLock()) {
@@ -67,7 +70,14 @@ function taoCuaSo() {
     },
   });
   cua.once("ready-to-show", () => { cua.show(); if (process.env.TKBZALO_DEVTOOLS) cua.webContents.openDevTools({ mode: "detach" }); });
-  cua.on("closed", () => { cua = null; });
+  cua.on("closed", () => {
+    cua = null;
+    // ĐÓNG CỬA SỔ CHÍNH LÀ THOÁT HẲN. Không đợi "window-all-closed": cửa sổ vẽ ảnh ẨN vẫn còn nên sự kiện
+    // đó không bao giờ tới → app chạy ngầm không cửa sổ, lần mở sau bị chặn "đã có bản đang chạy",
+    // phải khởi động lại máy mới mở được (lỗi người dùng báo 21/9/2026).
+    ghiLoiRaTep("[thoat] dong cua so chinh");
+    app.quit();
+  });
 
   // Lỗi bên trong giao diện cũng ghi vào loi.log để còn biết đường sửa khi người dùng báo hỏng.
   cua.webContents.on("console-message", (e) => {
@@ -148,6 +158,16 @@ app.whenReady().then(() => {
   datCuaSo(cua);
   ghiLoiRaTep("[khoi dong] da mo cua so");
 
+  // Kịch bản tự kiểm thoát (chỉ khi đặt biến môi trường): mở cửa sổ vẽ ẩn như lúc tạo ảnh,
+  // rồi đóng cửa sổ chính — tiến trình phải kết thúc hẳn.
+  if (process.env.TKBZALO_TU_KIEM_THOAT) {
+    setTimeout(async () => {
+      try { await hamNongCuaSoVe(duongDan.ve_tkb_html); ghiLoiRaTep("[tu kiem] da mo cua so ve an"); }
+      catch (e) { ghiLoiRaTep("[tu kiem] khong mo duoc cua so ve: " + e.message); }
+      cua?.close();
+    }, 2500);
+  }
+
   // Tự đăng nhập lại Zalo bằng phiên đã lưu (im lặng, không hiện QR)
   if (zalo.coPhienCu()) {
     setTimeout(() => {
@@ -170,7 +190,17 @@ app.whenReady().then(() => {
 });
 
 app.on("second-instance", () => {
-  if (cua) { if (cua.isMinimized()) cua.restore(); cua.focus(); }
+  // Bản đang chạy mà không còn cửa sổ chính (chạy ngầm) thì MỞ LẠI cửa sổ — đừng để người dùng bấm mãi
+  // mà không thấy gì hiện lên.
+  if (!cua || cua.isDestroyed()) {
+    ghiLoiRaTep("[khoi dong] bam mo lan nua ma khong con cua so - mo lai cua so");
+    taoCuaSo();
+    datCuaSo(cua);
+    return;
+  }
+  if (cua.isMinimized()) cua.restore();
+  cua.show();
+  cua.focus();
 });
 
 app.on("window-all-closed", () => {
@@ -178,10 +208,16 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
 
+let dangThoat = false;
 app.on("before-quit", () => {
+  if (dangThoat) return;
+  dangThoat = true;
   dongCuaSoVe();
   try { db.dongDb(); } catch { /* */ }
+  // Chốt chặn: còn thứ gì giữ tiến trình (kết nối Zalo, cửa sổ ẩn…) thì 5 giây sau vẫn thoát hẳn.
+  setTimeout(() => { ghiLoiRaTep("[thoat] ep thoat sau 5 giay"); app.exit(0); }, 5000);
 });
+app.on("will-quit", () => ghiLoiRaTep("[thoat] xong"));
 
 process.on("uncaughtException", (e) => {
   console.error("Loi khong bat duoc:", e);

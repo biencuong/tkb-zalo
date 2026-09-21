@@ -5,6 +5,16 @@ trên GitHub và hiện trong hộp cập nhật của phần mềm.
 
 ---
 
+## 0.1.17 — Sửa lỗi đóng app rồi không mở lại được
+
+- **Lỗi:** chạy lần đầu được; đóng rồi mở lại thì không lên gì, phải khởi động lại máy.
+  Nguyên nhân: cửa sổ ẩn dùng để vẽ ảnh thời khoá biểu giữ app chạy ngầm sau khi bạn đóng cửa sổ;
+  lần mở sau app thấy "đã có bản đang chạy" nên tự tắt.
+- **Nay:** đóng cửa sổ là app **thoát hẳn**. Nếu vì lý do nào đó vẫn còn bản chạy ngầm, bấm mở app sẽ
+  **mở lại cửa sổ** thay vì im lặng.
+
+---
+
 ## 0.1.16 — Tự báo có bản mới cả khi app đang mở
 
 - Trước đây app chỉ hỏi có bản mới **một lần lúc mở**. Để app mở cả buổi thì không biết có bản mới ra sau đó.
